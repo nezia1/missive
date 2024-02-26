@@ -20,9 +20,6 @@ build_docs:
   stage: build
   variables:
     ENABLE_PDF_EXPORT: 1
-  hooks:
-    pre_get_sources_script:
-      - apt-get update && apt-get install ssh -y
   script:
     - *prepare_docs
     - 'mkdocs build --verbose --site-dir build'
