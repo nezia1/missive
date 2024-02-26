@@ -33,7 +33,7 @@ pages:
   variables:
     ENABLE_PDF_EXPORT: 0
   script:
-    - mv build public
+    - mv documentation/build public
   artifacts:
     when: on_success
     paths:
