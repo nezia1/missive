@@ -1,0 +1,10 @@
+{
+  "folders": [
+    {
+      "path": "documentation"
+    }
+  ],
+  "extensions": {
+    "recommendations": ["dart-code.flutter", "oven.bun-vscode"]
+  }
+}
