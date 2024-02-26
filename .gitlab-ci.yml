@@ -3,7 +3,7 @@ image: python:3.8-bullseye
 variables:
   PIP_CACHE_DIR: '$CI_PROJECT_DIR/.cache/pip'
   GIT_SUBMODULE_STRATEGY: recursive
-  GIT_SUBMODULE_FORCE_HTTPS: "true"
+  GIT_SUBMODULE_FORCE_HTTPS: 'true'
 
 .prepare_docs: &prepare_docs
   - cd documentation
@@ -20,6 +20,9 @@ build_docs:
   stage: build
   variables:
     ENABLE_PDF_EXPORT: 1
+  hooks:
+    pre_get_sources_script:
+      - apt-get update && apt-get install ssh -y
   script:
     - *prepare_docs
     - 'mkdocs build --verbose --site-dir build'
@@ -42,4 +45,3 @@ pages:
     - build_docs
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-
