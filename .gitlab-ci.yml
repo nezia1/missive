@@ -26,14 +26,14 @@ build_docs:
   artifacts:
     when: on_success
     paths:
-      - build
+      - documentation/build
 
 pages:
   stage: deploy
   variables:
     ENABLE_PDF_EXPORT: 0
   script:
-    - mv documentation/build public
+    - mv build public
   artifacts:
     when: on_success
     paths:
