@@ -25,10 +25,7 @@ build_docs:
     - 'mkdocs build --verbose --site-dir build'
   hooks:
     pre_get_sources_script:
-      - cat /etc/os-release
-      - env
-      - ls /usr/bin
-      - ls /bin
+      - find -name "apt-get"
       - /usr/bin/apt-get update && /usr/bin/apt-get install openssh-client -y
   artifacts:
     when: on_success
