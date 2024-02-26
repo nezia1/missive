@@ -1,3 +1,6 @@
 [submodule "documentation"]
 	path = documentation
 	url = https://gitlab.ictge.ch/anthony-rdrgz/missive-documentation
+[submodule "poc"]
+	path = poc
+	url = https://gitlab.ictge.ch/anthony-rdrgz/missive-poc
