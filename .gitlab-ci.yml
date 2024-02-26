@@ -3,6 +3,7 @@ image: python:3.8-bullseye
 variables:
   PIP_CACHE_DIR: '$CI_PROJECT_DIR/.cache/pip'
   GIT_SUBMODULE_STRATEGY: recursive
+  GIT_SUBMODULE_FORCE_HTTPS: "true"
 
 .prepare_docs: &prepare_docs
   - cd documentation
