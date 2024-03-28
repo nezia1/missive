@@ -19,7 +19,7 @@ build_docs:
       - '.cache/pip'
   stage: build
   variables:
-    ENABLE_PDF_EXPORT: 1
+    ENABLE_PDF_EXPORT: 0
   script:
     - *prepare_docs
     - 'mkdocs build --verbose --site-dir build'
@@ -30,8 +30,6 @@ build_docs:
 
 pages:
   stage: deploy
-  variables:
-    ENABLE_PDF_EXPORT: 0
   script:
     - mv documentation/build public
   artifacts:
