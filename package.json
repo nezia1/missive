@@ -1,0 +1,10 @@
+{
+	"devDependencies": {
+		"@biomejs/biome": "^1.6.1",
+		"lefthook": "^1.6.7"
+	},
+	"scripts": {
+		"prepare": "lefthook install",
+		"test": "npm run test --prefix server"
+	}
+}
