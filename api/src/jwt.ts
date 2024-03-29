@@ -1,16 +1,16 @@
-import { type JWTPayload, SignJWT, jwtVerify } from "jose";
-import type { Permissions } from "./permissions";
+import { type JWTPayload, SignJWT, jwtVerify } from 'jose'
+import type { Permissions } from './permissions'
 
 interface ScopedJWTPayload extends JWTPayload {
-	scope?: Permissions[];
+	scope?: Permissions[]
 }
 
 export class SignScopedJWT extends SignJWT {
-	protected _payload: ScopedJWTPayload;
+	protected _payload: ScopedJWTPayload
 
 	constructor(payload: ScopedJWTPayload) {
-		super(payload);
-		this._payload = payload;
+		super(payload)
+		this._payload = payload
 	}
 }
 
@@ -22,6 +22,6 @@ export async function verifyAndDecodeJWT(
 	token: string,
 	secret: Uint8Array,
 ): Promise<ScopedJWTPayload> {
-	const { payload } = await jwtVerify(token, secret);
-	return payload as ScopedJWTPayload;
+	const { payload } = await jwtVerify(token, secret)
+	return payload as ScopedJWTPayload
 }
