@@ -1,2 +1,5 @@
 # Ignore biome symlink
 biome.json
+
+node_modules/
+.tap/
