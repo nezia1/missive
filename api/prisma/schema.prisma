@@ -19,6 +19,9 @@ model User {
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   tokens    RefreshToken[]
+  temporaryMessages TemporaryMessage[]
+  preKeys  PreKey[]
+  signedPreKey SignedPreKey?
 }
 
 // RefreshToken model
@@ -28,4 +31,27 @@ model RefreshToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @db.Uuid
   createdAt DateTime @default(now())
+}
+
+model TemporaryMessage {
+  id        String   @id @default(uuid()) @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PreKey {
+  id        String   @id @default(uuid()) @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @db.Uuid
+  key       String
+}
+
+model SignedPreKey {
+  id        String   @id @default(uuid()) @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
+  userId    String   @db.Uuid @unique
+  key       String
+  signature String
 }
