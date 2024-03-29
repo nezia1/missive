@@ -1,0 +1,28 @@
+{
+	"name": "poc-flutter-api",
+	"module": "index.ts",
+	"type": "module",
+	"scripts": {
+		"dev": "tsx --watch index.ts",
+		"test": "test -f .env && tsx --env-file=.env --test src/**/*.test.ts || tsx --test src/**/*.test.ts"
+	},
+	"prisma": {
+		"seed": "tsx prisma/seed.ts"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.6.1",
+		"@types/node": "^20.10.3",
+		"bun-types": "latest",
+		"prisma": "5.10.2",
+		"tsx": "^4.7.1",
+		"typescript": "^5.4.2"
+	},
+	"dependencies": {
+		"@fastify/cookie": "^9.2.0",
+		"@prisma/client": "5.10.2",
+		"argon2": "^0.40.1",
+		"fastify": "^4.24.3",
+		"jose": "^5.1.3",
+		"otpauth": "^9.2.0"
+	}
+}
