@@ -27,6 +27,9 @@ build_docs:
     when: on_success
     paths:
       - documentation/build
+  rules:
+    - changes: 
+      - documentation/**/*
 
 pages:
   stage: deploy
