@@ -5,7 +5,7 @@ import type { FastifyPluginCallback } from 'fastify'
 import { jwtVerify } from 'jose'
 import * as OTPAuth from 'otpauth'
 
-import { AuthenticationError } from '@/errors'
+import { AuthenticationError, AuthorizationError } from '@/errors'
 import { authenticationHook, authorizationHook } from '@/hooks'
 import { Permissions } from '@/permissions'
 import { exclude, generateRandomBase32String, parseGenericError } from '@/utils'
@@ -19,17 +19,23 @@ if (!process.env.JWT_SECRET) {
 const prisma = new PrismaClient()
 const secret = new TextEncoder().encode(process.env.JWT_SECRET)
 
+interface UserParams {
+	id: string
+}
 const users: FastifyPluginCallback = (fastify, _, done) => {
-	fastify.route<{ Reply: APIReply }>({
+	fastify.route<{ Reply: APIReply; Params: UserParams }>({
 		method: 'GET',
-		url: '/me',
+		url: '/:id',
 		preParsing: [
 			authenticationHook,
 			authorizationHook([Permissions.PROFILE_READ]),
 		],
 		handler: async (request, reply) => {
+			if (request.params.id !== request.authenticatedUser?.id)
+				throw new AuthorizationError('You can only access your own profile')
+
 			const user = await prisma.user.findUniqueOrThrow({
-				where: { id: request.authenticatedUser?.id },
+				where: { id: request.params.id },
 			})
 
 			reply.status(200).send({ data: exclude(user, ['password', 'totp_url']) })
