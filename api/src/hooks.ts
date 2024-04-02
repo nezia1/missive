@@ -3,8 +3,9 @@ import type { FastifyReply, FastifyRequest } from 'fastify'
 import { jwtVerify } from 'jose'
 import { JWTInvalid } from 'jose/errors'
 
+import { verifyAndDecodeJWT } from '@/jwt'
+import type { Permissions } from '@/permissions'
 import { AuthenticationError, AuthorizationError } from './errors'
-import { verifyAndDecodeJWT } from './jwt'
 
 const prisma = new PrismaClient()
 
@@ -49,7 +50,7 @@ export async function authenticationHook(
 }
 
 // This needs to be curried to be able to pass the permissionsRequired array (Fastify hooks are functions with a specific signature, with request and reply, so we can't pass the permissionsRequired array directly)
-export function authorizationHook(permissionsRequired: string[]) {
+export function authorizationHook(permissionsRequired: Permissions[]) {
 	return async (request: FastifyRequest, reply: FastifyReply) => {
 		if (!request.authenticatedUser)
 			throw new AuthenticationError('User not authenticated')
