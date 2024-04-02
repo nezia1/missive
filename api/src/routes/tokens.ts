@@ -56,7 +56,7 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 				const isTOTPValid = totp.validate({ token: request.body.totp })
 
 				if (isTOTPValid !== 0)
-					return reply.status(401).send({ error: { status: 'totp_invalid' } })
+					return reply.status(401).send({ error: 'Invalid TOTP token' })
 			}
 			// Creating the first access and refresh tokens
 			const accessToken = await new SignScopedJWT({
