@@ -59,12 +59,16 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.route<{
 		Body: Prisma.UserUpdateInput & { enable_totp?: boolean }
 		Reply: APIReply
+		Params: UserParams
 	}>({
 		method: 'PATCH',
-		url: '/me',
+		url: '/:id',
 		preParsing: authenticationHook,
 		handler: async (request, reply) => {
 			let totp: OTPAuth.TOTP | undefined
+
+			if (request.params.id !== request.authenticatedUser?.id)
+				throw new AuthorizationError('You can only access your own profile')
 
 			// If the user wants to enable TOTP, we generate a new URL
 			if (request.body.enable_totp) {
@@ -81,7 +85,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 
 			const updatedUser = await prisma.user.update({
 				where: {
-					id: request.authenticatedUser?.id,
+					id: request.params.id,
 				},
 				data: {
 					totp_url:
@@ -103,16 +107,20 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 		},
 	})
 
-	fastify.route<{ Reply: APIReply }>({
+	fastify.route<{ Reply: APIReply; Params: UserParams }>({
 		method: 'DELETE',
-		url: '/me',
+		url: '/:id',
 		preParsing: authenticationHook,
 		handler: async (request, response) => {
 			const accessToken = request.headers.authorization?.split(' ')[1]
 			const { payload } = await jwtVerify(accessToken || '', secret)
+
+			if (request.params.id !== request.authenticatedUser?.id)
+				throw new AuthorizationError('You can only access your own profile')
+
 			await prisma.user.delete({
 				where: {
-					id: payload.sub,
+					id: request.params.id,
 				},
 			})
 
