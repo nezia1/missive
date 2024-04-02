@@ -3,6 +3,7 @@ import {
 	PrismaClientKnownRequestError,
 } from '@prisma/client/runtime/library.js'
 import {
+	JWSInvalid,
 	JWSSignatureVerificationFailed,
 	JWTExpired,
 	JWTInvalid,
@@ -55,6 +56,9 @@ export function parseGenericError(
 
 		// JWT Errors
 	} else if (error instanceof JWTInvalid) {
+		apiError.statusCode = 401
+		apiError.responseMessage = 'Invalid token'
+	} else if (error instanceof JWSInvalid) {
 		apiError.statusCode = 401
 		apiError.responseMessage = 'Invalid token'
 	} else if (error instanceof JWTExpired) {
