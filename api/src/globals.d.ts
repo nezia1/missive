@@ -5,7 +5,7 @@ export interface APIReply {
 	'2xx': {
 		data: {
 			status?: 'totp_required'
-			[key: string]: unknown
+			[key: string]: unknown | Array<{ [key: string]: unknown }>
 		}
 	}
 	204: { [key: string]: never }
