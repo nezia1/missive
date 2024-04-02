@@ -21,7 +21,7 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 					userId: request.params.id,
 				},
 			})
-			reply.status(200).send({ data: keys })
+			reply.status(200).send({ data: { keys } })
 		},
 	})
 	done()
