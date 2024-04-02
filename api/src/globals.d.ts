@@ -13,3 +13,7 @@ export interface APIReply {
 		error: string
 	}
 }
+
+export interface UserParams {
+	id: string
+}

@@ -10,7 +10,9 @@ import { authenticationHook, authorizationHook } from '@/hooks'
 import { Permissions } from '@/permissions'
 import { exclude, generateRandomBase32String, parseGenericError } from '@/utils'
 
-import type { APIReply } from '@/globals'
+import type { APIReply, UserParams } from '@/globals'
+import keys from './keys'
+
 if (!process.env.JWT_SECRET) {
 	console.error('JWT_SECRET is not defined')
 	process.exit(1)
@@ -18,11 +20,8 @@ if (!process.env.JWT_SECRET) {
 
 const prisma = new PrismaClient()
 const secret = new TextEncoder().encode(process.env.JWT_SECRET)
-
-interface UserParams {
-	id: string
-}
 const users: FastifyPluginCallback = (fastify, _, done) => {
+	fastify.register(keys)
 	fastify.route<{ Reply: APIReply; Params: UserParams }>({
 		method: 'GET',
 		url: '/:id',

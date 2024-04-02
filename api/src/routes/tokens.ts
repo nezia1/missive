@@ -60,7 +60,11 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 			}
 			// Creating the first access and refresh tokens
 			const accessToken = await new SignScopedJWT({
-				scope: [Permissions.PROFILE_READ, Permissions.PROFILE_WRITE],
+				scope: [
+					Permissions.PROFILE_READ,
+					Permissions.PROFILE_WRITE,
+					Permissions.KEYS_READ,
+				],
 			})
 				.setProtectedHeader({ alg: 'HS256' })
 				.setIssuedAt()
@@ -106,7 +110,11 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 		})
 
 		const accessToken = await new SignScopedJWT({
-			scope: [Permissions.PROFILE_READ, Permissions.PROFILE_WRITE],
+			scope: [
+				Permissions.PROFILE_READ,
+				Permissions.PROFILE_WRITE,
+				Permissions.KEYS_READ,
+			],
 		})
 			.setProtectedHeader({ alg: 'HS256' })
 			.setIssuedAt()
