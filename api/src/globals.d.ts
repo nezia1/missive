@@ -10,7 +10,6 @@ export interface APIReply {
 	}
 	204: { [key: string]: never }
 	'4xx': {
-		status?: 'totp_invalid'
-		[key: string]: unknown
+		error: string
 	}
 }
