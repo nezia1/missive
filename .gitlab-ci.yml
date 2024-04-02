@@ -29,7 +29,7 @@ build_docs:
       - documentation/build
   rules:
     - changes: 
-      - documentation/**/*
+      - documentation
 
 pages:
   stage: deploy
@@ -43,4 +43,4 @@ pages:
     - build_docs
   rules:
     - changes:
-      - documentation/**/*
+      - documentation
