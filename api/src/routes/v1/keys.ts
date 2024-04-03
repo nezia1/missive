@@ -23,7 +23,7 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 				},
 			})
 
-			// TODO: handle case when preKey is not found (we are just going to not delete and return null for now to avoid it crashing)
+			// TODO: handle case when preKey is not found (we are just going to not delete and return null for now to avoid it crashing). Ideally, we should have a last resort pre key that is always present
 			if (preKey)
 				await prisma.preKey.delete({
 					where: {
