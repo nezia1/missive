@@ -40,18 +40,27 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 	})
 
 	fastify.route<{
-		Body: Prisma.OneTimePreKeyCreateManyInput[]
+		Body: {
+			oneTimePreKeys: Prisma.OneTimePreKeyCreateManyInput[]
+			signedPreKey?: Prisma.SignedPreKeyCreateInput
+		}
 		Reply: APIReply
 		Params: UserParams
 	}>({
 		method: 'POST',
-		url: '/:id/keys/pre',
+		url: '/:id/keys',
 		preParsing: [
 			authenticationHook,
 			authorizationHook([Permissions.KEYS_WRITE]),
 		],
 		handler: async (request, reply) => {
-			await prisma.oneTimePreKey.createMany({ data: request.body })
+			await prisma.oneTimePreKey.createMany({
+				data: request.body.oneTimePreKeys,
+			})
+
+			if (request.body.signedPreKey)
+				await prisma.signedPreKey.create({ data: request.body.signedPreKey })
+
 			reply.status(204).send()
 		},
 	})
