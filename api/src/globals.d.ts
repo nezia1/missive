@@ -1,5 +1,3 @@
-import { StringAsNumber } from 'fastify/types/utils'
-
 // TODO add more status for both interfaces
 export interface APIReply {
 	'2xx': {
