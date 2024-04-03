@@ -17,17 +17,17 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 			authorizationHook([Permissions.KEYS_READ]),
 		],
 		handler: async (request, reply) => {
-			const preKey = await prisma.preKey.findFirst({
+			const oneTimePreKey = await prisma.oneTimePreKey.findFirst({
 				where: {
 					userId: request.params.id,
 				},
 			})
 
-			// TODO: handle case when preKey is not found (we are just going to not delete and return null for now to avoid it crashing). Ideally, we should have a last resort pre key that is always present
-			if (preKey)
-				await prisma.preKey.delete({
+			// TODO: handle case when oneTimePreKey is not found (we are just going to not delete and return null for now to avoid it crashing). Ideally, we should have a last resort pre key that is always present
+			if (oneTimePreKey)
+				await prisma.oneTimePreKey.delete({
 					where: {
-						id: preKey?.id,
+						id: oneTimePreKey?.id,
 					},
 				})
 
@@ -35,12 +35,12 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 				where: { userId: request.params.id },
 			})
 
-			reply.status(200).send({ data: { preKey, signedPreKey } })
+			reply.status(200).send({ data: { oneTimePreKey, signedPreKey } })
 		},
 	})
 
 	fastify.route<{
-		Body: Prisma.PreKeyCreateManyInput[]
+		Body: Prisma.OneTimePreKeyCreateManyInput[]
 		Reply: APIReply
 		Params: UserParams
 	}>({
@@ -51,7 +51,7 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 			authorizationHook([Permissions.KEYS_WRITE]),
 		],
 		handler: async (request, reply) => {
-			await prisma.preKey.createMany({ data: request.body })
+			await prisma.oneTimePreKey.createMany({ data: request.body })
 			reply.status(204).send()
 		},
 	})

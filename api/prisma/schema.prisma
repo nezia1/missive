@@ -20,7 +20,7 @@ model User {
   updatedAt DateTime       @updatedAt
   tokens    RefreshToken[]
   temporaryMessages TemporaryMessage[]
-  preKeys  PreKey[]
+  oneTimePreKeys  OneTimePreKey[]
   signedPreKey SignedPreKey?
 }
 
@@ -41,7 +41,7 @@ model TemporaryMessage {
   updatedAt DateTime @updatedAt
 }
 
-model PreKey {
+model OneTimePreKey {
   id        String   @id @default(uuid()) @db.Uuid
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @db.Uuid
