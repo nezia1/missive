@@ -113,7 +113,7 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 				Permissions.KEYS_READ,
 			],
 		})
-			.setProtectedHeader({ alg: 'HS256' })
+			.setProtectedHeader({ alg: 'RS256' })
 			.setIssuedAt()
 			.setSubject(user.id)
 			.setExpirationTime('15m')
