@@ -1,7 +1,8 @@
+import fs from 'node:fs'
 import { type Prisma, PrismaClient } from '@prisma/client'
 import * as argon2 from 'argon2'
 import type { FastifyPluginCallback } from 'fastify'
-import { SignJWT, jwtVerify } from 'jose'
+import { SignJWT, importPKCS8, importSPKI, jwtVerify } from 'jose'
 import * as OTPAuth from 'otpauth'
 
 import { AuthenticationError } from '@/errors'
@@ -11,12 +12,9 @@ import { parseGenericError } from '@/utils'
 import { SignScopedJWT } from '@/jwt'
 import { JWTInvalid } from 'jose/errors'
 
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import type { APIReply } from '@/globals'
-
-if (!process.env.JWT_SECRET) {
-	console.error('JWT_SECRET is not defined')
-	process.exit(1)
-}
 
 const prisma = new PrismaClient()
 
@@ -25,8 +23,27 @@ type UserLoginInput = Prisma.UserWhereUniqueInput & {
 	totp?: string
 }
 
-// TODO: switch to a more robust secret (e.g. a private key)
-const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+// TODO: make this into a class / function
+// This is needed due to the way ES modules work
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+const privateKeyPem = fs.readFileSync(
+	path.join(__dirname, '../../../private_key.pem'),
+	{
+		encoding: 'utf-8',
+	},
+)
+
+// Importing OpenSSL keys
+const publicKeyPem = fs.readFileSync(
+	path.join(__dirname, '../../../public_key.pem'),
+	{
+		encoding: 'utf-8',
+	},
+)
+
+const privateKey = await importPKCS8(privateKeyPem, 'P256')
+const publicKey = await importSPKI(publicKeyPem, 'P256')
 
 const tokens: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.post<{ Body: UserLoginInput; Reply: APIReply }>(
@@ -66,18 +83,18 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 					Permissions.KEYS_READ,
 				],
 			})
-				.setProtectedHeader({ alg: 'HS256' })
+				.setProtectedHeader({ alg: 'RS256' })
 				.setIssuedAt()
 				.setSubject(user.id)
 				.setExpirationTime('15m')
-				.sign(secret)
+				.sign(privateKey)
 
 			const refreshToken = await new SignJWT()
-				.setProtectedHeader({ alg: 'HS256' })
+				.setProtectedHeader({ alg: 'RS256' })
 				.setIssuedAt()
 				.setSubject(user.id)
 				.setExpirationTime('30d')
-				.sign(secret)
+				.sign(privateKey)
 
 			// This needs to be stored in the database
 			await prisma.refreshToken.create({
@@ -104,7 +121,7 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 
 		if (!refreshToken) throw new JWTInvalid('Missing refresh token')
 
-		const { payload } = await jwtVerify(refreshToken, secret)
+		const { payload } = await jwtVerify(refreshToken, publicKey)
 		const user = await prisma.user.findUniqueOrThrow({
 			where: { id: payload.sub },
 		})
@@ -120,7 +137,7 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 			.setIssuedAt()
 			.setSubject(user.id)
 			.setExpirationTime('15m')
-			.sign(secret)
+			.sign(privateKey)
 		reply.status(200).send({ data: { accessToken } })
 	})
 

@@ -1,20 +1,29 @@
-import { PrismaClient, type User } from '@prisma/client'
-import type { FastifyReply, FastifyRequest } from 'fastify'
-import { jwtVerify } from 'jose'
-import { JWTInvalid } from 'jose/errors'
-
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { verifyAndDecodeJWT } from '@/jwt'
 import type { Permissions } from '@/permissions'
+import { PrismaClient, type User } from '@prisma/client'
+import type { FastifyReply, FastifyRequest } from 'fastify'
+import { importSPKI } from 'jose'
+import { JWTInvalid } from 'jose/errors'
 import { AuthenticationError, AuthorizationError } from './errors'
 
 const prisma = new PrismaClient()
 
-if (process.env.JWT_SECRET === null) {
-	console.error('JWT_SECRET is not defined')
-	process.exit(1)
-}
+// TODO: make this into a class / function
+// This is needed due to the way ES modules work
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+// Importing OpenSSL keys
+const publicKeyPem = fs.readFileSync(
+	path.join(__dirname, '../public_key.pem'),
+	{
+		encoding: 'utf-8',
+	},
+)
+
+const publicKey = await importSPKI(publicKeyPem, 'P256')
 
 // This is needed to augment the FastifyRequest type and add the authenticatedUser property
 declare module 'fastify' {
@@ -33,7 +42,7 @@ export async function authenticationHook(
 	if (!accessToken) throw new JWTInvalid('Missing access token')
 
 	// Get access token payload and check if it matches a user (jwtVerify throws an error if the token is invalid for any reason)
-	const payload = await verifyAndDecodeJWT(accessToken, secret)
+	const payload = await verifyAndDecodeJWT(accessToken, publicKey)
 
 	const user = await prisma.user.findUniqueOrThrow({
 		where: { id: payload.sub },

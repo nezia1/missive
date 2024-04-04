@@ -1,4 +1,4 @@
-import { type JWTPayload, SignJWT, jwtVerify } from 'jose'
+import { type JWTPayload, type KeyLike, SignJWT, jwtVerify } from 'jose'
 import type { Permissions } from './permissions'
 
 interface ScopedJWTPayload extends JWTPayload {
@@ -20,7 +20,7 @@ export class SignScopedJWT extends SignJWT {
 /// @returns {Promise<ScopedJWTPayload>} - The decoded payload with the scope/permissions
 export async function verifyAndDecodeJWT(
 	token: string,
-	secret: Uint8Array,
+	secret: KeyLike,
 ): Promise<ScopedJWTPayload> {
 	const { payload } = await jwtVerify(token, secret)
 	return payload as ScopedJWTPayload
