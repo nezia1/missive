@@ -2,24 +2,25 @@ import assert from 'node:assert'
 import { describe, it } from 'node:test'
 import app from '@/app'
 import { sampleUsers } from '@/constants'
-import { jwtVerify } from 'jose'
+import { loadKeys } from '@/utils'
+import { importSPKI, jwtVerify } from 'jose'
 
 const userWithTOTP = sampleUsers[0]
 const userWithoutTOTP = sampleUsers[1]
 
 const successfulResponseWithoutTOTP = await app.inject({
 	method: 'POST',
-	url: '/tokens',
+	url: '/v1/tokens',
 	payload: {
 		name: userWithoutTOTP.name,
 		password: userWithoutTOTP.password,
 	},
 })
 
-describe('POST /tokens', async () => {
+describe('POST /v1/tokens', async () => {
 	const successfulResponseWithTOTP = await app.inject({
 		method: 'POST',
-		url: '/tokens',
+		url: '/v1/tokens',
 		payload: {
 			name: userWithTOTP.name,
 			password: userWithTOTP.password,
@@ -28,7 +29,7 @@ describe('POST /tokens', async () => {
 
 	const unsuccessfulResponse = await app.inject({
 		method: 'POST',
-		url: '/tokens',
+		url: '/v1/tokens',
 		payload: {
 			name: 'nonexistent',
 			password: 'nonexistent',
@@ -52,22 +53,22 @@ describe('POST /tokens', async () => {
 	})
 })
 
-describe('PUT /tokens', async () => {
-	const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+describe('PUT /v1/tokens', async () => {
+	const { publicKeyPem } = loadKeys()
+	const publicKey = await importSPKI(publicKeyPem, 'P256')
 
 	const successfullyRefreshedTokenResponse = await app.inject({
 		method: 'PUT',
-		url: '/tokens',
+		url: '/v1/tokens',
 		cookies: {
 			refreshToken: successfulResponseWithoutTOTP.cookies[0].value,
 		},
 	})
-
 	const accessToken = successfullyRefreshedTokenResponse.json().data.accessToken
 
 	let isAccessTokenValid: boolean
 	try {
-		await jwtVerify(accessToken, secret)
+		await jwtVerify(accessToken, publicKey)
 		isAccessTokenValid = true
 	} catch {
 		isAccessTokenValid = false
