@@ -26,8 +26,10 @@ Après avoir cloné le dépôt en local et installé les prérequis, il faut cr�
 
 Il faudra également générer les clés pour signer les tokens JWT. Pour cela, vous pouvez utiliser les commandes suivantes :
 
-- `openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048`
-- `openssl rsa -pubout -in private_key.pem -out public_key.pem`
+```bash
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048`
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+```
 
 Assurez vous de les générer à la racine du dossier `api`.
 
