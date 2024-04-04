@@ -1,3 +1,7 @@
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { AuthenticationError, AuthorizationError } from '@/errors'
 import {
 	PrismaClientInitializationError,
 	PrismaClientKnownRequestError,
@@ -8,8 +12,6 @@ import {
 	JWTExpired,
 	JWTInvalid,
 } from 'jose/errors'
-
-import { AuthenticationError, AuthorizationError } from './errors'
 
 interface ParseErrorOptions {
 	notFoundMessage: string
@@ -145,4 +147,28 @@ export function exclude<T>(model: T, excludedFields: (keyof T)[]): Partial<T> {
 	}
 
 	return newModel
+}
+
+/**
+ * Load the private and public keys from the filesystem.
+ * @returns {Object} - An object containing the private and public keys as strings.
+ */
+export function loadKeys() {
+	const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+	const privateKeyPem = fs.readFileSync(
+		path.join(__dirname, '../private_key.pem'),
+		{
+			encoding: 'utf-8',
+		},
+	)
+
+	const publicKeyPem = fs.readFileSync(
+		path.join(__dirname, '../public_key.pem'),
+		{
+			encoding: 'utf-8',
+		},
+	)
+
+	return { privateKeyPem, publicKeyPem }
 }

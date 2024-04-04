@@ -1,4 +1,3 @@
-import fs from 'node:fs'
 import { type Prisma, PrismaClient } from '@prisma/client'
 import * as argon2 from 'argon2'
 import type { FastifyPluginCallback } from 'fastify'
@@ -7,13 +6,11 @@ import * as OTPAuth from 'otpauth'
 
 import { AuthenticationError } from '@/errors'
 import { Permissions } from '@/permissions'
-import { parseGenericError } from '@/utils'
+import { loadKeys, parseGenericError } from '@/utils'
 
 import { SignScopedJWT } from '@/jwt'
 import { JWTInvalid } from 'jose/errors'
 
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import type { APIReply } from '@/globals'
 
 const prisma = new PrismaClient()
@@ -23,24 +20,7 @@ type UserLoginInput = Prisma.UserWhereUniqueInput & {
 	totp?: string
 }
 
-// TODO: make this into a class / function
-// This is needed due to the way ES modules work
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
-const privateKeyPem = fs.readFileSync(
-	path.join(__dirname, '../../../private_key.pem'),
-	{
-		encoding: 'utf-8',
-	},
-)
-
-// Importing OpenSSL keys
-const publicKeyPem = fs.readFileSync(
-	path.join(__dirname, '../../../public_key.pem'),
-	{
-		encoding: 'utf-8',
-	},
-)
+const { privateKeyPem, publicKeyPem } = loadKeys()
 
 const privateKey = await importPKCS8(privateKeyPem, 'P256')
 const publicKey = await importSPKI(publicKeyPem, 'P256')

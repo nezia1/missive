@@ -1,27 +1,18 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { AuthenticationError, AuthorizationError } from '@/errors'
 import { verifyAndDecodeJWT } from '@/jwt'
 import type { Permissions } from '@/permissions'
+import { loadKeys } from '@/utils'
 import { PrismaClient, type User } from '@prisma/client'
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { importSPKI } from 'jose'
 import { JWTInvalid } from 'jose/errors'
-import { AuthenticationError, AuthorizationError } from './errors'
 
 const prisma = new PrismaClient()
 
-// TODO: make this into a class / function
-// This is needed due to the way ES modules work
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
-// Importing OpenSSL keys
-const publicKeyPem = fs.readFileSync(
-	path.join(__dirname, '../public_key.pem'),
-	{
-		encoding: 'utf-8',
-	},
-)
+const { publicKeyPem } = loadKeys()
 
 const publicKey = await importSPKI(publicKeyPem, 'P256')
 
