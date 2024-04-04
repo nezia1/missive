@@ -1,5 +1,5 @@
 {
-	"name": "poc-flutter-api",
+	"name": "missive-api",
 	"module": "index.ts",
 	"type": "module",
 	"scripts": {
