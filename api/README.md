@@ -1,6 +1,6 @@
-# poc-flutter-api
+# Missive API
 
-Ce dossier contient la partie serveur de mon POC Flutter. Il contient une API REST qui permet de gérer et d'authentifier des utilisateurs, ainsi qu'une fonctionnalité d'authentification à deux facteurs (TOTP).
+Ce dossier contient la partie API de Missive. Il contient une API REST qui permet de gérer et d'authentifier des utilisateurs, des routes pour gérer les messages, ainsi qu'une fonctionnalité d'authentification à deux facteurs (TOTP).
 
 ## Installation
 
@@ -22,6 +22,11 @@ Après avoir cloné le dépôt en local et installé les prérequis, il faut cr�
 - `DATABASE_URL` : l'URL de la base de données PostgreSQL
 - `JWT_SECRET` : la clé secrète utilisée pour générer les tokens JWT
 - `COOKIE_SECRET` : la clé secrète utilisée pour signer les cookies
+
+#### Génération des clés
+
+- `openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048`
+- `openssl rsa -pubout -in private_key.pem -out public_key.pem`
 
 Pour lancer le serveur en mode développement :
 

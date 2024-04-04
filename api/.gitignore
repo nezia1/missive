@@ -179,3 +179,6 @@ dist
 
 # Python virtual environment
 venv
+
+# OpenSSL keys
+*.pem
