@@ -10,7 +10,7 @@ const userWithoutTOTP = sampleUsers[1]
 
 const successfulResponseWithoutTOTP = await app.inject({
 	method: 'POST',
-	url: '/v1/tokens',
+	url: '/api/v1/tokens',
 	payload: {
 		name: userWithoutTOTP.name,
 		password: userWithoutTOTP.password,
@@ -20,7 +20,7 @@ const successfulResponseWithoutTOTP = await app.inject({
 describe('POST /v1/tokens', async () => {
 	const successfulResponseWithTOTP = await app.inject({
 		method: 'POST',
-		url: '/v1/tokens',
+		url: '/api/v1/tokens',
 		payload: {
 			name: userWithTOTP.name,
 			password: userWithTOTP.password,
@@ -29,7 +29,7 @@ describe('POST /v1/tokens', async () => {
 
 	const unsuccessfulResponse = await app.inject({
 		method: 'POST',
-		url: '/v1/tokens',
+		url: '/api/v1/tokens',
 		payload: {
 			name: 'nonexistent',
 			password: 'nonexistent',
@@ -53,13 +53,13 @@ describe('POST /v1/tokens', async () => {
 	})
 })
 
-describe('PUT /v1/tokens', async () => {
+describe('PUT /api/v1/tokens', async () => {
 	const { publicKeyPem } = loadKeys()
 	const publicKey = await importSPKI(publicKeyPem, 'P256')
 
 	const successfullyRefreshedTokenResponse = await app.inject({
 		method: 'PUT',
-		url: '/v1/tokens',
+		url: '/api/v1/tokens',
 		cookies: {
 			refreshToken: successfulResponseWithoutTOTP.cookies[0].value,
 		},
