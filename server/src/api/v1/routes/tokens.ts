@@ -25,6 +25,13 @@ const { privateKeyPem, publicKeyPem } = loadKeys()
 const privateKey = await importPKCS8(privateKeyPem, 'P256')
 const publicKey = await importSPKI(publicKeyPem, 'P256')
 
+const userPermissions = [
+	Permissions.PROFILE_READ,
+	Permissions.PROFILE_WRITE,
+	Permissions.KEYS_READ,
+	Permissions.MESSAGES_READ,
+]
+
 const tokens: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.post<{ Body: UserLoginInput; Reply: APIReply }>(
 		'/',
@@ -57,11 +64,7 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 			}
 			// Creating the first access and refresh tokens
 			const accessToken = await new SignScopedJWT({
-				scope: [
-					Permissions.PROFILE_READ,
-					Permissions.PROFILE_WRITE,
-					Permissions.KEYS_READ,
-				],
+				scope: userPermissions,
 			})
 				.setProtectedHeader({ alg: 'RS256' })
 				.setIssuedAt()
@@ -107,11 +110,7 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 		})
 
 		const accessToken = await new SignScopedJWT({
-			scope: [
-				Permissions.PROFILE_READ,
-				Permissions.PROFILE_WRITE,
-				Permissions.KEYS_READ,
-			],
+			scope: userPermissions,
 		})
 			.setProtectedHeader({ alg: 'RS256' })
 			.setIssuedAt()
