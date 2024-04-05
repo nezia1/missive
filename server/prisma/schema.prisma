@@ -35,8 +35,8 @@ model RefreshToken {
 
 model PendingMessage {
   id        String   @id @default(uuid()) @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String   @db.Uuid
+  receiver      User     @relation(fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId    String   @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
