@@ -35,10 +35,10 @@ model RefreshToken {
 
 model PendingMessage {
   id        String   @id @default(uuid()) @db.Uuid
+  content String
   receiver      User     @relation(fields: [receiverId], references: [id], onDelete: Cascade)
   receiverId    String   @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  sentAt DateTime @default(now())
 }
 
 model OneTimePreKey {

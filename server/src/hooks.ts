@@ -50,6 +50,15 @@ export function authenticationHook(
 				request.authenticatedUser.permissions = payload.scope
 				break
 			}
+			case AuthenticationStrategies.API_KEY: {
+				// Get API key from headers
+				const apiKey = request.headers['x-api-key']
+				// Check if the API key is valid
+				if (!apiKey) throw new AuthenticationError('Missing API key')
+				if (apiKey !== process.env.API_KEY)
+					throw new AuthenticationError('Invalid API key')
+				break
+			}
 
 			default:
 				break
