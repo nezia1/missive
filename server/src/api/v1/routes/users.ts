@@ -5,13 +5,15 @@ import type { FastifyPluginCallback } from 'fastify'
 import { jwtVerify } from 'jose'
 import * as OTPAuth from 'otpauth'
 
+import { AuthenticationStrategies } from '@/auth-strategies'
 import { AuthenticationError, AuthorizationError } from '@/errors'
+import type { APIReply, UserParams } from '@/globals'
 import { authenticationHook, authorizationHook } from '@/hooks'
 import { Permissions } from '@/permissions'
 import { exclude, generateRandomBase32String, parseGenericError } from '@/utils'
 
-import type { APIReply, UserParams } from '@/globals'
-import keys from './keys'
+import keys from '@api/v1/routes/keys'
+import messages from '@api/v1/routes/messages'
 
 if (!process.env.JWT_SECRET) {
 	console.error('JWT_SECRET is not defined')
@@ -22,11 +24,13 @@ const prisma = new PrismaClient()
 const secret = new TextEncoder().encode(process.env.JWT_SECRET)
 const users: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.register(keys)
+	fastify.register(messages)
+
 	fastify.route<{ Reply: APIReply; Params: UserParams }>({
 		method: 'GET',
 		url: '/:id',
 		preParsing: [
-			authenticationHook,
+			authenticationHook(AuthenticationStrategies.BEARER),
 			authorizationHook([Permissions.PROFILE_READ]),
 		],
 		handler: async (request, reply) => {
@@ -62,7 +66,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 	}>({
 		method: 'PATCH',
 		url: '/:id',
-		preParsing: authenticationHook,
+		preParsing: authenticationHook(AuthenticationStrategies.BEARER),
 		handler: async (request, reply) => {
 			let totp: OTPAuth.TOTP | undefined
 
@@ -109,7 +113,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.route<{ Reply: APIReply; Params: UserParams }>({
 		method: 'DELETE',
 		url: '/:id',
-		preParsing: authenticationHook,
+		preParsing: authenticationHook(AuthenticationStrategies.BEARER),
 		handler: async (request, response) => {
 			const accessToken = request.headers.authorization?.split(' ')[1]
 			const { payload } = await jwtVerify(accessToken || '', secret)

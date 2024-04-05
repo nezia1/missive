@@ -1,6 +1,4 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { AuthenticationStrategies } from '@/auth-strategies'
 import { AuthenticationError, AuthorizationError } from '@/errors'
 import { verifyAndDecodeJWT } from '@/jwt'
 import type { Permissions } from '@/permissions'
@@ -23,30 +21,40 @@ declare module 'fastify' {
 	}
 }
 
-export async function authenticationHook(
-	request: FastifyRequest,
-	reply: FastifyReply,
-): Promise<void> {
-	// Get access token from Authorization header
-	const accessToken = request.headers.authorization?.split(' ')[1]
+// This needs to be curried to be able to pass the authenticationStrategy (Fastify hooks are functions with a specific signature, with request and reply, so we can't pass the authenticationStrategy directly)
+export function authenticationHook(
+	authenticationStrategy: AuthenticationStrategies,
+) {
+	return async (request: FastifyRequest, reply: FastifyReply) => {
+		switch (authenticationStrategy) {
+			case AuthenticationStrategies.BEARER: {
+				// Get access token from Authorization header
+				const accessToken = request.headers.authorization?.split(' ')[1]
 
-	if (!accessToken) throw new JWTInvalid('Missing access token')
+				if (!accessToken) throw new JWTInvalid('Missing access token')
 
-	// Get access token payload and check if it matches a user (jwtVerify throws an error if the token is invalid for any reason)
-	const payload = await verifyAndDecodeJWT(accessToken, publicKey)
+				// Get access token payload and check if it matches a user (jwtVerify throws an error if the token is invalid for any reason)
+				const payload = await verifyAndDecodeJWT(accessToken, publicKey)
 
-	const user = await prisma.user.findUniqueOrThrow({
-		where: { id: payload.sub },
-	})
-	// Inject the authenticated user ID in the request
-	request.authenticatedUser = user
+				const user = await prisma.user.findUniqueOrThrow({
+					where: { id: payload.sub },
+				})
+				// Inject the authenticated user ID in the request
+				request.authenticatedUser = user
 
-	if (!payload.scope)
-		throw new AuthorizationError(
-			'Token used does not have any permissions (likely a refresh token)',
-		)
+				if (!payload.scope)
+					throw new AuthorizationError(
+						'Token used does not have any permissions (likely a refresh token)',
+					)
 
-	request.authenticatedUser.permissions = payload.scope
+				request.authenticatedUser.permissions = payload.scope
+				break
+			}
+
+			default:
+				break
+		}
+	}
 }
 
 // This needs to be curried to be able to pass the permissionsRequired array (Fastify hooks are functions with a specific signature, with request and reply, so we can't pass the permissionsRequired array directly)
