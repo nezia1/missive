@@ -1,6 +1,8 @@
-# Missive API
+# Missive Server
 
-Ce dossier contient la partie API de Missive. Il contient une API REST qui permet de gérer et d'authentifier des utilisateurs, des routes pour gérer les messages, ainsi qu'une fonctionnalité d'authentification à deux facteurs (TOTP).
+Ce dossier contient la partie serveur de Missive. Il contient une API REST qui permet de gérer et d'authentifier des utilisateurs, des routes pour gérer les messages, ainsi qu'une fonctionnalité d'authentification à deux facteurs (TOTP).
+
+Il contient également un serveur WebSocket qui va permettre de gérer la partie messagerie en temps réelle.
 
 ## Installation
 

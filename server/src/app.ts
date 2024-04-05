@@ -1,10 +1,9 @@
 import cookie from '@fastify/cookie'
 import type { FastifyCookieOptions } from '@fastify/cookie'
-import { PrismaClient } from '@prisma/client'
 import Fastify from 'fastify'
 
-import tokens from '@/routes/v1/tokens'
-import users from '@/routes/v1/users'
+import tokens from '@api/v1/routes/tokens'
+import users from '@api/v1/routes/users'
 
 const fastify = Fastify({ logger: true })
 
@@ -13,8 +12,10 @@ if (process.env.COOKIE_SECRET === undefined) {
 	process.exit(1)
 }
 
-fastify.register(users, { prefix: '/v1/users' })
-fastify.register(tokens, { prefix: '/v1/tokens' })
+const apiPrefix = '/api/v1'
+
+fastify.register(users, { prefix: `${apiPrefix}/users` })
+fastify.register(tokens, { prefix: `${apiPrefix}/tokens` })
 
 fastify.register(cookie, {
 	secret: process.env.COOKIE_SECRET,

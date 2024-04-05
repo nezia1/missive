@@ -2,11 +2,11 @@ export const sampleUsers = [
 	{
 		name: 'alice',
 		password: 'Super',
-		totp: true,
+		totp: false,
 	},
 	{
 		name: 'bob',
 		password: 'Super',
-		totp: false,
+		totp: true,
 	},
 ]

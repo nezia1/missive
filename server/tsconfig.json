@@ -19,7 +19,8 @@
 			"bun-types" // add Bun global
 		],
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@api/*": ["./src/api/*"]
 		}
 	}
 }
