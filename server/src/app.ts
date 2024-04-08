@@ -1,3 +1,4 @@
+import prismaPlugin from '@/plugins/prisma'
 import tokens from '@api/v1/routes/tokens'
 import users from '@api/v1/routes/users'
 import cookie from '@fastify/cookie'
@@ -5,7 +6,6 @@ import type { FastifyCookieOptions } from '@fastify/cookie'
 import fastifyWs from '@fastify/websocket'
 import websocket from '@ws/index'
 import Fastify from 'fastify'
-import { parseGenericError } from './utils'
 
 const fastify = Fastify({ logger: true })
 
@@ -16,6 +16,7 @@ if (process.env.COOKIE_SECRET === undefined) {
 
 const apiPrefix = '/api/v1'
 
+fastify.register(prismaPlugin)
 fastify.register(fastifyWs)
 fastify.register(users, { prefix: `${apiPrefix}/users` })
 fastify.register(tokens, { prefix: `${apiPrefix}/tokens` })

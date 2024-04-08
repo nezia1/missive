@@ -1,4 +1,4 @@
-import { type Prisma, PrismaClient } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 import * as argon2 from 'argon2'
 import type { FastifyPluginCallback } from 'fastify'
 import { SignJWT, importPKCS8, importSPKI, jwtVerify } from 'jose'
@@ -12,8 +12,6 @@ import { SignScopedJWT } from '@/jwt'
 import { JWTInvalid } from 'jose/errors'
 
 import type { APIReply } from '@/globals'
-
-const prisma = new PrismaClient()
 
 type UserLoginInput = Prisma.UserWhereUniqueInput & {
 	password: string
@@ -36,7 +34,7 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.post<{ Body: UserLoginInput; Reply: APIReply }>(
 		'/',
 		async (request, reply) => {
-			const user = await prisma.user.findUnique({
+			const user = await fastify.prisma.user.findUnique({
 				where: { name: request.body.name },
 			})
 
@@ -80,7 +78,7 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 				.sign(privateKey)
 
 			// This needs to be stored in the database
-			await prisma.refreshToken.create({
+			await fastify.prisma.refreshToken.create({
 				data: {
 					value: refreshToken,
 					user: { connect: { id: user.id } },
@@ -104,7 +102,7 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 		if (!refreshToken) throw new JWTInvalid('Missing refresh token')
 
 		const { payload } = await jwtVerify(refreshToken, publicKey)
-		const user = await prisma.user.findUniqueOrThrow({
+		const user = await fastify.prisma.user.findUniqueOrThrow({
 			where: { id: payload.sub },
 		})
 

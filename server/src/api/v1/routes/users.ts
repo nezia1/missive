@@ -1,11 +1,10 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js'
 import * as argon2 from 'argon2'
 import type { FastifyPluginCallback } from 'fastify'
 import { jwtVerify } from 'jose'
 import * as OTPAuth from 'otpauth'
 
-import { AuthenticationStrategies } from '@/auth-strategies'
 import { AuthenticationError, AuthorizationError } from '@/errors'
 import type { APIReply, UserParams } from '@/globals'
 import { authenticationHook, authorizationHook } from '@/hooks'
@@ -20,7 +19,6 @@ if (!process.env.JWT_SECRET) {
 	process.exit(1)
 }
 
-const prisma = new PrismaClient()
 const secret = new TextEncoder().encode(process.env.JWT_SECRET)
 const users: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.register(keys)
@@ -37,7 +35,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 			if (request.params.id !== request.authenticatedUser?.id)
 				throw new AuthorizationError('You can only access your own profile')
 
-			const user = await prisma.user.findUniqueOrThrow({
+			const user = await fastify.prisma.user.findUniqueOrThrow({
 				where: { id: request.params.id },
 			})
 
@@ -48,7 +46,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.post<{ Body: Prisma.UserCreateInput; Reply: APIReply }>(
 		'/',
 		async (request, reply) => {
-			const newUser = await prisma.user.create({
+			const newUser = await fastify.prisma.user.create({
 				data: {
 					name: request.body.name,
 					password: await argon2.hash(request.body.password),
@@ -86,7 +84,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 				})
 			}
 
-			const updatedUser = await prisma.user.update({
+			const updatedUser = await fastify.prisma.user.update({
 				where: {
 					id: request.params.id,
 				},
@@ -99,7 +97,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 			if (!updatedUser)
 				throw new PrismaClientKnownRequestError('User not found', {
 					code: 'P2025',
-					clientVersion: Prisma.prismaVersion.client,
+					clientVersion: fastify.prismaVersion,
 				})
 
 			if (totp) {
@@ -121,7 +119,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 			if (request.params.id !== request.authenticatedUser?.id)
 				throw new AuthorizationError('You can only access your own profile')
 
-			await prisma.user.delete({
+			await fastify.prisma.user.delete({
 				where: {
 					id: request.params.id,
 				},
