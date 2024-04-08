@@ -20,7 +20,8 @@
 		],
 		"paths": {
 			"@/*": ["./src/*"],
-			"@api/*": ["./src/api/*"]
+			"@api/*": ["./src/api/*"],
+			"@ws/*": ["./src/websocket/*"]
 		}
 	}
 }

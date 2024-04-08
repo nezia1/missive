@@ -1,3 +1,4 @@
+import { AuthenticationStrategies } from '@/auth-strategies'
 import type { APIReply, UserParams } from '@/globals'
 import { authenticationHook, authorizationHook } from '@/hooks'
 import { Permissions } from '@/permissions'
@@ -13,7 +14,7 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 		method: 'GET',
 		url: '/:id/keys',
 		preParsing: [
-			authenticationHook,
+			authenticationHook(AuthenticationStrategies.BEARER),
 			authorizationHook([Permissions.KEYS_READ]),
 		],
 		handler: async (request, reply) => {
@@ -50,7 +51,7 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 		method: 'POST',
 		url: '/:id/keys',
 		preParsing: [
-			authenticationHook,
+			authenticationHook(AuthenticationStrategies.BEARER),
 			authorizationHook([Permissions.KEYS_WRITE]),
 		],
 		handler: async (request, reply) => {

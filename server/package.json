@@ -12,6 +12,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^1.6.1",
 		"@types/node": "^20.10.3",
+		"@types/ws": "^8.5.10",
 		"bun-types": "latest",
 		"prisma": "5.10.2",
 		"tsx": "^4.7.1",
@@ -19,6 +20,7 @@
 	},
 	"dependencies": {
 		"@fastify/cookie": "^9.2.0",
+		"@fastify/websocket": "^10.0.1",
 		"@prisma/client": "5.10.2",
 		"argon2": "^0.40.1",
 		"fastify": "^4.24.3",
