@@ -3,6 +3,7 @@
 	"module": "index.ts",
 	"type": "module",
 	"scripts": {
+		"start": "tsx index.ts",
 		"dev": "tsx --watch index.ts",
 		"test": "test -f .env && tsx --env-file=.env --test src/**/*.test.ts || tsx --test src/**/*.test.ts"
 	},
