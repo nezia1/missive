@@ -6,11 +6,17 @@ import { parseGenericError } from '@/utils'
 
 const prisma = new PrismaClient()
 
+interface UserMessage {
+	userId: string
+	content: string
+}
 const websocket: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.addHook('preParsing', authenticationHook)
 	fastify.get('/', { websocket: true }, (socket, req) => {
 		socket.on('message', (msg) => {
-			socket.send('WEBSOCKET IS WORKING! 🎉')
+			// TODO: handle JSON parsing error (if it's not a valid JSON string, it will crash the conneection)
+			const message = JSON.parse(msg.toString()) as UserMessage
+			socket.send(`WEBSOCKET IS WORKING 🎉!  User sent ${message.content}`)
 		})
 	})
 
