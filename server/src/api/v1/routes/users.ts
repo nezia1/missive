@@ -30,7 +30,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 		method: 'GET',
 		url: '/:id',
 		preParsing: [
-			authenticationHook(AuthenticationStrategies.BEARER),
+			authenticationHook,
 			authorizationHook([Permissions.PROFILE_READ]),
 		],
 		handler: async (request, reply) => {
@@ -66,7 +66,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 	}>({
 		method: 'PATCH',
 		url: '/:id',
-		preParsing: authenticationHook(AuthenticationStrategies.BEARER),
+		preParsing: authenticationHook,
 		handler: async (request, reply) => {
 			let totp: OTPAuth.TOTP | undefined
 
@@ -113,7 +113,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.route<{ Reply: APIReply; Params: UserParams }>({
 		method: 'DELETE',
 		url: '/:id',
-		preParsing: authenticationHook(AuthenticationStrategies.BEARER),
+		preParsing: authenticationHook,
 		handler: async (request, response) => {
 			const accessToken = request.headers.authorization?.split(' ')[1]
 			const { payload } = await jwtVerify(accessToken || '', secret)

@@ -30,7 +30,7 @@ const messages: FastifyPluginCallback = (fastify, _, done) => {
 		method: 'GET',
 		url: '/:id/messages',
 		preParsing: [
-			authenticationHook(AuthenticationStrategies.BEARER),
+			authenticationHook,
 			authorizationHook([Permissions.MESSAGES_READ]),
 		],
 		handler: async (request, reply) => {
@@ -53,7 +53,7 @@ const messages: FastifyPluginCallback = (fastify, _, done) => {
 	}>({
 		method: 'POST',
 		url: '/:id/messages',
-		preParsing: [authenticationHook(AuthenticationStrategies.API_KEY)],
+		preParsing: authenticationHook,
 		handler: async (request, reply) => {
 			const messagesWithReceiverId = request.body.map((message) => ({
 				...message,

@@ -9,10 +9,7 @@ import { AuthenticationStrategies } from '@/auth-strategies'
 const prisma = new PrismaClient()
 
 const websocket: FastifyPluginCallback = (fastify, _, done) => {
-	fastify.addHook(
-		'preParsing',
-		authenticationHook(AuthenticationStrategies.BEARER),
-	)
+	fastify.addHook('preParsing', authenticationHook)
 	fastify.get('/', { websocket: true }, (socket, req) => {
 		socket.on('message', (msg) => {
 			socket.send('WEBSOCKET IS WORKING! 🎉')

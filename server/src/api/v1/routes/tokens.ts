@@ -99,7 +99,6 @@ const tokens: FastifyPluginCallback = (fastify, _, done) => {
 	)
 
 	fastify.put<{ Reply: APIReply }>('/', async (request, reply) => {
-		// Forcing non null since we know the cookie is set because of the authentication hook
 		const refreshToken = request.cookies?.refreshToken
 
 		if (!refreshToken) throw new JWTInvalid('Missing refresh token')
