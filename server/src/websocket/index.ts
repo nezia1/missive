@@ -4,8 +4,6 @@ import type { FastifyPluginCallback } from 'fastify'
 import { authenticationHook } from '@/hooks'
 import { parseGenericError } from '@/utils'
 
-import { AuthenticationStrategies } from '@/auth-strategies'
-
 const prisma = new PrismaClient()
 
 const websocket: FastifyPluginCallback = (fastify, _, done) => {
