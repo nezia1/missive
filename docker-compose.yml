@@ -22,7 +22,7 @@ services:
     environment:
       POSTGRES_USER: prisma
       POSTGRES_PASSWORD: prisma
-      POSTGRES_DB: missive
+      POSTGRES_DB: prisma
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
