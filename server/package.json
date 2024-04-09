@@ -16,6 +16,7 @@
 		"@types/ws": "^8.5.10",
 		"bun-types": "latest",
 		"prisma": "5.10.2",
+		"prisma-dbml-generator": "^0.12.0",
 		"tsx": "^4.7.1",
 		"typescript": "^5.4.2"
 	},

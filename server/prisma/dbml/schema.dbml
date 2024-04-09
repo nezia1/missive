@@ -1,0 +1,55 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id String [pk]
+  name String [unique, not null]
+  password String [not null]
+  totp_url String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  tokens RefreshToken [not null]
+  pendingMessages PendingMessage [not null]
+  oneTimePreKeys OneTimePreKey [not null]
+  signedPreKey SignedPreKey
+}
+
+Table RefreshToken {
+  id String [pk]
+  value String [unique, not null]
+  user User [not null]
+  userId String [not null]
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table PendingMessage {
+  id String [pk]
+  content String [not null]
+  receiver User [not null]
+  receiverId String [not null]
+  sentAt DateTime [default: `now()`, not null]
+}
+
+Table OneTimePreKey {
+  id String [pk]
+  user User [not null]
+  userId String [not null]
+  key String [not null]
+}
+
+Table SignedPreKey {
+  id String [pk]
+  user User [not null]
+  userId String [unique, not null]
+  key String [not null]
+  signature String [not null]
+}
+
+Ref: RefreshToken.userId > User.id [delete: Cascade]
+
+Ref: PendingMessage.receiverId > User.id [delete: Cascade]
+
+Ref: OneTimePreKey.userId > User.id [delete: Cascade]
+
+Ref: SignedPreKey.userId - User.id [delete: Cascade]
