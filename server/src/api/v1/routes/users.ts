@@ -2,24 +2,26 @@ import type { Prisma } from '@prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js'
 import * as argon2 from 'argon2'
 import type { FastifyPluginCallback } from 'fastify'
-import { jwtVerify } from 'jose'
+import { importSPKI, jwtVerify } from 'jose'
 import * as OTPAuth from 'otpauth'
 
 import { AuthenticationError, AuthorizationError } from '@/errors'
 import type { APIReply, UserParams } from '@/globals'
 import { authenticationHook, authorizationHook } from '@/hooks'
 import { Permissions } from '@/permissions'
-import { exclude, generateRandomBase32String, parseGenericError } from '@/utils'
+import {
+	exclude,
+	generateRandomBase32String,
+	loadKeys,
+	parseGenericError,
+} from '@/utils'
 
 import keys from '@api/v1/routes/keys'
 import messages from '@api/v1/routes/messages'
 
-if (!process.env.JWT_SECRET) {
-	console.error('JWT_SECRET is not defined')
-	process.exit(1)
-}
+const { publicKeyPem } = loadKeys()
+const publicKey = await importSPKI(publicKeyPem, 'P256')
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET)
 const users: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.register(keys)
 	fastify.register(messages)
@@ -113,9 +115,6 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 		url: '/:id',
 		preParsing: authenticationHook,
 		handler: async (request, response) => {
-			const accessToken = request.headers.authorization?.split(' ')[1]
-			const { payload } = await jwtVerify(accessToken || '', secret)
-
 			if (request.params.id !== request.authenticatedUser?.id)
 				throw new AuthorizationError('You can only access your own profile')
 

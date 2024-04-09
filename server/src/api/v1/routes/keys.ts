@@ -4,8 +4,6 @@ import { Permissions } from '@/permissions'
 import type { Prisma } from '@prisma/client'
 import type { FastifyPluginCallback } from 'fastify'
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET)
-
 const keys: FastifyPluginCallback = (fastify, _, done) => {
 	// Gets the first pre key for a user, as well as the signed pre key
 	fastify.route<{ Reply: APIReply; Params: UserParams }>({
