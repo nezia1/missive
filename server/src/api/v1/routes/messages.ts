@@ -25,7 +25,7 @@ const messages: FastifyPluginCallback = (fastify, _, done) => {
 			const messagesWithoutId = messages.map((message) =>
 				exclude(message, ['receiverId']),
 			)
-			reply.status(200).send({ data: { messagesWithoutId } })
+			reply.status(200).send({ data: { messages: messagesWithoutId } })
 		},
 	})
 
