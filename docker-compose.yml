@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: 
@@ -27,10 +25,20 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U prisma"]
-      interval: 10s
-      timeout: 5s
+      interval: 5s
       retries: 5
 
+#  caddy:
+#    image: caddy:2
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - ./Caddyfile:/etc/caddy/Caddyfile
+#      - caddy_data:/data
+#      - caddy_config:/config
 
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:

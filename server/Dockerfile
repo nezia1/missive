@@ -3,16 +3,16 @@ ARG DATABASE_URL
 WORKDIR /app
 
 COPY package*.json ./
+COPY prisma ./prisma/
 
 RUN npm install
 
 COPY . .
 
-RUN npx prisma generate
-
 FROM node:20-alpine
 ARG DATABASE_URL
 WORKDIR /app
+
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/ .
 
