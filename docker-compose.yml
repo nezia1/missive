@@ -2,8 +2,6 @@ services:
   app:
     build: 
       context: server/.
-    ports:
-      - "8080:8080"
     environment:
       DATABASE_URL: postgresql://prisma:prisma@db:5432/missive?schema=public
       API_KEY: secret
