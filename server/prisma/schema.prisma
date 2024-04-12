@@ -20,7 +20,9 @@ model User {
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   tokens    RefreshToken[]
-  pendingMessages PendingMessage[]
+  pendingMessages PendingMessage[] @relation("ReceivedMessages")
+  // this is a virtual relation to comply with Prisma's limitation of not being able to have a relation with the same model twice if one of them is unidirectional
+  sentMessages    PendingMessage[]  @relation("SentMessages", references: [], fields: [])
   oneTimePreKeys  OneTimePreKey[]
   signedPreKey SignedPreKey?
 }
@@ -35,11 +37,13 @@ model RefreshToken {
 }
 
 model PendingMessage {
-  id        String   @id @default(uuid()) @db.Uuid
-  content String
-  receiver      User     @relation(fields: [receiverId], references: [id], onDelete: Cascade)
-  receiverId    String   @db.Uuid
-  sentAt DateTime @default(now())
+  id          String   @id @default(uuid()) @db.Uuid
+  content     String  
+  receiverId  String   @db.Uuid
+  receiver    User     @relation(name: "ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  senderId    String   @db.Uuid
+  sender      User     @relation(name: "SentMessages", fields: [senderId], references: [id])
+  sentAt      DateTime @default(now())
 }
 
 model OneTimePreKey {
