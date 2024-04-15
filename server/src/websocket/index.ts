@@ -1,14 +1,8 @@
-import type { PendingMessage, Prisma, PrismaClient } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 import type { FastifyPluginCallback } from 'fastify'
 
-import { randomUUID } from 'node:crypto'
 import { authenticationHook } from '@/hooks'
-import { parseGenericError } from '@/utils'
-
-interface UserMessage {
-	userId: string
-	content: string
-}
+import { exclude, parseGenericError } from '@/utils'
 
 enum MessageStatus {
 	SENT = 'sent',
@@ -44,17 +38,17 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 			socket.send(
 				JSON.stringify({
 					status: MessageStatus.SENT,
-					message: pendingMessage,
+					message: exclude(pendingMessage, ['senderId']),
 				}),
 			)
 
 			if (connections.has(message.receiverId)) {
 				const receiver = connections.get(message.receiverId)
-				receiver?.send(JSON.stringify(pendingMessage))
+				receiver?.send(JSON.stringify(exclude(pendingMessage, ['receiverId'])))
 				socket.send(
 					JSON.stringify({
 						status: MessageStatus.DELIVERED,
-						message: pendingMessage,
+						message: exclude(pendingMessage, ['senderId']),
 					}),
 				)
 			} else {
