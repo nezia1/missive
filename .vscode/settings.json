@@ -1,0 +1,13 @@
+{
+	"print.folder.exclude": [
+		"{bin,obj,out}",
+		"node_modules",
+		"data",
+		"**/*.{bin,exe,dll,hex,pdb,pdf,pfx,png,jpg,gif,bmp,suo,design,md,pem}",
+		"**/.gitignore",
+		"prisma/dbml",
+		"prisma/migrations"
+	],
+	"print.lineNumbers": "on",
+	"print.folder.includeFileList": true
+}
