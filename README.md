@@ -4,6 +4,8 @@
   - [Installation](#installation)
     - [Prérequis](#prérequis)
     - [Procédure](#procédure)
+      - [Production](#production)
+      - [Local](#local)
   - [Organisation du projet](#organisation-du-projet)
 
 Missive est une application de messagerie sécurisée, basée sur le protocole Signal. Elle permet d'échanger des messages chiffrés de bout-en-bout avec différents utilisateurs. Elle a été réalisée dans le cadre du travail de diplôme de technicien ES en développement d'applications au CFPT informatique de Genève, promotion 2024.
@@ -22,6 +24,17 @@ Vous pouvez retrouver la documentation complète de l'application [sur cette pag
 
 Les procédures d'installation de la partie serveur et client sont détaillées dans un `README.md` présent dans leur dossier respectif.
 
+Un docker-compose est disponible à la racine du projet, et permet de déployer l'application sur un serveur cloud, ou alors de lancer un déploiement local.
+
+#### Production
+
+`docker compose up -f docker-compose.yml -f docker-compose.prod.yml up -d`
+
+#### Local
+
+`docker compose up -f docker-compose.yml -f docker-compose.dev.yml up -d`
+
+```bash
 ## Organisation du projet
 
 Le projet est découpé en multiples sous dossiers et sous dépôts :

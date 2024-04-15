@@ -1,0 +1,5 @@
+services:
+  caddy:
+    volumes:
+      - ./prod.Caddyfile:/etc/caddy/Caddyfile
+

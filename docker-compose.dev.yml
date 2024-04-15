@@ -1,0 +1,7 @@
+services:
+  caddy:
+    volumes:
+      - ./dev.Caddyfile:/etc/caddy/Caddyfile
+  db:
+    ports:
+      - "5432:5432"
