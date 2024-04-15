@@ -1,4 +1,3 @@
-import type { AuthenticationStrategies } from '@/auth-strategies'
 import { AuthenticationError, AuthorizationError } from '@/errors'
 import { verifyAndDecodeJWT } from '@/jwt'
 import type { Permissions } from '@/permissions'
