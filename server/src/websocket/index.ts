@@ -88,9 +88,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 
 		request.log.error(apiError.message)
 
-		return reply
-			.code(apiError.statusCode)
-			.send({ error: apiError.responseMessage })
+		reply.code(apiError.statusCode)
 	})
 
 	done()
