@@ -28,11 +28,15 @@ Un docker-compose est disponible à la racine du projet, et permet de déployer 
 
 #### Production
 
-`docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d`
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
 
 #### Local
 
-`docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d`
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+```
 
 ## Organisation du projet
 
