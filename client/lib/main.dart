@@ -50,10 +50,10 @@ class FlutterPOC extends StatelessWidget {
         builder: (context, state) => const SettingsScreen(),
       )
     ],
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final loggingIn = state.matchedLocation == '/login';
 
-      if (!_userProvider.isLoggedIn) return loggingIn ? null : '/login';
+      if (!(await _userProvider.isLoggedIn)) return loggingIn ? null : '/login';
 
       if (loggingIn) {
         if (_router.canPop()) _router.pop();

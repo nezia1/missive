@@ -11,7 +11,6 @@ import 'package:missive/constants/api.dart';
 /// -  authentication (login, logout, token management)
 /// - profile
 class AuthProvider extends ChangeNotifier {
-  bool _isLoggedIn = false;
   User? _user;
   final http.Client _httpClient;
   final FlutterSecureStorage _secureStorage;
@@ -21,13 +20,21 @@ class AuthProvider extends ChangeNotifier {
     return await _secureStorage.read(key: 'accessToken');
   }
 
+  /// Returns the refresh token as [String], or null if it's not available.
+  Future<String?> get refreshToken async {
+    return await _secureStorage.read(key: 'refreshToken');
+  }
+
   /// Returns the currently authenticated [User], or null if it's not available.
   Future<User?> get user async {
     if (_user == null) await loadProfile();
     return _user;
   }
 
-  bool get isLoggedIn => _isLoggedIn;
+  /// The user is logged in if the refresh token is available.
+  Future<bool> get isLoggedIn async {
+    return await refreshToken != null;
+  }
 
   /// Creates a new [AuthProvider] with an optional [http.Client] and [FlutterSecureStorage].
   AuthProvider({http.Client? httpClient, FlutterSecureStorage? secureStorage})
@@ -74,7 +81,6 @@ class AuthProvider extends ChangeNotifier {
       await _secureStorage.write(key: 'refreshToken', value: refreshToken);
       await _secureStorage.write(key: 'accessToken', value: accessToken);
 
-      _isLoggedIn = true;
       notifyListeners();
 
       return AuthenticationSuccess();
@@ -91,7 +97,6 @@ class AuthProvider extends ChangeNotifier {
     await _secureStorage.delete(key: 'accessToken');
 
     _user = null;
-    _isLoggedIn = false;
     notifyListeners();
   }
 
