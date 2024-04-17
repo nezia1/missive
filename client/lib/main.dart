@@ -17,7 +17,7 @@ class FlutterPOC extends StatelessWidget {
   FlutterPOC({super.key});
 
   final AuthProvider _userProvider = AuthProvider();
-  static const title = 'Flutter Auth';
+  static const title = 'Missive';
 
   @override
   Widget build(BuildContext context) => MultiProvider(
