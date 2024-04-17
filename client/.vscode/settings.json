@@ -1,0 +1,3 @@
+{
+  "dart.flutterSdkPaths": ["${userHome}/flutter/bin", ".fvm/flutter_sdk"]
+}
