@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
+import 'package:missive/features/encryption/secure_storage_pre_key_store.dart';
+import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});
@@ -18,6 +21,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _userProvider = Provider.of<AuthProvider>(context, listen: false);
+    install();
+  }
+
+  void install() async {
+    final preKeyStore = SecureStoragePreKeyStore(const FlutterSecureStorage());
+    final preKeys = generatePreKeys(0, 110);
+    for (var p in preKeys) {
+      await preKeyStore.storePreKey(p.id, p);
+    }
   }
 
   @override
