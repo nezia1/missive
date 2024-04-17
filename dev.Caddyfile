@@ -1,4 +1,3 @@
-localhost {
-    tls internal
+localhost:80 {
     reverse_proxy app:8080
 }

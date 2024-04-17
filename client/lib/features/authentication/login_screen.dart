@@ -50,6 +50,8 @@ class _LoginScreenState extends State<LoginScreen> {
       case AuthenticationTimeoutError():
         setState(() => _errorMessage =
             'The request timed out (server could not be reached)');
+      case AuthenticationSuccess():
+        break;
       default:
         setState(() => _errorMessage = 'An unexpected error occurred');
         break;

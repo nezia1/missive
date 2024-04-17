@@ -56,7 +56,7 @@ class FlutterPOC extends StatelessWidget {
       if (!_userProvider.isLoggedIn) return loggingIn ? null : '/login';
 
       if (loggingIn) {
-        _router.pop();
+        if (_router.canPop()) _router.pop();
         return '/';
       }
       return null;

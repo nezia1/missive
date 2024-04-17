@@ -1,4 +1,4 @@
 class ApiConstants {
   ApiConstants._();
-  static const baseUrl = 'http://localhost:8080';
+  static const baseUrl = 'http://localhost/api/v1';
 }

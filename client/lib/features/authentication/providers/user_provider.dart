@@ -114,8 +114,9 @@ class UserProvider extends ChangeNotifier {
     }
 
     try {
+      final userId = _getSubFromToken((await accessToken)!);
       final response = await _httpClient
-          .get(Uri.parse('${ApiConstants.baseUrl}/users/me'), headers: {
+          .get(Uri.parse('${ApiConstants.baseUrl}/users/$userId'), headers: {
         'Authorization': 'Bearer ${await accessToken}',
       });
 
@@ -130,6 +131,22 @@ class UserProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+}
+
+// This function adds padding to a base64 string if needed so it can be decoded properly.
+String _normalizeBase64(String base64Url) {
+  String normalized = base64Url
+      .replaceAll('-', '+') // Replace - with +
+      .replaceAll('_', '/'); // Replace _ with /
+  return normalized.padRight((normalized.length + 3) ~/ 4 * 4,
+      '='); // Pad with = to make the length a multiple of 4
+}
+
+String _getSubFromToken(String token) {
+  final normalizedPayload = _normalizeBase64(token.split('.')[1]);
+  final payload =
+      jsonDecode(String.fromCharCodes(base64Decode(normalizedPayload)));
+  return payload['sub'];
 }
 
 // Represents the result of an authentication attempt.
