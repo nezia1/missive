@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:missive/features/authentication/providers/user_provider.dart';
+import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'totp_modal.dart';
 
@@ -39,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final loginResult = await Provider.of<UserProvider>(context, listen: false)
+    final loginResult = await Provider.of<AuthProvider>(context, listen: false)
         .login(_name, _password, _totp);
 
     switch (loginResult) {
@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               _loggingIn = true;
                               bool authenticationSucceeded = false;
                               final loginResult =
-                                  await Provider.of<UserProvider>(context,
+                                  await Provider.of<AuthProvider>(context,
                                           listen: false)
                                       .login(_name, _password, totp);
                               switch (loginResult) {

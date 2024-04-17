@@ -9,14 +9,14 @@ import 'package:missive/features/authentication/login_screen.dart';
 import 'package:missive/features/home/screens/home_screen.dart';
 
 // providers
-import 'package:missive/features/authentication/providers/user_provider.dart';
+import 'package:missive/features/authentication/providers/auth_provider.dart';
 
 void main() => runApp(FlutterPOC());
 
 class FlutterPOC extends StatelessWidget {
   FlutterPOC({super.key});
 
-  final UserProvider _userProvider = UserProvider();
+  final AuthProvider _userProvider = AuthProvider();
   static const title = 'Flutter Auth';
 
   @override

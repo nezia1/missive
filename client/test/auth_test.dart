@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
-import 'package:missive/features/authentication/providers/user_provider.dart';
+import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mockito/mockito.dart';
@@ -14,7 +14,7 @@ import 'package:missive/constants/api.dart';
 @GenerateMocks([FlutterSecureStorage])
 void main() {
   group('UserProvider', () {
-    var userProvider = UserProvider();
+    var userProvider = AuthProvider();
     SharedPreferences.setMockInitialValues({});
     test('UserProvider should return a null user when instantiated', () async {
       expect(await userProvider.user, isNull);
@@ -46,7 +46,7 @@ void main() {
               http.Response('{"status":"success","accessToken":"token"}', 200));
 
       userProvider =
-          UserProvider(httpClient: client, secureStorage: secureStorage);
+          AuthProvider(httpClient: client, secureStorage: secureStorage);
 
       final result = await userProvider.login('user', 'password');
 

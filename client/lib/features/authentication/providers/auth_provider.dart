@@ -11,7 +11,7 @@ import 'package:missive/constants/api.dart';
 /// Provides everything related to the user, such as:
 /// -  authentication (login, logout, token management)
 /// - profile
-class UserProvider extends ChangeNotifier {
+class AuthProvider extends ChangeNotifier {
   String? _accessToken;
   bool _isLoggedIn = false;
   User? _user;
@@ -34,8 +34,8 @@ class UserProvider extends ChangeNotifier {
 
   bool get isLoggedIn => _isLoggedIn;
 
-  /// Creates a new [UserProvider] with an optional [http.Client] and [FlutterSecureStorage].
-  UserProvider({http.Client? httpClient, FlutterSecureStorage? secureStorage})
+  /// Creates a new [AuthProvider] with an optional [http.Client] and [FlutterSecureStorage].
+  AuthProvider({http.Client? httpClient, FlutterSecureStorage? secureStorage})
       : _httpClient = httpClient ?? http.Client(),
         _secureStorage = secureStorage ?? const FlutterSecureStorage();
 
