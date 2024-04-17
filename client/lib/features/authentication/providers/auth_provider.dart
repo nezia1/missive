@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:missive/features/authentication/models/user.dart';
@@ -12,7 +11,6 @@ import 'package:missive/constants/api.dart';
 /// -  authentication (login, logout, token management)
 /// - profile
 class AuthProvider extends ChangeNotifier {
-  String? _accessToken;
   bool _isLoggedIn = false;
   User? _user;
   final http.Client _httpClient;
@@ -20,10 +18,7 @@ class AuthProvider extends ChangeNotifier {
 
   /// Returns the access token as [String], or null if it's not available.
   Future<String?> get accessToken async {
-    final prefs = await SharedPreferences.getInstance();
-    if (_accessToken != null) return _accessToken;
-
-    return prefs.getString('accessToken');
+    return await _secureStorage.read(key: 'accessToken');
   }
 
   /// Returns the currently authenticated [User], or null if it's not available.
@@ -42,9 +37,6 @@ class AuthProvider extends ChangeNotifier {
   /// Logs in a user and returns a [AuthenticationResult], that can either be [AuthenticationSuccess] or [AuthenticationError].
   Future<AuthenticationResult> login(String name, String password,
       [String? totp]) async {
-    // regular key-value storage
-    final prefs = await SharedPreferences.getInstance();
-
     try {
       final requestBody = jsonEncode(
           {'name': name, 'password': password, if (totp != null) 'totp': totp});
@@ -79,10 +71,8 @@ class AuthProvider extends ChangeNotifier {
           .split('=')
           .last;
 
-      // store tokens
-      _accessToken = accessToken;
       await _secureStorage.write(key: 'refreshToken', value: refreshToken);
-      await prefs.setString('accessToken', accessToken);
+      await _secureStorage.write(key: 'accessToken', value: accessToken);
 
       _isLoggedIn = true;
       notifyListeners();
@@ -97,12 +87,10 @@ class AuthProvider extends ChangeNotifier {
   /// Logs out a user and clears the stored tokens.
   /// TODO delete the refresh token from the server
   void logout() async {
-    final prefs = await SharedPreferences.getInstance();
     await _secureStorage.delete(key: 'refreshToken');
-    await prefs.remove('accessToken');
+    await _secureStorage.delete(key: 'accessToken');
 
     _user = null;
-    _accessToken = null;
     _isLoggedIn = false;
     notifyListeners();
   }
