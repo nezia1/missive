@@ -56,9 +56,12 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
 
   @override
   Future<bool> isTrustedIdentity(SignalProtocolAddress address,
-      IdentityKey? identityKey, Direction direction) {
-    // TODO: implement isTrustedIdentity
-    throw UnimplementedError();
+      IdentityKey? identityKey, Direction direction) async {
+    final trusted = await getIdentity(address);
+
+    if (identityKey == null) return false;
+
+    return trusted == null || trusted.serialize() == identityKey.serialize();
   }
 
   @override
@@ -66,6 +69,8 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
       SignalProtocolAddress address, IdentityKey? identityKey) async {
     if (identityKey == null) return false;
     String serializedIdentityKey = base64Encode(identityKey.serialize());
+    final existing = await getIdentity(address);
+    if (identityKey == existing) return false;
     await _secureStorage.write(
         key: address.toString(), value: serializedIdentityKey);
     return true;
