@@ -1,18 +1,18 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:missive/features/authentication/models/user.dart';
-import 'package:missive/constants/api.dart';
 
 /// Provides everything related to the user, such as:
 /// -  authentication (login, logout, token management)
 /// - profile
 class AuthProvider extends ChangeNotifier {
   User? _user;
-  final http.Client _httpClient;
+  final Dio _httpClient;
   final FlutterSecureStorage _secureStorage;
 
   /// Returns the access token as [String], or null if it's not available.
@@ -36,9 +36,9 @@ class AuthProvider extends ChangeNotifier {
     return await refreshToken != null;
   }
 
-  /// Creates a new [AuthProvider] with an optional [http.Client] and [FlutterSecureStorage].
-  AuthProvider({http.Client? httpClient, FlutterSecureStorage? secureStorage})
-      : _httpClient = httpClient ?? http.Client(),
+  /// Creates a new [AuthProvider] with an optional [Dio] client and [FlutterSecureStorage].
+  AuthProvider({Dio? httpClient, FlutterSecureStorage? secureStorage})
+      : _httpClient = httpClient ?? Dio(),
         _secureStorage = secureStorage ?? const FlutterSecureStorage();
 
   /// Logs in a user and returns a [AuthenticationResult], that can either be [AuthenticationSuccess] or [AuthenticationError].
@@ -49,30 +49,28 @@ class AuthProvider extends ChangeNotifier {
           {'name': name, 'password': password, if (totp != null) 'totp': totp});
 
       final response = await _httpClient
-          .post(Uri.parse('${ApiConstants.baseUrl}/tokens'),
-              headers: {'Content-Type': 'application/json'}, body: requestBody)
+          .post('/tokens', data: requestBody)
           .timeout(const Duration(seconds: 5));
-
-      final jsonBody = jsonDecode(response.body);
 
       // 200 represents a successful login attempt, but the user needs to provide a TOTP
       if (response.statusCode == 200 &&
-          jsonBody['data']['status'] == 'totp_required') {
+          response.data['data']['status'] == 'totp_required') {
         return TOTPRequiredError();
       }
 
       // 401 represents either invalid credentials or an invalid TOTP
       if (response.statusCode == 401) {
-        if (jsonBody['status'] == 'totp_invalid') {
+        if (response.data['status'] == 'totp_invalid') {
           return TOTPInvalidError();
         }
         return InvalidCredentialsError();
       }
 
-      final accessToken = jsonBody['data']['accessToken'];
+      final accessToken = response.data['data']['accessToken'];
 
       // the set-cookie header is not accessible from the http package, so we have to parse it manually
-      final refreshToken = response.headers['set-cookie']
+      final refreshToken = response.headers
+          .value('set-cookie')
           ?.split(';')
           .firstWhere((cookie) => cookie.contains('refreshToken'))
           .split('=')
@@ -84,7 +82,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
 
       return AuthenticationSuccess();
-    } on http.ClientException catch (e) {
+    } on DioException catch (e) {
       print(e.message);
       return AuthenticationError(e.message);
     }
@@ -108,13 +106,12 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final userId = _getSubFromToken((await accessToken)!);
-      final response = await _httpClient
-          .get(Uri.parse('${ApiConstants.baseUrl}/users/$userId'), headers: {
-        'Authorization': 'Bearer ${await accessToken}',
-      });
+      final response = await _httpClient.get('/users/$userId',
+          options: Options(headers: {
+            'Authorization': 'Bearer ${await accessToken}',
+          }));
 
-      User user =
-          User.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+      User user = User.fromJson(response.data);
       _user = user;
     } catch (e) {
       // TODO handle/log error

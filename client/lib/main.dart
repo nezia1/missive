@@ -11,18 +11,21 @@ import 'package:missive/features/home/screens/home_screen.dart';
 // providers
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 
+// common
+import 'package:missive/common/http.dart';
+
 void main() => runApp(FlutterPOC());
 
 class FlutterPOC extends StatelessWidget {
   FlutterPOC({super.key});
 
-  final AuthProvider _userProvider = AuthProvider();
+  final AuthProvider _authProvider = AuthProvider(httpClient: dio);
   static const title = 'Missive';
 
   @override
   Widget build(BuildContext context) => MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => _userProvider),
+          ChangeNotifierProvider(create: (_) => _authProvider),
         ],
         child: MaterialApp.router(
           title: title,
@@ -53,7 +56,7 @@ class FlutterPOC extends StatelessWidget {
     redirect: (context, state) async {
       final loggingIn = state.matchedLocation == '/login';
 
-      if (!(await _userProvider.isLoggedIn)) return loggingIn ? null : '/login';
+      if (!(await _authProvider.isLoggedIn)) return loggingIn ? null : '/login';
 
       if (loggingIn) {
         if (_router.canPop()) _router.pop();
@@ -61,6 +64,6 @@ class FlutterPOC extends StatelessWidget {
       }
       return null;
     },
-    refreshListenable: _userProvider,
+    refreshListenable: _authProvider,
   );
 }
