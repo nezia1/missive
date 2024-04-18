@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+
 import 'package:dio/dio.dart';
+import 'package:missive/common/http.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -17,11 +19,36 @@ class AuthProvider extends ChangeNotifier {
 
   /// Returns the access token as [String], or null if it's not available.
   Future<String?> get accessToken async {
-    return await _secureStorage.read(key: 'accessToken');
+    var token = await _secureStorage.read(key: 'accessToken');
+
+    if (token == null) return null;
+
+    // decode the token to check if it's expired
+    final payload = jsonDecode(String.fromCharCodes(
+        base64Decode(_normalizeBase64(token.split('.')[1]))));
+
+    if (payload['exp'] < DateTime.now().millisecondsSinceEpoch ~/ 1000) {
+      try {
+        final request = await dio.put('/tokens',
+            data: {},
+            options: Options(
+                headers: {'Cookie': 'refreshToken=${await refreshToken}'}));
+
+        final newToken = request.data['data']['accessToken'];
+        token = newToken;
+
+        await _secureStorage.write(key: 'accessToken', value: token);
+      } on DioException catch (e) {
+        print(e);
+        // TODO: handle error better (e.g. log out user, show error message, etc.)
+      }
+    }
+    return token;
   }
 
   /// Returns the refresh token as [String], or null if it's not available.
   Future<String?> get refreshToken async {
+    // TODO: logout on refresh token expiration
     return await _secureStorage.read(key: 'refreshToken');
   }
 
@@ -83,7 +110,7 @@ class AuthProvider extends ChangeNotifier {
 
       return AuthenticationSuccess();
     } on DioException catch (e) {
-      print(e.message);
+      print(e.message); // Additional methods related to pre-key management
       return AuthenticationError(e.message);
     }
   }
