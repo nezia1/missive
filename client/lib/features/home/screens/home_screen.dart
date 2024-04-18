@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
+
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/secure_storage_pre_key_store.dart';
-import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});
@@ -16,20 +19,37 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // late is needed here because AuthProvider requires context and IdentityKeyStore is initialized in initState (the constructor needs to be different whether or not the user just created their account)
   late AuthProvider _userProvider;
+  late IdentityKeyStore identityKeyStore;
+  final preKeyStore = SecureStoragePreKeyStore(const FlutterSecureStorage());
+
   @override
   void initState() {
     super.initState();
     _userProvider = Provider.of<AuthProvider>(context, listen: false);
-    install();
+    SharedPreferences.getInstance().then((prefs) {
+      // TODO: when changing accounts, this should also trigger. But not on log out, in case the user logs back and in again and it's the same account.
+      if (prefs.getBool('installed') == null) {
+        install();
+        return;
+      }
+      identityKeyStore =
+          SecureStorageIdentityKeyStore(const FlutterSecureStorage());
+    });
   }
 
   void install() async {
-    final preKeyStore = SecureStoragePreKeyStore(const FlutterSecureStorage());
+    final identityKeyPair = generateIdentityKeyPair();
+    final registrationId = generateRegistrationId(false);
+
+    identityKeyStore = SecureStorageIdentityKeyStore.fromIdentityKeyPair(
+        const FlutterSecureStorage(), identityKeyPair, registrationId);
     final preKeys = generatePreKeys(0, 110);
     for (var p in preKeys) {
       await preKeyStore.storePreKey(p.id, p);
     }
+    print((await preKeyStore.loadPreKey(0)).serialize());
   }
 
   @override
