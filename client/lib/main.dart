@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 // screens
+import 'package:missive/features/authentication/landing_screen.dart';
 import 'package:missive/features/home/screens/settings_screen.dart';
 import 'package:missive/features/authentication/login_screen.dart';
 import 'package:missive/features/home/screens/home_screen.dart';
@@ -14,10 +15,10 @@ import 'package:missive/features/authentication/providers/auth_provider.dart';
 // common
 import 'package:missive/common/http.dart';
 
-void main() => runApp(FlutterPOC());
+void main() => runApp(Missive());
 
-class FlutterPOC extends StatelessWidget {
-  FlutterPOC({super.key});
+class Missive extends StatelessWidget {
+  Missive({super.key});
 
   final AuthProvider _authProvider = AuthProvider(httpClient: dio);
   static const title = 'Missive';
@@ -39,14 +40,19 @@ class FlutterPOC extends StatelessWidget {
       );
 
   late final GoRouter _router = GoRouter(
+    initialLocation: '/landing',
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => const HomeScreen(title: FlutterPOC.title),
+        builder: (context, state) => const HomeScreen(title: Missive.title),
       ),
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginScreen(title: FlutterPOC.title),
+        builder: (context, state) => const LoginScreen(title: Missive.title),
+      ),
+      GoRoute(
+        path: '/landing',
+        builder: (context, state) => const LandingScreen(title: Missive.title),
       ),
       GoRoute(
         path: '/settings',
@@ -54,11 +60,17 @@ class FlutterPOC extends StatelessWidget {
       )
     ],
     redirect: (context, state) async {
-      final loggingIn = state.matchedLocation == '/login';
+      final onboarding = state.matchedLocation == '/login' ||
+          state.matchedLocation == '/register' ||
+          state.matchedLocation == '/landing';
 
-      if (!(await _authProvider.isLoggedIn)) return loggingIn ? null : '/login';
+      if (!(await _authProvider.isLoggedIn)) {
+        // this means we just logged out
+        if (!onboarding) return '/landing';
+        return onboarding ? null : '/';
+      }
 
-      if (loggingIn) {
+      if (onboarding) {
         if (_router.canPop()) _router.pop();
         return '/';
       }
