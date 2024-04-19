@@ -50,7 +50,7 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.route<{
 		Body: {
 			preKeys: Prisma.OneTimePreKeyCreateManyInput[]
-			signedPreKey?: Prisma.SignedPreKeyCreateInput
+			signedPreKey?: Prisma.SignedPreKeyCreateWithoutUserInput
 			identityKey?: string
 			registrationId?: number
 		}
@@ -73,7 +73,7 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 
 			if (request.body.signedPreKey)
 				await fastify.prisma.signedPreKey.create({
-					data: request.body.signedPreKey,
+					data: { ...request.body.signedPreKey, userId: request.params.id },
 				})
 
 			if (request.body.identityKey && request.body.registrationId)

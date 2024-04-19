@@ -27,6 +27,7 @@ const userPermissions = [
 	Permissions.PROFILE_READ,
 	Permissions.PROFILE_WRITE,
 	Permissions.KEYS_READ,
+	Permissions.KEYS_WRITE,
 	Permissions.MESSAGES_READ,
 ]
 
