@@ -19,18 +19,30 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // late is needed here because AuthProvider requires context and IdentityKeyStore is initialized in initState (the constructor needs to be different whether or not the user just created their account)
   late AuthProvider _userProvider;
+  late SignalProvider _signalProvider;
   late SecureStorageIdentityKeyStore identityKeyStore;
   @override
   void initState() {
     super.initState();
     _userProvider = Provider.of<AuthProvider>(context, listen: false);
+    _signalProvider = Provider.of<SignalProvider>(context, listen: false);
     SharedPreferences.getInstance().then((prefs) {
-      // TODO: when changing accounts, this should also trigger. But not on log out, in case the user logs back and in again and it's the same account.
-      // if (prefs.getBool('installed') == null) {
-      Provider.of<SignalProvider>(context, listen: false).initialize(true);
-      return;
-      // }
+      if (prefs.getBool('installed') == false) {
+        install();
+        prefs.setBool('installed', true);
+        return;
+      }
+      _signalProvider.initialize(installing: false);
     });
+  }
+
+  void install() async {
+    // TODO: when changing accounts, this should also trigger. But not on log out, in case the user logs back and in again and it's the same account.
+    await _signalProvider.initialize(
+      installing: true,
+      accountId: (await _userProvider.user)?.id,
+      accessToken: await _userProvider.accessToken,
+    );
   }
 
   @override

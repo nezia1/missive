@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:dio/dio.dart';
 
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
 import 'package:missive/features/encryption/secure_storage_session_store.dart';
 import 'package:missive/features/encryption/secure_storage_pre_key_store.dart';
 import 'package:missive/features/encryption/secure_storage_signed_pre_key_store.dart';
-import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:missive/common/http.dart';
 
 class SignalProvider extends ChangeNotifier {
@@ -15,7 +19,9 @@ class SignalProvider extends ChangeNotifier {
   late SecureStorageSessionStore _sessionStore;
 
   /// Initializes the Signal protocol stores. If [installing] is true, generates a new identity key pair, registration ID, signed pre key, and pre keys.
-  Future<void> initialize(bool installing) async {
+  /// [accountId] and [accessToken] are required when [installing] is true, and is used to upload the keys to the server.
+  Future<void> initialize(
+      {bool installing = false, String? accountId, String? accessToken}) async {
     const secureStorage = FlutterSecureStorage();
 
     _preKeyStore = SecureStoragePreKeyStore(secureStorage);
@@ -36,7 +42,20 @@ class SignalProvider extends ChangeNotifier {
         await _preKeyStore.storePreKey(p.id, p);
       }
 
-      // TODO: upload keys to server
+      await dio.post('/users/$accountId/keys',
+          data: {
+            'identityKeyPair': identityKeyPair.serialize().toList(),
+            'registrationId': registrationId,
+            'signedPreKey': {
+              'key': base64Encode(signedPreKey.serialize()),
+              'signature': base64Encode(signedPreKey.signature),
+              'userId': accountId
+            },
+            'preKeys': preKeys
+                .map((p) => {'key': base64Encode(p.serialize())})
+                .toList()
+          },
+          options: Options(headers: {'Authorization': 'Bearer $accessToken'}));
       return;
     }
 
