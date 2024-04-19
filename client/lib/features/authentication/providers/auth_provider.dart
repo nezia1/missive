@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:dio/dio.dart';
+import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:missive/common/http.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:missive/features/authentication/models/user.dart';
+import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
 
 /// Provides everything related to the user, such as:
 /// -  authentication (login, logout, token management)
@@ -67,6 +69,50 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider({Dio? httpClient, FlutterSecureStorage? secureStorage})
       : _httpClient = httpClient ?? Dio(),
         _secureStorage = secureStorage ?? const FlutterSecureStorage();
+
+  /// Registers a new user and returns a [AuthenticationResult], that can either be [AuthenticationSuccess] or [AuthenticationError].
+  Future<AuthenticationResult> register(String name, String password) async {
+    try {
+      const secureStorage = FlutterSecureStorage();
+      final identityKeyPair = generateIdentityKeyPair();
+      final registrationId = generateRegistrationId(false);
+
+      final requestBody = jsonEncode({
+        'name': name,
+        'password': password,
+        'registrationId': registrationId,
+        'identityKey': base64Encode(identityKeyPair.getPublicKey().serialize())
+      });
+
+      final response = await _httpClient
+          .post('/users', data: requestBody)
+          .timeout(const Duration(seconds: 5));
+
+      SecureStorageIdentityKeyStore.fromIdentityKeyPair(
+          secureStorage, identityKeyPair, registrationId);
+
+      final accessToken = response.data['data']['accessToken'];
+
+      // the set-cookie header is not accessible from the http package, so we have to parse it manually
+      final refreshToken = response.headers
+          .value('set-cookie')
+          ?.split(';')
+          .firstWhere((cookie) => cookie.contains('refreshToken'))
+          .split('=')
+          .last;
+
+      print(response.headers);
+      await _secureStorage.write(key: 'refreshToken', value: refreshToken);
+      await _secureStorage.write(key: 'accessToken', value: accessToken);
+
+      notifyListeners();
+
+      return AuthenticationSuccess();
+    } on DioException catch (e) {
+      print(e.message);
+      return AuthenticationError(e.message);
+    }
+  }
 
   /// Logs in a user and returns a [AuthenticationResult], that can either be [AuthenticationSuccess] or [AuthenticationError].
   Future<AuthenticationResult> login(String name, String password,

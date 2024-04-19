@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:missive/features/encryption/secure_storage_session_store.dart';
+import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 
 import 'package:missive/features/authentication/providers/auth_provider.dart';
-import 'package:missive/features/encryption/secure_storage_pre_key_store.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
-import 'package:missive/features/encryption/secure_storage_signed_pre_key_store.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});
@@ -31,35 +27,10 @@ class _HomeScreenState extends State<HomeScreen> {
     SharedPreferences.getInstance().then((prefs) {
       // TODO: when changing accounts, this should also trigger. But not on log out, in case the user logs back and in again and it's the same account.
       // if (prefs.getBool('installed') == null) {
-      install();
+      Provider.of<SignalProvider>(context, listen: false).initialize(true);
       return;
       // }
     });
-  }
-
-  void install() async {
-    const secureStorage = FlutterSecureStorage();
-    final identityKeyPair = generateIdentityKeyPair();
-    final registrationId = generateRegistrationId(false);
-
-    final signedPreKey = generateSignedPreKey(identityKeyPair, 0);
-
-    final preKeyStore = SecureStoragePreKeyStore(secureStorage);
-    final signedPreKeyStore = SecureStorageSignedPreKeyStore(secureStorage);
-    identityKeyStore = SecureStorageIdentityKeyStore.fromIdentityKeyPair(
-        secureStorage, identityKeyPair, registrationId);
-    final sessionStore = SecureStorageSessionStore(secureStorage);
-
-    final preKeys = generatePreKeys(0, 110);
-    for (var p in preKeys) {
-      await preKeyStore.storePreKey(p.id, p);
-    }
-
-    await signedPreKeyStore.storeSignedPreKey(signedPreKey.id, signedPreKey);
-
-    final remoteAddress = SignalProtocolAddress('+1234567890', 1);
-    final SessionBuilder sessionBuilder = SessionBuilder(sessionStore,
-        preKeyStore, signedPreKeyStore, identityKeyStore, remoteAddress);
   }
 
   @override

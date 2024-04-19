@@ -7,10 +7,13 @@ import 'package:go_router/go_router.dart';
 import 'package:missive/features/authentication/landing_screen.dart';
 import 'package:missive/features/home/screens/settings_screen.dart';
 import 'package:missive/features/authentication/login_screen.dart';
+import 'package:missive/features/authentication/register_screen.dart';
+
 import 'package:missive/features/home/screens/home_screen.dart';
 
 // providers
 import 'package:missive/features/authentication/providers/auth_provider.dart';
+import 'package:missive/features/encryption/providers/signal_provider.dart';
 
 // common
 import 'package:missive/common/http.dart';
@@ -21,12 +24,14 @@ class Missive extends StatelessWidget {
   Missive({super.key});
 
   final AuthProvider _authProvider = AuthProvider(httpClient: dio);
+  final SignalProvider _signalProvider = SignalProvider();
   static const title = 'Missive';
 
   @override
   Widget build(BuildContext context) => MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => _authProvider),
+          ChangeNotifierProvider(create: (_) => _signalProvider)
         ],
         child: MaterialApp.router(
           title: title,
@@ -51,6 +56,10 @@ class Missive extends StatelessWidget {
         builder: (context, state) => const LoginScreen(title: Missive.title),
       ),
       GoRoute(
+          path: '/register',
+          builder: (context, state) =>
+              const RegisterScreen(title: Missive.title)),
+      GoRoute(
         path: '/landing',
         builder: (context, state) => const LandingScreen(title: Missive.title),
       ),
@@ -70,10 +79,8 @@ class Missive extends StatelessWidget {
         return onboarding ? null : '/';
       }
 
-      if (onboarding) {
-        if (_router.canPop()) _router.pop();
-        return '/';
-      }
+      if (onboarding) return '/';
+
       return null;
     },
     refreshListenable: _authProvider,
