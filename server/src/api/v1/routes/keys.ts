@@ -51,6 +51,8 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 		Body: {
 			preKeys: Prisma.OneTimePreKeyCreateManyInput[]
 			signedPreKey?: Prisma.SignedPreKeyCreateInput
+			identityKey?: string
+			registrationId?: number
 		}
 		Reply: APIReply
 		Params: UserParams
@@ -63,12 +65,24 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 		],
 		handler: async (request, reply) => {
 			await fastify.prisma.oneTimePreKey.createMany({
-				data: request.body.preKeys,
+				data: request.body.preKeys.map((preKey) => ({
+					...preKey,
+					userId: request.params.id,
+				})),
 			})
 
 			if (request.body.signedPreKey)
 				await fastify.prisma.signedPreKey.create({
 					data: request.body.signedPreKey,
+				})
+
+			if (request.body.identityKey && request.body.registrationId)
+				await fastify.prisma.user.update({
+					where: { id: request.params.id },
+					data: {
+						identityKey: request.body.identityKey,
+						registrationId: request.body.registrationId,
+					},
 				})
 
 			reply.status(204).send()
