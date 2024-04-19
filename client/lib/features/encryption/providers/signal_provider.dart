@@ -12,6 +12,7 @@ import 'package:missive/features/encryption/secure_storage_signed_pre_key_store.
 
 import 'package:missive/common/http.dart';
 
+/// Provides higher-level functions for Missive's Signal protocol implementation. Allows to access stores, generate keys, and initialize the application, among server communication to keep the keys up to date.
 class SignalProvider extends ChangeNotifier {
   late SecureStorageIdentityKeyStore _identityKeyStore;
   late SecureStoragePreKeyStore _preKeyStore;
