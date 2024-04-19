@@ -2,7 +2,7 @@ import type { Prisma } from '@prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js'
 import * as argon2 from 'argon2'
 import type { FastifyPluginCallback } from 'fastify'
-import { importSPKI, jwtVerify } from 'jose'
+import { SignJWT, importPKCS8, importSPKI } from 'jose'
 import * as OTPAuth from 'otpauth'
 
 import { AuthenticationError, AuthorizationError } from '@/errors'
@@ -16,11 +16,20 @@ import {
 	parseGenericError,
 } from '@/utils'
 
+import { SignScopedJWT } from '@/jwt'
 import keys from '@api/v1/routes/keys'
 import messages from '@api/v1/routes/messages'
 
-const { publicKeyPem } = loadKeys()
+const { publicKeyPem, privateKeyPem } = loadKeys()
 const publicKey = await importSPKI(publicKeyPem, 'P256')
+const privateKey = await importPKCS8(privateKeyPem, 'P256')
+
+const userPermissions = [
+	Permissions.PROFILE_READ,
+	Permissions.PROFILE_WRITE,
+	Permissions.KEYS_READ,
+	Permissions.MESSAGES_READ,
+]
 
 const users: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.register(keys)
@@ -52,10 +61,42 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 				data: {
 					name: request.body.name,
 					password: await argon2.hash(request.body.password),
+					registrationId: request.body.registrationId,
+					identityKey: request.body.identityKey,
+				},
+			})
+			const accessToken = await new SignScopedJWT({
+				scope: userPermissions,
+			})
+				.setProtectedHeader({ alg: 'RS256' })
+				.setIssuedAt()
+				.setSubject(newUser.id)
+				.setExpirationTime('15m')
+				.sign(privateKey)
+
+			const refreshToken = await new SignJWT()
+				.setProtectedHeader({ alg: 'RS256' })
+				.setIssuedAt()
+				.setSubject(newUser.id)
+				.setExpirationTime('30d')
+				.sign(privateKey)
+
+			// This needs to be stored in the database
+			await fastify.prisma.refreshToken.create({
+				data: {
+					value: refreshToken,
+					user: { connect: { id: newUser.id } },
 				},
 			})
 
-			reply.status(201).send({ data: { id: newUser.id } })
+			reply
+				.status(201)
+				.setCookie('refreshToken', refreshToken, {
+					path: '/',
+					httpOnly: true,
+					sameSite: 'strict',
+				})
+				.send({ data: { accessToken } })
 		},
 	)
 

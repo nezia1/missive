@@ -32,13 +32,24 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 				where: { userId: request.params.id },
 			})
 
-			reply.status(200).send({ data: { oneTimePreKey, signedPreKey } })
+			const user = await fastify.prisma.user.findUniqueOrThrow({
+				where: { id: request.params.id },
+			})
+
+			reply.status(200).send({
+				data: {
+					oneTimePreKey,
+					signedPreKey,
+					identityKey: user.identityKey,
+					registrationId: user.registrationId,
+				},
+			})
 		},
 	})
 
 	fastify.route<{
 		Body: {
-			oneTimePreKeys: Prisma.OneTimePreKeyCreateManyInput[]
+			preKeys: Prisma.OneTimePreKeyCreateManyInput[]
 			signedPreKey?: Prisma.SignedPreKeyCreateInput
 		}
 		Reply: APIReply
@@ -52,7 +63,7 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 		],
 		handler: async (request, reply) => {
 			await fastify.prisma.oneTimePreKey.createMany({
-				data: request.body.oneTimePreKeys,
+				data: request.body.preKeys,
 			})
 
 			if (request.body.signedPreKey)
