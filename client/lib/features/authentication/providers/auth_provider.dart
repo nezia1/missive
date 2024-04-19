@@ -10,6 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:missive/features/authentication/models/user.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Provides everything related to the user, such as:
 /// -  authentication (login, logout, token management)
@@ -162,11 +163,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Logs out a user and clears the stored tokens.
-  /// TODO delete the refresh token from the server
   void logout() async {
+    // TODO: this should not happen every time the user logs out, but rather when they log out and log back in with a different account (it will work for now, needs to be improved later)
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool('installed', false);
+    });
+    // TODO revoke the refresh token from the server, not only client-side
     await _secureStorage.delete(key: 'refreshToken');
     await _secureStorage.delete(key: 'accessToken');
-
     _user = null;
     notifyListeners();
   }
