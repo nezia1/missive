@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final name = (await _userProvider.user)!.name;
     final accessToken = await _userProvider.accessToken;
     _signalProvider.buildSession(
-        name: name, accessToken: accessToken!, message: 'Hello world');
+        name: 'bob', accessToken: accessToken!, message: 'Hello world');
   }
 
   void install() async {
