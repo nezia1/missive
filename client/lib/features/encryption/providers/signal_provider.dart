@@ -20,11 +20,10 @@ class SignalProvider extends ChangeNotifier {
   late SecureStorageSessionStore _sessionStore;
 
   /// Initializes the Signal protocol stores. If [installing] is true, generates a new identity key pair, registration ID, signed pre key, and pre keys.
-  /// [accountId] and [accessToken] are required when [installing] is true, and is used to upload the keys to the server.
+  /// [name] and [accessToken] are required when [installing] is true, and is used to upload the keys to the server.
   Future<void> initialize(
-      {bool installing = false, String? accountId, String? accessToken}) async {
+      {bool installing = false, String? name, String? accessToken}) async {
     const secureStorage = FlutterSecureStorage();
-
     _preKeyStore = SecureStoragePreKeyStore(secureStorage);
     _signedPreKeyStore = SecureStorageSignedPreKeyStore(secureStorage);
     _sessionStore = SecureStorageSessionStore(secureStorage);
@@ -43,14 +42,14 @@ class SignalProvider extends ChangeNotifier {
         await _preKeyStore.storePreKey(p.id, p);
       }
 
-      await dio.post('/users/$accountId/keys',
+      await dio.post('/users/$name/keys',
           data: {
-            'identityKeyPair': identityKeyPair.serialize().toList(),
+            'identityKey':
+                base64Encode(identityKeyPair.getPublicKey().serialize()),
             'registrationId': registrationId,
             'signedPreKey': {
               'key': base64Encode(signedPreKey.serialize()),
-              'signature': base64Encode(signedPreKey.signature),
-              'userId': accountId
+              'signature': base64Encode(signedPreKey.signature)
             },
             'preKeys': preKeys
                 .map((p) => {'key': base64Encode(p.serialize())})
@@ -60,6 +59,34 @@ class SignalProvider extends ChangeNotifier {
       return;
     }
 
+    print('signedPreKeys: ${await _signedPreKeyStore.loadSignedPreKeys()}');
     _identityKeyStore = SecureStorageIdentityKeyStore(secureStorage);
+  }
+
+  // TODO: this needs to be fetched by name, not by ID. The user should be able to start a conversation with a username, not an ID. We need to update the API accordingly, but this will work for testing for now.
+  /// Fetch a pre-key bundle from the server. This is used when a user wants to start a conversation with another user.
+  Future<PreKeyBundle?> fetchPreKeyBundle(
+      String name, String accessToken) async {
+    final response = await dio.get('/users/$name/keys',
+        options: Options(headers: {'Authorization': 'Bearer $accessToken'}));
+    final data = response.data['data'];
+
+    final registrationId = data['registrationId'];
+    final identityKey =
+        IdentityKey.fromBytes(base64Decode(data['identityKey']), 0);
+    final signedPreKey = SignedPreKeyRecord.fromSerialized(
+        base64Decode(data['signedPreKey']['key']));
+    final preKey =
+        PreKeyRecord.fromBuffer(base64Decode(data['oneTimePreKey']['key']));
+
+    return PreKeyBundle(
+        registrationId,
+        1,
+        preKey.id,
+        preKey.getKeyPair().publicKey,
+        signedPreKey.id,
+        signedPreKey.getKeyPair().publicKey,
+        signedPreKey.signature,
+        identityKey);
   }
 }

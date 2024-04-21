@@ -20,11 +20,12 @@ class SecureStorageSignedPreKeyStore implements SignedPreKeyStore {
   @override
   Future<SignedPreKeyRecord> loadSignedPreKey(int signedPreKeyId) async {
     final signedPreKeys = await _loadKeys();
-    if (signedPreKeys == null) {
+    if (signedPreKeys == null ||
+        signedPreKeys[signedPreKeyId.toString()] == null) {
       throw InvalidKeyIdException('No such signed pre key id: $signedPreKeyId');
     }
     return SignedPreKeyRecord.fromSerialized(
-        signedPreKeys[signedPreKeyId.toString()]);
+        base64Decode(signedPreKeys[signedPreKeyId.toString()]!));
   }
 
   @override
@@ -35,7 +36,7 @@ class SecureStorageSignedPreKeyStore implements SignedPreKeyStore {
 
     // each element is serialized
     return signedPreKeys.values
-        .map((value) => SignedPreKeyRecord.fromSerialized(value))
+        .map((value) => SignedPreKeyRecord.fromSerialized(base64Decode(value)))
         .toList();
   }
 
@@ -53,16 +54,18 @@ class SecureStorageSignedPreKeyStore implements SignedPreKeyStore {
       int signedPreKeyId, SignedPreKeyRecord record) async {
     var signedPreKeys = await _loadKeys();
 
-    signedPreKeys ??= <String, dynamic>{};
+    signedPreKeys ??= <String, String>{};
 
-    signedPreKeys[signedPreKeyId.toString()] = record.serialize();
+    signedPreKeys[signedPreKeyId.toString()] = base64Encode(record.serialize());
     await _secureStorage.write(
         key: 'signedPreKeys', value: jsonEncode(signedPreKeys));
   }
 
+  /// Load signed pre-keys from secure storage as base 64 encoded [SignedPreKeyRecord]s.
   Future<Map<String, dynamic>?> _loadKeys() async {
     final preKeysString = await _secureStorage.read(key: 'signedPreKeys');
     if (preKeysString == null) return null;
-    return jsonDecode(preKeysString) as Map<String, dynamic>;
+
+    return jsonDecode(preKeysString);
   }
 }

@@ -55,7 +55,7 @@ class SecureStorageSessionStore implements SessionStore {
 
     if (sessions == null) return;
 
-    sessions[address.toString()] = record.serialize();
+    sessions[address.toString()] = base64Encode(record.serialize());
 
     await _secureStorage.write(key: 'sessions', value: jsonEncode(sessions));
   }
@@ -65,6 +65,6 @@ class SecureStorageSessionStore implements SessionStore {
 
     if (serializedSessions == null) return null;
 
-    return jsonDecode(serializedSessions) as Map<String, dynamic>;
+    return jsonDecode(serializedSessions);
   }
 }

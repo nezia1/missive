@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: when changing accounts, this should also trigger. But not on log out, in case the user logs back and in again and it's the same account.
     await _signalProvider.initialize(
       installing: true,
-      accountId: (await _userProvider.user)?.id,
+      name: (await _userProvider.user)?.name,
       accessToken: await _userProvider.accessToken,
     );
   }
