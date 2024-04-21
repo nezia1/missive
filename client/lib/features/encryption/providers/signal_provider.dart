@@ -59,7 +59,6 @@ class SignalProvider extends ChangeNotifier {
       return;
     }
 
-    print('signedPreKeys: ${await _signedPreKeyStore.loadSignedPreKeys()}');
     _identityKeyStore = SecureStorageIdentityKeyStore(secureStorage);
   }
 
@@ -88,5 +87,28 @@ class SignalProvider extends ChangeNotifier {
         signedPreKey.getKeyPair().publicKey,
         signedPreKey.signature,
         identityKey);
+  }
+
+  void buildSession(
+      {required String name,
+      required String accessToken,
+      required String message}) async {
+    final remotePreKeyBundle = await fetchPreKeyBundle(name, accessToken);
+
+    if (remotePreKeyBundle == null) return;
+
+    final remoteAddress = SignalProtocolAddress(name, 1);
+    final sessionBuilder = SessionBuilder(_sessionStore, _preKeyStore,
+        _signedPreKeyStore, _identityKeyStore, remoteAddress);
+
+    await sessionBuilder.processPreKeyBundle(remotePreKeyBundle);
+
+    final sessionCipher = SessionCipher(_sessionStore, _preKeyStore,
+        _signedPreKeyStore, _identityKeyStore, remoteAddress);
+
+    final cipherText = await sessionCipher.encrypt(utf8.encode(message));
+
+    // ITS WORKING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    print(String.fromCharCodes(cipherText.serialize()));
   }
 }

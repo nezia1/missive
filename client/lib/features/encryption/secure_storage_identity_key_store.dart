@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
@@ -61,7 +62,9 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
 
     if (identityKey == null) return false;
 
-    return trusted == null || trusted.serialize() == identityKey.serialize();
+    return trusted == null ||
+        const ListEquality()
+            .equals(trusted.serialize(), identityKey.serialize());
   }
 
   @override

@@ -33,7 +33,15 @@ class _HomeScreenState extends State<HomeScreen> {
         return;
       }
       _signalProvider.initialize(installing: false);
+      buildSessionTest();
     });
+  }
+
+  void buildSessionTest() async {
+    final name = (await _userProvider.user)!.name;
+    final accessToken = await _userProvider.accessToken;
+    _signalProvider.buildSession(
+        name: name, accessToken: accessToken!, message: 'Hello world');
   }
 
   void install() async {
