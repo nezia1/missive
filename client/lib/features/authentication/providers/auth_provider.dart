@@ -42,7 +42,6 @@ class AuthProvider extends ChangeNotifier {
 
         await _secureStorage.write(key: 'accessToken', value: token);
       } on DioException catch (e) {
-        print(e);
         // TODO: handle error better (e.g. log out user, show error message, etc.)
       }
     }
@@ -102,7 +101,6 @@ class AuthProvider extends ChangeNotifier {
           .split('=')
           .last;
 
-      print(response.headers);
       await _secureStorage.write(key: 'refreshToken', value: refreshToken);
       await _secureStorage.write(key: 'accessToken', value: accessToken);
 
@@ -110,7 +108,6 @@ class AuthProvider extends ChangeNotifier {
 
       return AuthenticationSuccess();
     } on DioException catch (e) {
-      print(e.message);
       return AuthenticationError(e.message);
     }
   }
@@ -157,7 +154,6 @@ class AuthProvider extends ChangeNotifier {
 
       return AuthenticationSuccess();
     } on DioException catch (e) {
-      print(e.message); // Additional methods related to pre-key management
       return AuthenticationError(e.message);
     }
   }
@@ -192,7 +188,6 @@ class AuthProvider extends ChangeNotifier {
       _user = user;
     } catch (e) {
       // TODO handle/log error
-      print(e);
       _user = null;
     } finally {
       notifyListeners();
