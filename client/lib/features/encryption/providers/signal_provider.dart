@@ -56,7 +56,6 @@ class SignalProvider extends ChangeNotifier {
                 .toList()
           },
           options: Options(headers: {'Authorization': 'Bearer $accessToken'}));
-      print('Keys uploaded');
       return;
     }
 

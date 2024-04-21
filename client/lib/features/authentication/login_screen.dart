@@ -124,7 +124,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 case TOTPInvalidError():
                                   authenticationSucceeded = false;
                                 case AuthenticationError():
-                                  print(loginResult.message);
                                   authenticationSucceeded = false;
                               }
                               _loggingIn = false;
