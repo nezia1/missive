@@ -6,9 +6,9 @@ import type { FastifyPluginCallback } from 'fastify'
 
 const keys: FastifyPluginCallback = (fastify, _, done) => {
 	// Gets the first pre key for a user, as well as the signed pre key
-	fastify.route<{ Reply: APIReply; Params: UserParams }>({
+	fastify.route<{ Reply: APIReply; Params: { name: string } }>({
 		method: 'GET',
-		url: '/:id/keys',
+		url: '/:name/keys',
 		preParsing: [
 			authenticationHook,
 			authorizationHook([Permissions.KEYS_READ]),
@@ -16,7 +16,7 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 		handler: async (request, reply) => {
 			const oneTimePreKey = await fastify.prisma.oneTimePreKey.findFirst({
 				where: {
-					userId: request.params.id,
+					user: { name: request.params.name },
 				},
 			})
 
@@ -29,11 +29,11 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 				})
 
 			const signedPreKey = await fastify.prisma.signedPreKey.findFirst({
-				where: { userId: request.params.id },
+				where: { user: { name: request.params.name } },
 			})
 
 			const user = await fastify.prisma.user.findUniqueOrThrow({
-				where: { id: request.params.id },
+				where: { name: request.params.name },
 			})
 
 			reply.status(200).send({
@@ -55,10 +55,10 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 			registrationId?: number
 		}
 		Reply: APIReply
-		Params: UserParams
+		Params: { name: string }
 	}>({
 		method: 'POST',
-		url: '/:id/keys',
+		url: '/:name/keys',
 		preParsing: [
 			authenticationHook,
 			authorizationHook([Permissions.KEYS_WRITE]),
@@ -67,18 +67,21 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 			await fastify.prisma.oneTimePreKey.createMany({
 				data: request.body.preKeys.map((preKey) => ({
 					...preKey,
-					userId: request.params.id,
+					userId: request.authenticatedUser?.id || '', // really ugly hack
 				})),
 			})
 
 			if (request.body.signedPreKey)
 				await fastify.prisma.signedPreKey.create({
-					data: { ...request.body.signedPreKey, userId: request.params.id },
+					data: {
+						...request.body.signedPreKey,
+						userId: request.authenticatedUser?.id || '', // really ugly hack
+					},
 				})
 
 			if (request.body.identityKey && request.body.registrationId)
 				await fastify.prisma.user.update({
-					where: { id: request.params.id },
+					where: { name: request.params.name },
 					data: {
 						identityKey: request.body.identityKey,
 						registrationId: request.body.registrationId,
