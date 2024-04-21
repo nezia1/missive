@@ -61,10 +61,5 @@ class SignalProvider extends ChangeNotifier {
     }
 
     _identityKeyStore = SecureStorageIdentityKeyStore(secureStorage);
-
-    const remoteAddress = SignalProtocolAddress('+1234567890', 1);
-
-    final SessionBuilder sessionBuilder = SessionBuilder(_sessionStore,
-        _preKeyStore, _signedPreKeyStore, _identityKeyStore, remoteAddress);
   }
 }
