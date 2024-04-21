@@ -34,26 +34,19 @@ class SecureStorageSessionStore implements SessionStore {
 
   @override
   Future<SessionRecord> loadSession(SignalProtocolAddress address) async {
-    final sessions = await _getSessions();
+    var session = (await _getSessions())?[address.toString()];
 
-    if (sessions == null) {
-      throw Exception('No session with address $address found');
-    }
-    final session = sessions[address.toString()];
+    session ??= SessionRecord();
 
-    if (session == null) {
-      throw Exception('No session with address $address found');
-    }
-
-    return session;
+    return SessionRecord.fromSerialized(base64Decode(session));
   }
 
   @override
   Future<void> storeSession(
       SignalProtocolAddress address, SessionRecord record) async {
-    final sessions = await _getSessions();
+    var sessions = await _getSessions();
 
-    if (sessions == null) return;
+    sessions ??= {};
 
     sessions[address.toString()] = base64Encode(record.serialize());
 
