@@ -36,7 +36,7 @@ class SecureStorageSessionStore implements SessionStore {
   Future<SessionRecord> loadSession(SignalProtocolAddress address) async {
     var session = (await _getSessions())?[address.toString()];
 
-    session ??= SessionRecord();
+    if (session == null) return SessionRecord();
 
     return SessionRecord.fromSerialized(base64Decode(session));
   }

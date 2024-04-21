@@ -56,13 +56,14 @@ class SignalProvider extends ChangeNotifier {
                 .toList()
           },
           options: Options(headers: {'Authorization': 'Bearer $accessToken'}));
+      print('Keys uploaded');
       return;
     }
 
     _identityKeyStore = SecureStorageIdentityKeyStore(secureStorage);
   }
 
-  // TODO: this needs to be fetched by name, not by ID. The user should be able to start a conversation with a username, not an ID. We need to update the API accordingly, but this will work for testing for now.
+  // TODO: this needs error handling in case user doesn't exist, server is down, or user has no keys
   /// Fetch a pre-key bundle from the server. This is used when a user wants to start a conversation with another user.
   Future<PreKeyBundle?> fetchPreKeyBundle(
       String name, String accessToken) async {

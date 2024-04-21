@@ -32,8 +32,9 @@ class _HomeScreenState extends State<HomeScreen> {
         prefs.setBool('installed', true);
         return;
       }
-      _signalProvider.initialize(installing: false);
-      buildSessionTest();
+      _signalProvider
+          .initialize(installing: false)
+          .then((value) => buildSessionTest());
     });
   }
 
