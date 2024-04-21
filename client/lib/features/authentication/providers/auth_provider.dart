@@ -164,9 +164,12 @@ class AuthProvider extends ChangeNotifier {
     SharedPreferences.getInstance().then((prefs) {
       prefs.setBool('installed', false);
     });
+
     // TODO revoke the refresh token from the server, not only client-side
     await _secureStorage.delete(key: 'refreshToken');
     await _secureStorage.delete(key: 'accessToken');
+
+    await _secureStorage.deleteAll();
     _user = null;
     notifyListeners();
   }
