@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late AuthProvider _userProvider;
   late SignalProvider _signalProvider;
   late SecureStorageIdentityKeyStore identityKeyStore;
+  late ChatProvider _chatProvider;
   @override
   void initState() {
     super.initState();
@@ -35,14 +37,21 @@ class _HomeScreenState extends State<HomeScreen> {
       _signalProvider
           .initialize(installing: false)
           .then((value) => buildSessionTest());
+
+      _chatProvider = Provider.of<ChatProvider>(context, listen: false);
+      connectWebSocket();
     });
   }
 
+  void connectWebSocket() async {
+    _chatProvider.connect((await _userProvider.accessToken)!);
+  }
+
+  // Build session with ourselves to test the Signal protocol
   void buildSessionTest() async {
     final name = (await _userProvider.user)!.name;
     final accessToken = await _userProvider.accessToken;
-    _signalProvider.buildSession(
-        name: 'bob', accessToken: accessToken!, message: 'Hello world');
+    _signalProvider.buildSession(name: name, accessToken: accessToken!);
   }
 
   void install() async {

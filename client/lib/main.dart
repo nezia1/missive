@@ -14,6 +14,7 @@ import 'package:missive/features/home/screens/home_screen.dart';
 // providers
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
+import 'package:missive/features/chat/providers/chat_provider.dart';
 
 // common
 import 'package:missive/common/http.dart';
@@ -31,7 +32,9 @@ class Missive extends StatelessWidget {
   Widget build(BuildContext context) => MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => _authProvider),
-          ChangeNotifierProvider(create: (_) => _signalProvider)
+          ChangeNotifierProvider(create: (_) => _signalProvider),
+          // TODO: change this to a non hard coded value
+          ChangeNotifierProvider(create: (_) => ChatProvider('ws://localhost'))
         ],
         child: MaterialApp.router(
           title: title,

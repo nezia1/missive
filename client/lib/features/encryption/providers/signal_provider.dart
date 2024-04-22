@@ -89,10 +89,10 @@ class SignalProvider extends ChangeNotifier {
         identityKey);
   }
 
-  void buildSession(
-      {required String name,
-      required String accessToken,
-      required String message}) async {
+  void buildSession({
+    required String name,
+    required String accessToken,
+  }) async {
     final remotePreKeyBundle = await fetchPreKeyBundle(name, accessToken);
 
     if (remotePreKeyBundle == null) return;
@@ -102,13 +102,17 @@ class SignalProvider extends ChangeNotifier {
         _signedPreKeyStore, _identityKeyStore, remoteAddress);
 
     await sessionBuilder.processPreKeyBundle(remotePreKeyBundle);
+  }
 
+  /// Encrypts a message for a given user. Returns a [CiphertextMessage].
+  Future<CiphertextMessage> encrypt(
+      {required String name, required String message}) async {
+    final remoteAddress = SignalProtocolAddress(name, 1);
     final sessionCipher = SessionCipher(_sessionStore, _preKeyStore,
         _signedPreKeyStore, _identityKeyStore, remoteAddress);
 
     final cipherText = await sessionCipher.encrypt(utf8.encode(message));
 
-    // ITS WORKING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    print(String.fromCharCodes(cipherText.serialize()));
+    return cipherText;
   }
 }
