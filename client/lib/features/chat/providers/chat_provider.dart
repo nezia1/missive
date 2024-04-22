@@ -7,7 +7,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 
 class ChatProvider with ChangeNotifier {
-  WebSocketChannel? _channel;
+  WebSocketChannel? channel;
   final String _url;
   final SignalProvider _signalProvider;
 
@@ -19,9 +19,9 @@ class ChatProvider with ChangeNotifier {
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
     );
 
-    _channel = IOWebSocketChannel(ws);
+    channel = IOWebSocketChannel(ws);
 
-    _channel!.stream.listen((message) async {
+    channel!.stream.listen((message) async {
       final messageJson = jsonDecode(message);
       if (messageJson['status'] != null) {
         print(
@@ -50,11 +50,11 @@ class ChatProvider with ChangeNotifier {
       'content': base64Encode(message.serialize()),
       'receiver': receiver,
     });
-    _channel?.sink.add(messageJson);
+    channel?.sink.add(messageJson);
   }
 
   void disconnect() {
-    _channel?.sink.close();
+    channel?.sink.close();
   }
 
   @override

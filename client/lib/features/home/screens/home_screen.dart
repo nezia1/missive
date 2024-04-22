@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+// TODO: wrap in FutureBuilder so we can wait for everything to be initialized properly
 class _HomeScreenState extends State<HomeScreen> {
   // late is needed here because AuthProvider requires context and IdentityKeyStore is initialized in initState (the constructor needs to be different whether or not the user just created their account)
   late AuthProvider _userProvider;
@@ -129,15 +130,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text('Send message to Alice'),
                   onPressed: handleMessageSent),
               const SizedBox(height: 20),
-              Text(
-                  'This is an example of a home screen. This is a proof of concept to showcase the authentication and navigation capabilities of Flutter.',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  textAlign: TextAlign.justify),
-              const SizedBox(height: 10),
-              Text(
-                  'You can find a side bar on the left with a settings and logout button. The settings button will take you to a settings screen, allowing you to change your account settings, and the logout button will send you back to the login screen. The app is built using the following technologies: Flutter, GoRouter and Provider.',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  textAlign: TextAlign.justify),
+              StreamBuilder(
+                  stream: _chatProvider.channel?.stream,
+                  builder: (context, snapshot) {
+                    return Text(
+                        snapshot.hasData ? snapshot.data : 'No messages yet');
+                  })
             ])));
   }
 }
