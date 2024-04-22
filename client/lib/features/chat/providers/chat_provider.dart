@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -22,8 +24,12 @@ class ChatProvider with ChangeNotifier {
     });
   }
 
-  void sendMessage(String message) {
-    _channel?.sink.add(message);
+  void sendMessage(CiphertextMessage message, String receiver) {
+    final messageJson = jsonEncode({
+      'content': base64Encode(message.serialize()),
+      'receiver': receiver,
+    });
+    _channel?.sink.add(messageJson);
   }
 
   void disconnect() {
