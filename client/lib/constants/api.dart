@@ -1,4 +1,4 @@
 class ApiConstants {
   ApiConstants._();
-  static const baseUrl = 'http://localhost/api/v1';
+  static const baseUrl = 'https://missive.nezia.dev/api/v1';
 }
