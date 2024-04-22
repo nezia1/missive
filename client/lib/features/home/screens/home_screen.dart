@@ -34,13 +34,23 @@ class _HomeScreenState extends State<HomeScreen> {
         prefs.setBool('installed', true);
         return;
       }
+      // buildSessionTest and encryptAndSendMessage are called here to test the Signal protocol
       _signalProvider
           .initialize(installing: false)
           .then((value) => buildSessionTest());
 
       _chatProvider = Provider.of<ChatProvider>(context, listen: false);
       connectWebSocket();
+      encryptAndSendMessage();
     });
+  }
+
+  void encryptAndSendMessage() async {
+    final message = 'Hello, world!';
+    final receiver = 'alice';
+    final ciphertext =
+        await _signalProvider.encrypt(message: message, name: receiver);
+    _chatProvider.sendMessage(ciphertext, receiver);
   }
 
   void connectWebSocket() async {
