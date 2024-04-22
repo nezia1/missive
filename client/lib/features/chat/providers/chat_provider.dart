@@ -4,12 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:missive/features/encryption/providers/signal_provider.dart';
 
 class ChatProvider with ChangeNotifier {
   WebSocketChannel? _channel;
   final String _url;
+  final SignalProvider _signalProvider;
 
-  ChatProvider(this._url);
+  ChatProvider(this._url, this._signalProvider);
 
   void connect(String accessToken) async {
     final ws = await WebSocket.connect(
@@ -20,7 +22,26 @@ class ChatProvider with ChangeNotifier {
     _channel = IOWebSocketChannel(ws);
 
     _channel!.stream.listen((message) {
-      print('Received: $message');
+      final messageJson = jsonDecode(message);
+      if (messageJson['status'] != null) {
+        print(
+            'This is a status update, update corresponding message status accordingly');
+        return;
+      }
+
+      CiphertextMessage cipherMessage;
+      final serializedContent = base64Decode(messageJson['content']);
+
+      // Try parsing it as a SignalMessage, if it fails, it's a PreKeySignalMessage
+      try {
+        cipherMessage = SignalMessage.fromSerialized(serializedContent);
+      } catch (_) {
+        cipherMessage = PreKeySignalMessage(serializedContent);
+      }
+
+      // TODO: send received message to SignalProvider for decryption and session handling
+      _signalProvider.handleReceivedMessage(
+          cipherMessage, SignalProtocolAddress(messageJson['sender'], 1));
     });
   }
 

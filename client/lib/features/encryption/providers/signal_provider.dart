@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
@@ -112,7 +113,21 @@ class SignalProvider extends ChangeNotifier {
         _signedPreKeyStore, _identityKeyStore, remoteAddress);
 
     final cipherText = await sessionCipher.encrypt(utf8.encode(message));
-
     return cipherText;
+  }
+
+  Future<void> handleReceivedMessage(
+      CiphertextMessage message, SignalProtocolAddress senderAddress) async {
+    final sessionCipher = SessionCipher(_sessionStore, _preKeyStore,
+        _signedPreKeyStore, _identityKeyStore, senderAddress);
+    Uint8List plainText = Uint8List(0);
+
+    if (message is PreKeySignalMessage) {
+      await sessionCipher.decrypt(message);
+    }
+    if (message is SignalMessage) {
+      await sessionCipher.decryptFromSignal(message);
+    }
+    print(utf8.decode(plainText));
   }
 }

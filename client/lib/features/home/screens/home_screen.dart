@@ -23,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late SignalProvider _signalProvider;
   late SecureStorageIdentityKeyStore identityKeyStore;
   late ChatProvider _chatProvider;
+  String _message = '';
   @override
   void initState() {
     super.initState();
@@ -35,9 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return;
       }
       // buildSessionTest and encryptAndSendMessage are called here to test the Signal protocol
-      _signalProvider
-          .initialize(installing: false)
-          .then((value) => buildSessionTest());
+      _signalProvider.initialize(installing: false);
 
       _chatProvider = Provider.of<ChatProvider>(context, listen: false);
       connectWebSocket();
@@ -71,6 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
       name: (await _userProvider.user)?.name,
       accessToken: await _userProvider.accessToken,
     );
+  }
+
+  void handleMessageSent() async {
+    final cipherText =
+        await _signalProvider.encrypt(message: _message, name: 'alice');
+    _chatProvider.sendMessage(cipherText, 'alice');
   }
 
   @override
@@ -129,6 +134,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   return const Text('Welcome, user');
                 },
               ),
+              TextField(
+                  decoration: const InputDecoration(
+                    labelText: 'Message',
+                  ),
+                  onChanged: (value) => _message = value),
+              ElevatedButton(
+                  child: Text('Send message to Alice'),
+                  onPressed: handleMessageSent),
               const SizedBox(height: 20),
               Text(
                   'This is an example of a home screen. This is a proof of concept to showcase the authentication and navigation capabilities of Flutter.',
