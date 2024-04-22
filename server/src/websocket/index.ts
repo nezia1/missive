@@ -18,44 +18,41 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 		if (!req.authenticatedUser)
 			return socket.close(1008, 'User is not authenticated')
 
-		connections.set(req.authenticatedUser.id, socket)
+		connections.set(req.authenticatedUser.name, socket)
 
 		socket.on('message', async (msg) => {
 			if (!req.authenticatedUser) return
 
 			// TODO: handle JSON parsing error (if it's not a valid JSON string, it will crash the conneection)
-			const message = JSON.parse(
-				msg.toString(),
-			) as Prisma.PendingMessageCreateManyInput
-
-			// Create a pending message
-			const pendingMessage: Prisma.PendingMessageCreateManyInput = {
-				content: message.content,
-				receiverId: message.receiverId,
-				senderId: req.authenticatedUser.id,
+			const message = JSON.parse(msg.toString()) as {
+				content: string
+				receiver: string
+				sender: string
 			}
+
+			message.sender = req.authenticatedUser.name
 
 			socket.send(
 				JSON.stringify({
 					status: MessageStatus.SENT,
-					message: exclude(pendingMessage, ['senderId']),
+					message: exclude(message, ['sender']),
 				}),
 			)
 
-			if (connections.has(message.receiverId)) {
-				const receiver = connections.get(message.receiverId)
-				receiver?.send(JSON.stringify(exclude(pendingMessage, ['receiverId'])))
+			if (connections.has(message.receiver)) {
+				const receiver = connections.get(message.receiver)
+				receiver?.send(JSON.stringify(exclude(message, ['receiver'])))
 				socket.send(
 					JSON.stringify({
 						status: MessageStatus.DELIVERED,
-						message: exclude(pendingMessage, ['senderId']),
+						message: exclude(message, ['sender']),
 					}),
 				)
 			} else {
 				// Check if receiver exists
 				const offlineReceiver = await fastify.prisma.user.findUnique({
 					where: {
-						id: message.receiverId,
+						name: message.receiver,
 					},
 				})
 
@@ -69,7 +66,20 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 
 				fastify.prisma.pendingMessage
 					.create({
-						data: pendingMessage,
+						// add receiver id to the pending message
+						data: {
+							content: message.content,
+							receiver: {
+								connect: {
+									name: message.receiver,
+								},
+							},
+							sender: {
+								connect: {
+									id: req.authenticatedUser.id,
+								},
+							},
+						},
 					})
 					.then((storedPendingMessage) => {
 						// TODO send push notification to the receiver. If successful, update the message status to delivered for the sender.
@@ -79,7 +89,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 
 		socket.on('close', () => {
 			if (!req.authenticatedUser) return
-			connections.delete(req.authenticatedUser.id)
+			connections.delete(req.authenticatedUser.name)
 		})
 	})
 
