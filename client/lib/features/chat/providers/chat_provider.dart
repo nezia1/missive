@@ -21,11 +21,11 @@ class ChatProvider with ChangeNotifier {
 
     _channel = IOWebSocketChannel(ws);
 
-    _channel!.stream.listen((message) {
+    _channel!.stream.listen((message) async {
       final messageJson = jsonDecode(message);
       if (messageJson['status'] != null) {
         print(
-            'This is a status update, update corresponding message status accordingly');
+            'This is a status update, update corresponding message status accordingly. $messageJson');
         return;
       }
 
@@ -40,7 +40,7 @@ class ChatProvider with ChangeNotifier {
       }
 
       // TODO: send received message to SignalProvider for decryption and session handling
-      _signalProvider.handleReceivedMessage(
+      await _signalProvider.handleReceivedMessage(
           cipherMessage, SignalProtocolAddress(messageJson['sender'], 1));
     });
   }

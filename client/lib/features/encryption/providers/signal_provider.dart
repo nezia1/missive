@@ -69,6 +69,7 @@ class SignalProvider extends ChangeNotifier {
       String name, String accessToken) async {
     final response = await dio.get('/users/$name/keys',
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}));
+
     final data = response.data['data'];
 
     final registrationId = data['registrationId'];
@@ -90,15 +91,17 @@ class SignalProvider extends ChangeNotifier {
         identityKey);
   }
 
-  void buildSession({
+  Future<void> buildSession({
     required String name,
     required String accessToken,
   }) async {
+    final remoteAddress = SignalProtocolAddress(name, 1);
+    if (await _sessionStore.containsSession(remoteAddress)) return;
     final remotePreKeyBundle = await fetchPreKeyBundle(name, accessToken);
 
+    print(remotePreKeyBundle);
     if (remotePreKeyBundle == null) return;
 
-    final remoteAddress = SignalProtocolAddress(name, 1);
     final sessionBuilder = SessionBuilder(_sessionStore, _preKeyStore,
         _signedPreKeyStore, _identityKeyStore, remoteAddress);
 
@@ -123,10 +126,10 @@ class SignalProvider extends ChangeNotifier {
     Uint8List plainText = Uint8List(0);
 
     if (message is PreKeySignalMessage) {
-      await sessionCipher.decrypt(message);
+      plainText = await sessionCipher.decrypt(message);
     }
     if (message is SignalMessage) {
-      await sessionCipher.decryptFromSignal(message);
+      plainText = await sessionCipher.decryptFromSignal(message);
     }
     print(utf8.decode(plainText));
   }

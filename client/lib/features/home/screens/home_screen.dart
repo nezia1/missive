@@ -40,27 +40,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
       _chatProvider = Provider.of<ChatProvider>(context, listen: false);
       connectWebSocket();
-      encryptAndSendMessage();
     });
-  }
-
-  void encryptAndSendMessage() async {
-    final message = 'Hello, world!';
-    final receiver = 'alice';
-    final ciphertext =
-        await _signalProvider.encrypt(message: message, name: receiver);
-    _chatProvider.sendMessage(ciphertext, receiver);
   }
 
   void connectWebSocket() async {
     _chatProvider.connect((await _userProvider.accessToken)!);
-  }
-
-  // Build session with ourselves to test the Signal protocol
-  void buildSessionTest() async {
-    final name = (await _userProvider.user)!.name;
-    final accessToken = await _userProvider.accessToken;
-    _signalProvider.buildSession(name: name, accessToken: accessToken!);
   }
 
   void install() async {
@@ -73,6 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void handleMessageSent() async {
+    await _signalProvider.buildSession(
+        name: 'alice', accessToken: (await _userProvider.accessToken)!);
     final cipherText =
         await _signalProvider.encrypt(message: _message, name: 'alice');
     _chatProvider.sendMessage(cipherText, 'alice');

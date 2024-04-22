@@ -9,9 +9,12 @@ class SecureStorageSessionStore implements SessionStore {
       : _secureStorage = secureStorage;
 
   @override
-  Future<bool> containsSession(SignalProtocolAddress address) {
-    // TODO: implement containsSession
-    throw UnimplementedError();
+  Future<bool> containsSession(SignalProtocolAddress address) async {
+    var sessions = await _getSessions();
+
+    if (sessions == null) return false;
+
+    return sessions[address.toString()] != null;
   }
 
   @override

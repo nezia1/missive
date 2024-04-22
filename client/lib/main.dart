@@ -35,7 +35,8 @@ class Missive extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => _signalProvider),
           // TODO: change this to a non hard coded value
           ChangeNotifierProvider(
-              create: (_) => ChatProvider('ws://localhost', _signalProvider))
+              create: (_) =>
+                  ChatProvider('wss://missive.nezia.dev', _signalProvider))
         ],
         child: MaterialApp.router(
           title: title,
