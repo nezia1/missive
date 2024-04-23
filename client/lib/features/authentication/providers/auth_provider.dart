@@ -161,8 +161,9 @@ class AuthProvider extends ChangeNotifier {
           SecureStorageManager(secureStorage: _secureStorage, namespace: name);
 
       // If user didn't log in yet, we need to install the app
-      final firstLogin = await storageManager.read(key: 'identityKey') == null;
-
+      final firstLogin =
+          await storageManager.read(key: 'identityKeyPair') == null;
+      print('first time logged in: $firstLogin');
       if (firstLogin) {
         (await SharedPreferences.getInstance()).setBool('installed', false);
       }
