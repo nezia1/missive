@@ -39,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     final name = (await _userProvider.user)?.name;
 
+    print('installed state: ${prefs.getBool('installed')}');
     if (prefs.getBool('installed') == false) {
       await _signalProvider.initialize(
         installing: true,
@@ -55,10 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void handleMessageSent() async {
     await _signalProvider.buildSession(
-        name: 'dave', accessToken: (await _userProvider.accessToken)!);
+        name: 'carol', accessToken: (await _userProvider.accessToken)!);
     final cipherText =
-        await _signalProvider.encrypt(message: _message, name: 'dave');
-    _chatProvider.sendMessage(cipherText, 'dave');
+        await _signalProvider.encrypt(message: _message, name: 'carol');
+    _chatProvider.sendMessage(cipherText, 'carol');
   }
 
   Widget _buildBody() {
