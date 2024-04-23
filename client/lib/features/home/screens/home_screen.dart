@@ -86,6 +86,14 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: handleMessageSent,
           ),
           const SizedBox(height: 20),
+          Consumer<ChatProvider>(
+            builder: (context, chat, child) {
+              return Column(
+                children:
+                    chat.messages.map((message) => Text(message)).toList(),
+              );
+            },
+          )
         ]));
   }
 
