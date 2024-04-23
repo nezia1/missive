@@ -119,7 +119,7 @@ class SignalProvider extends ChangeNotifier {
     return cipherText;
   }
 
-  // TODO: handle case where the session might have changed (e.g. user logs out and logs back in, or user deletes their account and creates a new one with the same name). The signed key needs to be updated.
+  // TODO: handle case where the session might have changed (e.g. user logs out and logs back in, user logs back out, to another account, and in again, or user deletes their account and creates a new one with the same name). The signed key needs to be updated. Perhaps we should store all the accounts the user has logged on separately?
   Future<String> decrypt(
       CiphertextMessage message, SignalProtocolAddress senderAddress) async {
     final sessionCipher = SessionCipher(_sessionStore, _preKeyStore,
