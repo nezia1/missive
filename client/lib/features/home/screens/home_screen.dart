@@ -55,8 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
     await _signalProvider.buildSession(
         name: 'dave', accessToken: (await _userProvider.accessToken)!);
     final cipherText =
-        await _signalProvider.encrypt(message: _message, name: 'alice');
-    _chatProvider.sendMessage(cipherText, 'alice');
+        await _signalProvider.encrypt(message: _message, name: 'dave');
+    _chatProvider.sendMessage(cipherText, 'dave');
   }
 
   Widget _buildBody() {
@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onChanged: (value) => _message = value,
           ),
           ElevatedButton(
-            child: Text('Send message to Alice'),
+            child: Text('Send message to Dave'),
             onPressed: handleMessageSent,
           ),
           const SizedBox(height: 20),
