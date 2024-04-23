@@ -24,118 +24,111 @@ class _HomeScreenState extends State<HomeScreen> {
   late SignalProvider _signalProvider;
   late SecureStorageIdentityKeyStore identityKeyStore;
   late ChatProvider _chatProvider;
+  late Future _initialization;
   String _message = '';
   @override
   void initState() {
     super.initState();
     _userProvider = Provider.of<AuthProvider>(context, listen: false);
     _signalProvider = Provider.of<SignalProvider>(context, listen: false);
-    SharedPreferences.getInstance().then((prefs) {
-      if (prefs.getBool('installed') == false) {
-        install();
-        prefs.setBool('installed', true);
-        return;
-      }
-      // buildSessionTest and encryptAndSendMessage are called here to test the Signal protocol
-      _signalProvider.initialize(installing: false);
-
-      _chatProvider = Provider.of<ChatProvider>(context, listen: false);
-      connectWebSocket();
-    });
+    _chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    _initialization = initialize();
   }
 
-  void connectWebSocket() async {
-    _chatProvider.connect((await _userProvider.accessToken)!);
-  }
-
-  void install() async {
-    // TODO: when changing accounts, this should also trigger. But not on log out, in case the user logs back and in again and it's the same account.
-    await _signalProvider.initialize(
-      installing: true,
-      name: (await _userProvider.user)?.name,
-      accessToken: await _userProvider.accessToken,
-    );
+  Future<void> initialize() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('installed') == false) {
+      await _signalProvider.initialize(
+        installing: true,
+        name: (await _userProvider.user)?.name,
+        accessToken: await _userProvider.accessToken,
+      );
+      prefs.setBool('installed', true);
+    } else {
+      await _signalProvider.initialize(installing: false);
+    }
+    await _chatProvider.connect((await _userProvider.accessToken)!);
+    return;
   }
 
   void handleMessageSent() async {
     await _signalProvider.buildSession(
-        name: 'alice', accessToken: (await _userProvider.accessToken)!);
+        name: 'dave', accessToken: (await _userProvider.accessToken)!);
     final cipherText =
         await _signalProvider.encrypt(message: _message, name: 'alice');
     _chatProvider.sendMessage(cipherText, 'alice');
   }
 
+  Widget _buildBody() {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 80.0, vertical: 20.0),
+        child: Column(children: [
+          FutureBuilder(
+              future: _userProvider.user,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text('Welcome, ${snapshot.data?.name}');
+                } else {
+                  return Text('Welcome');
+                }
+              }),
+          TextField(
+            decoration: const InputDecoration(
+              labelText: 'Message',
+            ),
+            onChanged: (value) => _message = value,
+          ),
+          ElevatedButton(
+            child: Text('Send message to Alice'),
+            onPressed: handleMessageSent,
+          ),
+          const SizedBox(height: 20),
+        ]));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
-        ),
-        drawer: Drawer(
-          backgroundColor: Theme.of(context).canvasColor,
-          child: ListView(
-            children: [
-              SizedBox(
-                height: 70,
-                child: DrawerHeader(
-                    child: TextButton.icon(
-                  label: const Text('Settings'),
-                  icon: const Icon(Icons.settings),
-                  onPressed: () {
-                    context.push('/settings');
-                  },
-                )),
-              ),
-              SizedBox(
-                height: 70,
-                child: DrawerHeader(
-                    child: TextButton.icon(
-                        label: const Text('Logout'),
-                        icon: const Icon(Icons.logout),
-                        onPressed: () {
-                          _userProvider.logout();
-                        })),
-              ),
-            ],
-          ),
-        ),
-        body: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 80.0, vertical: 20.0),
-            child: Column(children: [
-              FutureBuilder(
-                future: _userProvider.user,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final user = snapshot.data;
-                    if (user == null) {
-                      return const Text('An unexpected error occurred');
-                    }
-
-                    TextStyle? style =
-                        Theme.of(context).textTheme.headlineLarge;
-                    return Text('Welcome, ${user.name}', style: style);
-                  }
-
-                  return const Text('Welcome, user');
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      drawer: Drawer(
+        backgroundColor: Theme.of(context).canvasColor,
+        child: ListView(
+          children: [
+            SizedBox(
+              height: 70,
+              child: DrawerHeader(
+                  child: TextButton.icon(
+                label: const Text('Settings'),
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  context.push('/settings');
                 },
-              ),
-              TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'Message',
-                  ),
-                  onChanged: (value) => _message = value),
-              ElevatedButton(
-                  child: Text('Send message to Alice'),
-                  onPressed: handleMessageSent),
-              const SizedBox(height: 20),
-              StreamBuilder(
-                  stream: _chatProvider.channel?.stream,
-                  builder: (context, snapshot) {
-                    return Text(
-                        snapshot.hasData ? snapshot.data : 'No messages yet');
-                  })
-            ])));
+              )),
+            ),
+            SizedBox(
+              height: 70,
+              child: DrawerHeader(
+                  child: TextButton.icon(
+                      label: const Text('Logout'),
+                      icon: const Icon(Icons.logout),
+                      onPressed: () {
+                        _userProvider.logout();
+                      })),
+            ),
+          ],
+        ),
+      ),
+      body: FutureBuilder(
+          future: _initialization,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return _buildBody();
+            }
+            return const Center(child: CircularProgressIndicator());
+          }),
+    );
   }
 }
