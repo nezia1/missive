@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
 
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
+import 'package:missive/features/encryption/secure_storage_manager.dart';
 import 'package:missive/features/encryption/secure_storage_session_store.dart';
 import 'package:missive/features/encryption/secure_storage_pre_key_store.dart';
 import 'package:missive/features/encryption/secure_storage_signed_pre_key_store.dart';
@@ -23,11 +24,16 @@ class SignalProvider extends ChangeNotifier {
   /// Initializes the Signal protocol stores. If [installing] is true, generates a new identity key pair, registration ID, signed pre key, and pre keys.
   /// [name] and [accessToken] are required when [installing] is true, and is used to upload the keys to the server.
   Future<void> initialize(
-      {bool installing = false, String? name, String? accessToken}) async {
+      {required bool installing,
+      required String name,
+      String? accessToken}) async {
     const secureStorage = FlutterSecureStorage();
-    _preKeyStore = SecureStoragePreKeyStore(secureStorage);
-    _signedPreKeyStore = SecureStorageSignedPreKeyStore(secureStorage);
-    _sessionStore = SecureStorageSessionStore(secureStorage);
+    final storageManager =
+        SecureStorageManager(secureStorage: secureStorage, namespace: name);
+
+    _preKeyStore = SecureStoragePreKeyStore(storageManager);
+    _signedPreKeyStore = SecureStorageSignedPreKeyStore(storageManager);
+    _sessionStore = SecureStorageSessionStore(storageManager);
 
     if (installing) {
       final identityKeyPair = generateIdentityKeyPair();
@@ -36,7 +42,7 @@ class SignalProvider extends ChangeNotifier {
 
       await _signedPreKeyStore.storeSignedPreKey(signedPreKey.id, signedPreKey);
       _identityKeyStore = SecureStorageIdentityKeyStore.fromIdentityKeyPair(
-          secureStorage, identityKeyPair, registrationId);
+          storageManager, identityKeyPair, registrationId);
 
       final preKeys = generatePreKeys(0, 110);
       for (var p in preKeys) {
@@ -57,10 +63,11 @@ class SignalProvider extends ChangeNotifier {
                 .toList()
           },
           options: Options(headers: {'Authorization': 'Bearer $accessToken'}));
+      print('Protocol successfully installed');
       return;
     }
 
-    _identityKeyStore = SecureStorageIdentityKeyStore(secureStorage);
+    _identityKeyStore = SecureStorageIdentityKeyStore(storageManager);
   }
 
   // TODO: this needs error handling in case user doesn't exist, server is down, or user has no keys

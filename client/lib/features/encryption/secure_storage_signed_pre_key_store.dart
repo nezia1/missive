@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:missive/features/encryption/secure_storage_manager.dart';
 
 class SecureStorageSignedPreKeyStore implements SignedPreKeyStore {
-  final FlutterSecureStorage _secureStorage;
+  final SecureStorageManager _storageManager;
 
-  SecureStorageSignedPreKeyStore(FlutterSecureStorage secureStorage)
-      : _secureStorage = secureStorage;
+  SecureStorageSignedPreKeyStore(SecureStorageManager storageManager)
+      : _storageManager = storageManager;
 
   @override
   Future<bool> containsSignedPreKey(int signedPreKeyId) async {
@@ -57,13 +57,13 @@ class SecureStorageSignedPreKeyStore implements SignedPreKeyStore {
     signedPreKeys ??= <String, String>{};
 
     signedPreKeys[signedPreKeyId.toString()] = base64Encode(record.serialize());
-    await _secureStorage.write(
+    await _storageManager.write(
         key: 'signedPreKeys', value: jsonEncode(signedPreKeys));
   }
 
   /// Load signed pre-keys from secure storage as base 64 encoded [SignedPreKeyRecord]s.
   Future<Map<String, dynamic>?> _loadKeys() async {
-    final preKeysString = await _secureStorage.read(key: 'signedPreKeys');
+    final preKeysString = await _storageManager.read(key: 'signedPreKeys');
     if (preKeysString == null) return null;
 
     return jsonDecode(preKeysString);

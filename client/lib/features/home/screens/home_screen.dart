@@ -37,15 +37,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
+    final name = (await _userProvider.user)?.name;
+
     if (prefs.getBool('installed') == false) {
       await _signalProvider.initialize(
         installing: true,
-        name: (await _userProvider.user)?.name,
+        name: name!,
         accessToken: await _userProvider.accessToken,
       );
       prefs.setBool('installed', true);
     } else {
-      await _signalProvider.initialize(installing: false);
+      await _signalProvider.initialize(installing: false, name: name!);
     }
     await _chatProvider.connect((await _userProvider.accessToken)!);
     return;

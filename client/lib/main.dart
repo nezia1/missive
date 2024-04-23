@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // screens
 import 'package:missive/features/authentication/landing_screen.dart';
@@ -24,7 +25,8 @@ void main() => runApp(Missive());
 class Missive extends StatelessWidget {
   Missive({super.key});
 
-  final AuthProvider _authProvider = AuthProvider(httpClient: dio);
+  final AuthProvider _authProvider = AuthProvider(
+      httpClient: dio, secureStorage: const FlutterSecureStorage());
   final SignalProvider _signalProvider = SignalProvider();
   static const title = 'Missive';
 

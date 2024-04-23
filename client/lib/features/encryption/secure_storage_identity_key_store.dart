@@ -3,24 +3,26 @@ import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 
+import 'package:missive/features/encryption/secure_storage_manager.dart';
+
 class SecureStorageIdentityKeyStore implements IdentityKeyStore {
-  final FlutterSecureStorage _secureStorage;
+  final SecureStorageManager _storageManager;
 
-  SecureStorageIdentityKeyStore(FlutterSecureStorage secureStorage)
-      : _secureStorage = secureStorage;
+  SecureStorageIdentityKeyStore(SecureStorageManager storageManager)
+      : _storageManager = storageManager;
 
-  /// Instanciate a new [SecureStorageIdentityKeyStore], and store the [IdentityKeyPair] and registrationId using [FlutterSecureStorage]. This is meant to be used when the user first creates their account.
+  /// Instanciate a new [SecureStorageIdentityKeyStore], and store the [IdentityKeyPair] and registrationId using [SecureStorageManager]. This is meant to be used when the user first creates their account.
   SecureStorageIdentityKeyStore.fromIdentityKeyPair(
-      FlutterSecureStorage secureStorage,
+      SecureStorageManager storageManager,
       IdentityKeyPair identityKeyPair,
       int registrationId)
-      : _secureStorage = secureStorage {
+      : _storageManager = storageManager {
     // we cannot use async here, so we need to use Future.wait since fromIdentityKeyPair a constructor
     List<Future> futures = [
-      _secureStorage.write(
+      _storageManager.write(
           key: 'identityKeyPair',
           value: base64Encode(identityKeyPair.serialize())),
-      _secureStorage.write(
+      _storageManager.write(
           key: 'registrationId', value: registrationId.toString())
     ];
     Future.wait(futures);
@@ -29,7 +31,7 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
   @override
   Future<IdentityKey?> getIdentity(SignalProtocolAddress address) async {
     final identityKeyString =
-        await _secureStorage.read(key: address.toString());
+        await _storageManager.read(key: address.toString());
     if (identityKeyString == null) return null;
     return IdentityKey.fromBytes(base64Decode(identityKeyString), 0);
   }
@@ -37,7 +39,7 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
   @override
   Future<IdentityKeyPair> getIdentityKeyPair() async {
     final identityKeyPairString =
-        await _secureStorage.read(key: 'identityKeyPair');
+        await _storageManager.read(key: 'identityKeyPair');
 
     if (identityKeyPairString == null) {
       throw Exception('Identity key pair not found');
@@ -48,7 +50,7 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
 
   @override
   Future<int> getLocalRegistrationId() async {
-    final registrationId = await _secureStorage.read(key: 'registrationId');
+    final registrationId = await _storageManager.read(key: 'registrationId');
 
     if (registrationId == null) throw Exception('Registration ID not found');
 
@@ -74,7 +76,7 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
     String serializedIdentityKey = base64Encode(identityKey.serialize());
     final existing = await getIdentity(address);
     if (identityKey == existing) return false;
-    await _secureStorage.write(
+    await _storageManager.write(
         key: address.toString(), value: serializedIdentityKey);
     return true;
   }

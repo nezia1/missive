@@ -10,6 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:missive/features/authentication/models/user.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
+import 'package:missive/features/encryption/secure_storage_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Provides everything related to the user, such as:
@@ -65,15 +66,15 @@ class AuthProvider extends ChangeNotifier {
     return await refreshToken != null;
   }
 
-  /// Creates a new [AuthProvider] with an optional [Dio] client and [FlutterSecureStorage].
-  AuthProvider({Dio? httpClient, FlutterSecureStorage? secureStorage})
-      : _httpClient = httpClient ?? Dio(),
-        _secureStorage = secureStorage ?? const FlutterSecureStorage();
+  /// Creates a new [AuthProvider] with a [Dio] client and [FlutterSecureStorage].
+  AuthProvider(
+      {required Dio httpClient, required FlutterSecureStorage secureStorage})
+      : _httpClient = httpClient,
+        _secureStorage = secureStorage;
 
   /// Registers a new user and returns a [AuthenticationResult], that can either be [AuthenticationSuccess] or [AuthenticationError].
   Future<AuthenticationResult> register(String name, String password) async {
     try {
-      const secureStorage = FlutterSecureStorage();
       final identityKeyPair = generateIdentityKeyPair();
       final registrationId = generateRegistrationId(false);
 
@@ -88,8 +89,12 @@ class AuthProvider extends ChangeNotifier {
           .post('/users', data: requestBody)
           .timeout(const Duration(seconds: 5));
 
+      // we need a namespace to store user related data
+      final storageManager =
+          SecureStorageManager(secureStorage: _secureStorage, namespace: name);
+
       SecureStorageIdentityKeyStore.fromIdentityKeyPair(
-          secureStorage, identityKeyPair, registrationId);
+          storageManager, identityKeyPair, registrationId);
 
       final accessToken = response.data['data']['accessToken'];
 
@@ -150,14 +155,14 @@ class AuthProvider extends ChangeNotifier {
       await _secureStorage.write(key: 'refreshToken', value: refreshToken);
       await _secureStorage.write(key: 'accessToken', value: accessToken);
 
-      final latestUserString = await _secureStorage.read(key: 'latestUser');
+      SecureStorageManager storageManager =
+          SecureStorageManager(secureStorage: _secureStorage, namespace: name);
 
-      // If user didn't log back in with the same account, we need to reset the installation status
-      if (latestUserString != null) {
-        final latestUser = jsonDecode(latestUserString);
-        if (latestUser != name) {
-          (await SharedPreferences.getInstance()).setBool('installed', false);
-        }
+      // If user didn't log in yet, we need to install the app
+      final firstLogin = await storageManager.read(key: 'identityKey') == null;
+
+      if (firstLogin) {
+        (await SharedPreferences.getInstance()).setBool('installed', false);
       }
       notifyListeners();
 
@@ -169,14 +174,9 @@ class AuthProvider extends ChangeNotifier {
 
   /// Logs out a user and clears the stored tokens.
   void logout() async {
-    // Store latest logged out user to be able to restore their identity keys if they log back in
-    final latestUser = (await user)?.name;
-    _secureStorage.write(key: 'latestUser', value: jsonEncode(latestUser));
-
     // TODO revoke the refresh token from the server, not only client-side
     await _secureStorage.delete(key: 'refreshToken');
     await _secureStorage.delete(key: 'accessToken');
-    await _secureStorage.delete(key: 'sessions');
 
     _user = null;
     notifyListeners();

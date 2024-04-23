@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:missive/features/encryption/secure_storage_manager.dart';
 
 class SecureStorageSessionStore implements SessionStore {
-  final FlutterSecureStorage _secureStorage;
+  final SecureStorageManager _storageManager;
 
-  SecureStorageSessionStore(FlutterSecureStorage secureStorage)
-      : _secureStorage = secureStorage;
+  SecureStorageSessionStore(SecureStorageManager storageManager)
+      : _storageManager = storageManager;
 
   @override
   Future<bool> containsSession(SignalProtocolAddress address) async {
@@ -53,11 +53,11 @@ class SecureStorageSessionStore implements SessionStore {
 
     sessions[address.toString()] = base64Encode(record.serialize());
 
-    await _secureStorage.write(key: 'sessions', value: jsonEncode(sessions));
+    await _storageManager.write(key: 'sessions', value: jsonEncode(sessions));
   }
 
   Future<Map<String, dynamic>?> _getSessions() async {
-    final serializedSessions = await _secureStorage.read(key: 'sessions');
+    final serializedSessions = await _storageManager.read(key: 'sessions');
 
     if (serializedSessions == null) return null;
 
