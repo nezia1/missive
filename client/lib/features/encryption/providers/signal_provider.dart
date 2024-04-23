@@ -73,6 +73,7 @@ class SignalProvider extends ChangeNotifier {
     final data = response.data['data'];
 
     final registrationId = data['registrationId'];
+
     final identityKey =
         IdentityKey.fromBytes(base64Decode(data['identityKey']), 0);
     final signedPreKey = SignedPreKeyRecord.fromSerialized(
@@ -99,7 +100,6 @@ class SignalProvider extends ChangeNotifier {
     if (await _sessionStore.containsSession(remoteAddress)) return;
     final remotePreKeyBundle = await fetchPreKeyBundle(name, accessToken);
 
-    print(remotePreKeyBundle);
     if (remotePreKeyBundle == null) return;
 
     final sessionBuilder = SessionBuilder(_sessionStore, _preKeyStore,
@@ -119,7 +119,8 @@ class SignalProvider extends ChangeNotifier {
     return cipherText;
   }
 
-  Future<void> handleReceivedMessage(
+  // TODO: handle case where the session might have changed (e.g. user logs out and logs back in, or user deletes their account and creates a new one with the same name). The signed key needs to be updated.
+  Future<String> decrypt(
       CiphertextMessage message, SignalProtocolAddress senderAddress) async {
     final sessionCipher = SessionCipher(_sessionStore, _preKeyStore,
         _signedPreKeyStore, _identityKeyStore, senderAddress);
@@ -132,5 +133,7 @@ class SignalProvider extends ChangeNotifier {
       plainText = await sessionCipher.decryptFromSignal(message);
     }
     print(utf8.decode(plainText));
+
+    return utf8.decode(plainText);
   }
 }

@@ -7,21 +7,23 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 
 class ChatProvider with ChangeNotifier {
-  WebSocketChannel? channel;
+  WebSocketChannel? _channel;
   final String _url;
   final SignalProvider _signalProvider;
+  final List<String> messages = [];
 
   ChatProvider(this._url, this._signalProvider);
 
-  void connect(String accessToken) async {
+  Future<void> connect(String accessToken) async {
     final ws = await WebSocket.connect(
       _url,
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
     );
 
-    channel = IOWebSocketChannel(ws);
+    _channel = IOWebSocketChannel(ws);
 
-    channel!.stream.listen((message) async {
+    print('Connected to $_url');
+    _channel!.stream.listen((message) async {
       final messageJson = jsonDecode(message);
       if (messageJson['status'] != null) {
         print(
@@ -39,9 +41,12 @@ class ChatProvider with ChangeNotifier {
         cipherMessage = PreKeySignalMessage(serializedContent);
       }
 
-      // TODO: send received message to SignalProvider for decryption and session handling
-      await _signalProvider.handleReceivedMessage(
+      final newMessage = await _signalProvider.decrypt(
           cipherMessage, SignalProtocolAddress(messageJson['sender'], 1));
+
+      messages.add(newMessage);
+
+      notifyListeners();
     });
   }
 
@@ -50,16 +55,14 @@ class ChatProvider with ChangeNotifier {
       'content': base64Encode(message.serialize()),
       'receiver': receiver,
     });
-    channel?.sink.add(messageJson);
-  }
-
-  void disconnect() {
-    channel?.sink.close();
+    _channel?.sink.add(messageJson);
   }
 
   @override
   void dispose() {
-    disconnect();
+    if (_channel != null) {
+      _channel?.sink.close();
+    }
     super.dispose();
   }
 }
