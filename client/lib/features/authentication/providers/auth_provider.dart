@@ -150,6 +150,15 @@ class AuthProvider extends ChangeNotifier {
       await _secureStorage.write(key: 'refreshToken', value: refreshToken);
       await _secureStorage.write(key: 'accessToken', value: accessToken);
 
+      final latestUserString = await _secureStorage.read(key: 'latestUser');
+
+      // If user didn't log back in with the same account, we need to reset the installation status
+      if (latestUserString != null) {
+        final latestUser = jsonDecode(latestUserString);
+        if (latestUser != name) {
+          (await SharedPreferences.getInstance()).setBool('installed', false);
+        }
+      }
       notifyListeners();
 
       return AuthenticationSuccess();
@@ -160,16 +169,15 @@ class AuthProvider extends ChangeNotifier {
 
   /// Logs out a user and clears the stored tokens.
   void logout() async {
-    // TODO: this should not happen every time the user logs out, but rather when they log out and log back in with a different account (it will work for now, needs to be improved later)
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setBool('installed', false);
-    });
+    // Store latest logged out user to be able to restore their identity keys if they log back in
+    final latestUser = (await user)?.name;
+    _secureStorage.write(key: 'latestUser', value: jsonEncode(latestUser));
 
     // TODO revoke the refresh token from the server, not only client-side
     await _secureStorage.delete(key: 'refreshToken');
     await _secureStorage.delete(key: 'accessToken');
+    await _secureStorage.delete(key: 'sessions');
 
-    await _secureStorage.deleteAll();
     _user = null;
     notifyListeners();
   }
