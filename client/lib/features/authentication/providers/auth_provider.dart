@@ -106,6 +106,8 @@ class AuthProvider extends ChangeNotifier {
           .split('=')
           .last;
 
+      (await SharedPreferences.getInstance()).setBool('installed', false);
+
       await _secureStorage.write(key: 'refreshToken', value: refreshToken);
       await _secureStorage.write(key: 'accessToken', value: accessToken);
 
