@@ -136,14 +136,6 @@ class AuthProvider extends ChangeNotifier {
         return TOTPRequiredError();
       }
 
-      // 401 represents either invalid credentials or an invalid TOTP
-      if (response.statusCode == 401) {
-        if (response.data['status'] == 'totp_invalid') {
-          return TOTPInvalidError();
-        }
-        return InvalidCredentialsError();
-      }
-
       final accessToken = response.data['data']['accessToken'];
 
       // the set-cookie header is not accessible from the http package, so we have to parse it manually
@@ -171,7 +163,15 @@ class AuthProvider extends ChangeNotifier {
 
       return AuthenticationSuccess();
     } on DioException catch (e) {
-      return AuthenticationError(e.message);
+      switch (e.response?.statusCode) {
+        case 401:
+          if (e.response?.data?['data']?['status'] == 'totp_invalid') {
+            return TOTPInvalidError();
+          }
+          return InvalidCredentialsError();
+        default:
+          return AuthenticationError(e.message);
+      }
     }
   }
 
