@@ -83,9 +83,10 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.only(left: 80.0, right: 80.0),
+          padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               TextField(
                   style: Theme.of(context).textTheme.bodyMedium,

@@ -14,7 +14,7 @@ class LandingScreen extends StatelessWidget {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.only(left: 80.0, right: 80.0),
+          padding: const EdgeInsets.symmetric(horizontal: 40.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -23,14 +23,19 @@ class LandingScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
               const SizedBox(height: 50.0),
-              ElevatedButton(
-                onPressed: () => context.push('/register'),
-                child: const Text('Register'),
-              ),
-              const SizedBox(height: 10.0),
-              ElevatedButton(
-                onPressed: () => context.push('/login'),
-                child: const Text('Login'),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => context.push('/register'),
+                    child: const Text('Register'),
+                  ),
+                  const SizedBox(height: 10.0),
+                  ElevatedButton(
+                    onPressed: () => context.push('/login'),
+                    child: const Text('Login'),
+                  )
+                ],
               )
             ],
           ),
