@@ -45,6 +45,13 @@ class Missive extends StatelessWidget {
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink),
             useMaterial3: true,
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0))),
+              ),
+            ),
           ),
           routerConfig: _router,
           debugShowCheckedModeBanner: false,
