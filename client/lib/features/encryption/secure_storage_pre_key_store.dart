@@ -1,5 +1,4 @@
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 
 import 'package:missive/features/encryption/secure_storage_manager.dart';

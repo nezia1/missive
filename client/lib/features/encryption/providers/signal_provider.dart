@@ -139,8 +139,6 @@ class SignalProvider extends ChangeNotifier {
     if (message is SignalMessage) {
       plainText = await sessionCipher.decryptFromSignal(message);
     }
-    print(utf8.decode(plainText));
-
     return utf8.decode(plainText);
   }
 }

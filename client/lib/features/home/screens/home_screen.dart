@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
+import 'package:missive/features/chat/providers/plain_text_message.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});
@@ -50,7 +52,13 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       await _signalProvider.initialize(installing: false, name: name!);
     }
-    await _chatProvider.connect((await _userProvider.accessToken)!);
+
+    await Hive.initFlutter();
+    Hive.registerAdapter(PlainTextMessageAdapter());
+
+    await _chatProvider.connect(
+        accessToken: (await _userProvider.accessToken)!,
+        name: (await _userProvider.user)!.name);
     return;
   }
 
@@ -141,5 +149,11 @@ class _HomeScreenState extends State<HomeScreen> {
             return const Center(child: CircularProgressIndicator());
           }),
     );
+  }
+
+  @override
+  void dispose() {
+    Hive.close();
+    super.dispose();
   }
 }
