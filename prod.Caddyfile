@@ -1,3 +1,7 @@
 missive.nezia.dev {
+    handle_path /pgadmin* {
+        uri strip_prefix /pgadmin
+        reverse_proxy pgadmin:80
+    }
     reverse_proxy app:8080
 }
