@@ -27,6 +27,8 @@ services:
     image: dpage/pgadmin4
     depends_on:
       - db
+    env_file:
+      - pgadmin.env
   caddy:
     image: caddy:2
     environment:
