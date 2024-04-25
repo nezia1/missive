@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:missive/constants/app_colors.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 

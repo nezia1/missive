@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'totp_modal.dart';
-import 'package:missive/constants/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.title});

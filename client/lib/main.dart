@@ -121,6 +121,8 @@ ThemeData _buildAppTheme() {
         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
           const EdgeInsets.symmetric(vertical: 25.0),
         ),
+        textStyle:
+            MaterialStateProperty.all<TextStyle>(const TextStyle(fontSize: 17)),
         backgroundColor:
             MaterialStateProperty.all<Color>(AppColors.secondaryPurple),
         foregroundColor:
