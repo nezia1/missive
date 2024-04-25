@@ -8,3 +8,7 @@ Le projet est divisé avec la structure standard de Flutter. La structure du dos
 
 - **constants** : Contient les constantes du projet
 - **features** : Contient les différentes fonctionnalités de l'application (contient les écrans, les modèles, les services, ...)
+
+## Crédits
+
+- Icône de l'application : [messaging, Gregor Cresnar](https://thenounproject.com/icon/messaging-6249502/) (CC BY 3.0)
