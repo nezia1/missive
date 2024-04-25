@@ -43,8 +43,8 @@ class ChatProvider with ChangeNotifier {
 
     final hiveCipher = HiveAesCipher(base64Decode(hiveEncryptionKeyString));
 
-    final encryptedBox = await Hive.openBox<List<PlainTextMessage>>('messages',
-        encryptionCipher: hiveCipher);
+    final encryptedBox =
+        await Hive.openBox<List>('messages', encryptionCipher: hiveCipher);
 
     _channel!.stream.listen((message) async {
       final messageJson = jsonDecode(message);
@@ -74,11 +74,10 @@ class ChatProvider with ChangeNotifier {
       );
 
       // store message in Hive
-      // TODO: fix typing issues
       final messages =
-          encryptedBox.get(messageJson['sender']) ?? <PlainTextMessage>[];
+          encryptedBox.get(messageJson['sender'])?.cast<PlainTextMessage>() ??
+              <PlainTextMessage>[];
       messages.add(plainTextMessage);
-
       await encryptedBox.put(messageJson['sender'], messages);
 
       notifyListeners();
