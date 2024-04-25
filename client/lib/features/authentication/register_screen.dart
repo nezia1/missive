@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:missive/constants/app_colors.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -16,18 +17,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _password = '';
   String _errorMessage = '';
 
-  bool _loggingIn = false;
+  bool _creatingAccount = false;
 
   Future<void> handleRegister() async {
     setState(() {
-      _loggingIn = true;
+      _creatingAccount = true;
       _errorMessage = '';
     });
 
     if (_name.trim() == '' || _password.trim() == '') {
       setState(() {
         _errorMessage = 'Please fill in all fields';
-        _loggingIn = false;
+        _creatingAccount = false;
       });
 
       return;
@@ -48,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         break;
     }
 
-    setState(() => _loggingIn = false);
+    setState(() => _creatingAccount = false);
   }
 
   void displayErrorSnackBar(String message) {
@@ -64,9 +65,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-        bottom: _loggingIn
+        backgroundColor: Colors.transparent,
+        bottom: _creatingAccount
             ? const PreferredSize(
                 preferredSize: Size.fromHeight(4.0),
                 child: LinearProgressIndicator())

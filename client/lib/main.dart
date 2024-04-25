@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // screens
 import 'package:missive/features/authentication/landing_screen.dart';
@@ -19,6 +20,7 @@ import 'package:missive/features/chat/providers/chat_provider.dart';
 
 // common
 import 'package:missive/common/http.dart';
+import 'package:missive/constants/app_colors.dart';
 
 void main() => runApp(Missive());
 
@@ -44,17 +46,7 @@ class Missive extends StatelessWidget {
         ],
         child: MaterialApp.router(
           title: title,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink),
-            useMaterial3: true,
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0))),
-              ),
-            ),
-          ),
+          theme: _buildAppTheme(),
           routerConfig: _router,
           debugShowCheckedModeBanner: false,
         ),
@@ -100,5 +92,40 @@ class Missive extends StatelessWidget {
       return null;
     },
     refreshListenable: _authProvider,
+  );
+}
+
+ThemeData _buildAppTheme() {
+  final ThemeData base = ThemeData.dark();
+  return base.copyWith(
+    brightness: Brightness.dark,
+    textTheme: GoogleFonts.varelaRoundTextTheme(base.textTheme),
+    scaffoldBackgroundColor: AppColors.accentBlue,
+    colorScheme: base.colorScheme.copyWith(
+      primary: AppColors.primaryPurple,
+      onPrimary: AppColors.contrastWhite,
+      secondary: AppColors.accentPink,
+      onSecondary: AppColors.contrastWhite,
+      error: Colors.red,
+      background: AppColors.accentBlue,
+      onBackground: AppColors.contrastWhite,
+      surface: AppColors.secondaryPurple,
+      onSurface: AppColors.primaryPurple,
+    ),
+    iconTheme: const IconThemeData(color: AppColors.contrastWhite),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ButtonStyle(
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+        ),
+        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+          const EdgeInsets.symmetric(vertical: 25.0),
+        ),
+        backgroundColor:
+            MaterialStateProperty.all<Color>(AppColors.secondaryPurple),
+        foregroundColor:
+            MaterialStateProperty.all<Color>(AppColors.contrastWhite),
+      ),
+    ),
   );
 }

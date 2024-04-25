@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'totp_modal.dart';
+import 'package:missive/constants/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.title});
@@ -73,8 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        backgroundColor: Colors.transparent,
         bottom: _loggingIn
             ? const PreferredSize(
                 preferredSize: Size.fromHeight(4.0),
