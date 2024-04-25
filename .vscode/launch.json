@@ -1,0 +1,18 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Launch Client (dev)",
+			"cwd": "${workspaceFolder}/client",
+			"request": "launch",
+			"type": "dart",
+			"program": "lib/main.dart",
+			"args": [
+				"--dart-define",
+				"API_URL=http://localhost/api/v1",
+				"--dart-define",
+				"WEBSOCKET_URL=ws://localhost"
+			]
+		}
+	]
+}

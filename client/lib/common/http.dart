@@ -2,7 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:missive/constants/api.dart';
 
 final dio = Dio(BaseOptions(
-  baseUrl: ApiConstants.baseUrl,
+  baseUrl:
+      const String.fromEnvironment('API_URL', defaultValue: 'localhost/api/v1'),
   headers: {
     'Content-Type': 'application/json',
   },
