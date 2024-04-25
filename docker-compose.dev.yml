@@ -5,6 +5,3 @@ services:
   db:
     ports:
       - "5432:5432"
-  pgadmin:
-    ports:
-      - "5050:80"

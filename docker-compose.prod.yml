@@ -2,4 +2,10 @@ services:
   caddy:
     volumes:
       - ./prod.Caddyfile:/etc/caddy/Caddyfile
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - db
+    env_file:
+      - pgadmin.env
 
