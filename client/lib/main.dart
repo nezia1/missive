@@ -130,7 +130,7 @@ ThemeData _buildAppTheme() {
         backgroundColor: MaterialStateProperty.all<Color>(palette.accent),
         foregroundColor: MaterialStateProperty.all<Color>(palette.textPrimary),
         elevation:
-            MaterialStateProperty.all(4.0), // Raised elevation for a 3D effect
+            MaterialStateProperty.all(8.0), // Raised elevation for a 3D effect
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(

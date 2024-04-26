@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
 import 'package:missive/features/chat/providers/plain_text_message.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});
@@ -19,7 +20,6 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-// TODO: wrap in FutureBuilder so we can wait for everything to be initialized properly
 class _HomeScreenState extends State<HomeScreen> {
   // late is needed here because AuthProvider requires context and IdentityKeyStore is initialized in initState (the constructor needs to be different whether or not the user just created their account)
   late AuthProvider _userProvider;
@@ -72,84 +72,105 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBody() {
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 80.0, vertical: 20.0),
-        child: Column(children: [
-          FutureBuilder(
-              future: _userProvider.user,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Text('Welcome, ${snapshot.data?.name}');
-                } else {
-                  return Text('Welcome');
-                }
-              }),
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'Message',
-            ),
-            onChanged: (value) => _message = value,
+    return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Text(widget.title),
+        ),
+        drawer: Drawer(
+          backgroundColor: Theme.of(context).canvasColor,
+          child: ListView(
+            children: [
+              SizedBox(
+                height: 70,
+                child: DrawerHeader(
+                    child: TextButton.icon(
+                  label: const Text('Settings'),
+                  icon: const Icon(Icons.settings),
+                  onPressed: () {
+                    context.push('/settings');
+                  },
+                )),
+              ),
+              SizedBox(
+                height: 70,
+                child: DrawerHeader(
+                    child: TextButton.icon(
+                        label: const Text('Logout'),
+                        icon: const Icon(Icons.logout),
+                        onPressed: () {
+                          _userProvider.logout();
+                        })),
+              ),
+            ],
           ),
-          ElevatedButton(
-            child: Text('Send message to Dave'),
-            onPressed: handleMessageSent,
-          ),
-          const SizedBox(height: 20),
-          Consumer<ChatProvider>(
-            builder: (context, chat, child) {
-              return Column(
-                children:
-                    chat.messages.map((message) => Text(message)).toList(),
-              );
-            },
-          )
-        ]));
+        ),
+        body: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 80.0, vertical: 20.0),
+            child: Column(children: [
+              FutureBuilder(
+                  future: _userProvider.user,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Text('Welcome, ${snapshot.data?.name}');
+                    } else {
+                      return Text('Welcome');
+                    }
+                  }),
+              TextField(
+                decoration: const InputDecoration(
+                  labelText: 'Message',
+                ),
+                onChanged: (value) => _message = value,
+              ),
+              ElevatedButton(
+                child: Text('Send message to Dave'),
+                onPressed: handleMessageSent,
+              ),
+              const SizedBox(height: 20),
+              Consumer<ChatProvider>(
+                builder: (context, chat, child) {
+                  return Column(
+                    children:
+                        chat.messages.map((message) => Text(message)).toList(),
+                  );
+                },
+              )
+            ])));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      drawer: Drawer(
-        backgroundColor: Theme.of(context).canvasColor,
-        child: ListView(
-          children: [
-            SizedBox(
-              height: 70,
-              child: DrawerHeader(
-                  child: TextButton.icon(
-                label: const Text('Settings'),
-                icon: const Icon(Icons.settings),
-                onPressed: () {
-                  context.push('/settings');
-                },
-              )),
-            ),
-            SizedBox(
-              height: 70,
-              child: DrawerHeader(
-                  child: TextButton.icon(
-                      label: const Text('Logout'),
-                      icon: const Icon(Icons.logout),
-                      onPressed: () {
-                        _userProvider.logout();
-                      })),
-            ),
-          ],
-        ),
-      ),
-      body: FutureBuilder(
-          future: _initialization,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return _buildBody();
-            }
-            return const Center(child: CircularProgressIndicator());
-          }),
+    const String logoName = 'assets/missive_logo.svg';
+    final logo = SvgPicture.asset(
+      logoName,
+      width: 200.0,
+      height: 200.0,
+      colorFilter: ColorFilter.mode(
+          Theme.of(context).colorScheme.onPrimary, BlendMode.srcIn),
     );
+    return FutureBuilder(
+        future: _initialization,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return _buildBody();
+          }
+          return Container(
+            color: Theme.of(context).colorScheme.background,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                logo,
+                CircularProgressIndicator(
+                  strokeWidth: 8,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).colorScheme.onPrimary),
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   @override
