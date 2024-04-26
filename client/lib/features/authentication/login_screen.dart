@@ -80,61 +80,76 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: LinearProgressIndicator())
             : null,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              TextField(
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  decoration: const InputDecoration(labelText: 'Name'),
-                  onChanged: (value) => _name = value),
-              const SizedBox(height: 10),
-              TextField(
-                style: Theme.of(context).textTheme.bodyMedium,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                onChanged: (value) => _password = value,
-              ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                  child: const Text('Login'),
-                  onPressed: () async {
-                    await handleLogin();
-                    if (_errorMessage.isNotEmpty) {
-                      displayErrorSnackBar(_errorMessage);
-                    }
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Expanded(
+              flex: 1,
+              child: Center(
+                  child: Text(
+                'Welcome back!',
+                style: Theme.of(context).textTheme.headlineMedium,
+              )),
+            ),
+            Expanded(
+              flex: 2,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      decoration: const InputDecoration(labelText: 'Name'),
+                      onChanged: (value) => _name = value),
+                  const SizedBox(height: 10),
+                  TextField(
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    decoration: const InputDecoration(labelText: 'Password'),
+                    obscureText: true,
+                    onChanged: (value) => _password = value,
+                  ),
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                      child: const Text('Login'),
+                      onPressed: () async {
+                        await handleLogin();
+                        if (_errorMessage.isNotEmpty) {
+                          displayErrorSnackBar(_errorMessage);
+                        }
 
-                    if (_totpRequired) {
-                      if (!context.mounted) return;
-                      showModalBottomSheet(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return TOTPModal(onHandleTotp: (totp) async {
-                              _loggingIn = true;
-                              bool authenticationSucceeded = false;
-                              final loginResult =
-                                  await Provider.of<AuthProvider>(context,
-                                          listen: false)
-                                      .login(_name, _password, totp);
-                              switch (loginResult) {
-                                case AuthenticationSuccess():
-                                  authenticationSucceeded = true;
-                                case TOTPInvalidError():
-                                  authenticationSucceeded = false;
-                                case AuthenticationError():
-                                  authenticationSucceeded = false;
-                              }
-                              _loggingIn = false;
-                              return authenticationSucceeded;
-                            });
-                          });
-                    }
-                  }),
-            ],
-          ),
+                        if (_totpRequired) {
+                          if (!context.mounted) return;
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return TOTPModal(onHandleTotp: (totp) async {
+                                  _loggingIn = true;
+                                  bool authenticationSucceeded = false;
+                                  final loginResult =
+                                      await Provider.of<AuthProvider>(context,
+                                              listen: false)
+                                          .login(_name, _password, totp);
+                                  switch (loginResult) {
+                                    case AuthenticationSuccess():
+                                      authenticationSucceeded = true;
+                                    case TOTPInvalidError():
+                                      authenticationSucceeded = false;
+                                    case AuthenticationError():
+                                      authenticationSucceeded = false;
+                                  }
+                                  _loggingIn = false;
+                                  return authenticationSucceeded;
+                                });
+                              });
+                        }
+                      }),
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );

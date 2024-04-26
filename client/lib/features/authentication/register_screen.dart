@@ -71,35 +71,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: LinearProgressIndicator())
             : null,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              TextField(
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  decoration: const InputDecoration(labelText: 'Name'),
-                  onChanged: (value) => _name = value),
-              const SizedBox(height: 10),
-              TextField(
-                style: Theme.of(context).textTheme.bodyMedium,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                onChanged: (value) => _password = value,
-              ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                  child: const Text('Register'),
-                  onPressed: () async {
-                    await handleRegister();
-                    if (_errorMessage.isNotEmpty) {
-                      displayErrorSnackBar(_errorMessage);
-                    }
-                  }),
-            ],
-          ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Column(
+          children: <Widget>[
+            Expanded(
+                flex: 1,
+                child: Center(
+                  child: Text('Nice to meet you!',
+                      style: Theme.of(context).textTheme.headlineMedium),
+                )),
+            Expanded(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextField(
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        decoration: const InputDecoration(labelText: 'Name'),
+                        onChanged: (value) => _name = value),
+                    const SizedBox(height: 10),
+                    TextField(
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      decoration: const InputDecoration(labelText: 'Password'),
+                      obscureText: true,
+                      onChanged: (value) => _password = value,
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                        child: const Text('Register'),
+                        onPressed: () async {
+                          await handleRegister();
+                          if (_errorMessage.isNotEmpty) {
+                            displayErrorSnackBar(_errorMessage);
+                          }
+                        }),
+                  ],
+                ))
+          ],
         ),
       ),
     );
