@@ -65,9 +65,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void handleMessageSent() async {
     await _signalProvider.buildSession(
         name: 'carol', accessToken: (await _userProvider.accessToken)!);
-    final cipherText =
-        await _signalProvider.encrypt(message: _message, name: 'carol');
-    _chatProvider.sendMessage(cipherText, 'carol');
+    await _chatProvider.sendMessage(
+        plainText: _message,
+        receiver: 'carol',
+        name: (await _userProvider.user)!.name);
   }
 
   Widget _buildBody() {

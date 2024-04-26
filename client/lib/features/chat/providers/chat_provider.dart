@@ -28,23 +28,9 @@ class ChatProvider with ChangeNotifier {
     _channel = IOWebSocketChannel(ws);
 
     print('Connected to $_url');
+
     // Initialize Hive box for storing messages
-    const secureStorage = FlutterSecureStorage();
-    var hiveEncryptionKeyString =
-        await secureStorage.read(key: '${name}_hiveEncryptionKey');
-
-    if (hiveEncryptionKeyString == null) {
-      hiveEncryptionKeyString = base64Encode(Hive.generateSecureKey());
-      await secureStorage.write(
-        key: '${name}_hiveEncryptionKey',
-        value: hiveEncryptionKeyString,
-      );
-    }
-
-    final hiveCipher = HiveAesCipher(base64Decode(hiveEncryptionKeyString));
-
-    final encryptedBox =
-        await Hive.openBox<List>('messages', encryptionCipher: hiveCipher);
+    final encryptedBox = await _getMessagesBox(name);
 
     _channel!.stream.listen((message) async {
       final messageJson = jsonDecode(message);
@@ -84,12 +70,48 @@ class ChatProvider with ChangeNotifier {
     });
   }
 
-  void sendMessage(CiphertextMessage message, String receiver) {
+  // TODO: add id to message so that we can update the status
+  Future<void> sendMessage(
+      {required String plainText,
+      required String receiver,
+      required String name}) async {
+    final message =
+        await _signalProvider.encrypt(name: receiver, message: plainText);
+
     final messageJson = jsonEncode({
       'content': base64Encode(message.serialize()),
       'receiver': receiver,
     });
+    // send message over WebSocket
     _channel?.sink.add(messageJson);
+
+    // store sent message
+    final encryptedBox = await _getMessagesBox(name);
+    final messages = encryptedBox.get(receiver)?.cast<PlainTextMessage>() ??
+        <PlainTextMessage>[];
+
+    messages.add(PlainTextMessage(content: plainText, own: true));
+
+    await encryptedBox.put(receiver, messages);
+  }
+
+  /// Get the messages box for a specific user
+  Future<Box<List>> _getMessagesBox(String name) async {
+    const secureStorage = FlutterSecureStorage();
+
+    var hiveEncryptionKeyString =
+        await secureStorage.read(key: '${name}_hiveEncryptionKey');
+    if (hiveEncryptionKeyString == null) {
+      hiveEncryptionKeyString = base64Encode(Hive.generateSecureKey());
+      await secureStorage.write(
+        key: '${name}_hiveEncryptionKey',
+        value: hiveEncryptionKeyString,
+      );
+    }
+
+    final hiveCipher = HiveAesCipher(base64Decode(hiveEncryptionKeyString));
+
+    return await Hive.openBox<List>('messages', encryptionCipher: hiveCipher);
   }
 
   @override
