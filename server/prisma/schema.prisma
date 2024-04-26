@@ -44,7 +44,7 @@ model PendingMessage {
   receiverId  String   @db.Uuid
   receiver    User     @relation(name: "ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
   senderId    String   @db.Uuid
-  sender      User     @relation(name: "SentMessages", fields: [senderId], references: [id])
+  sender      User     @relation(name: "SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
   sentAt      DateTime @default(now())
 }
 
