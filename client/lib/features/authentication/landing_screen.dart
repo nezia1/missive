@@ -14,8 +14,8 @@ class LandingScreen extends StatelessWidget {
       logoName,
       width: 200.0,
       height: 200.0,
-      colorFilter:
-          const ColorFilter.mode(AppColors.contrastWhite, BlendMode.srcIn),
+      colorFilter: ColorFilter.mode(
+          Theme.of(context).colorScheme.onPrimary, BlendMode.srcIn),
     );
     return Scaffold(
       body: Padding(
