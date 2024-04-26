@@ -101,7 +101,7 @@ ThemeData _buildAppTheme() {
 
   return base.copyWith(
     brightness: Brightness.dark,
-    textTheme: GoogleFonts.varelaRoundTextTheme(base.textTheme).apply(
+    textTheme: GoogleFonts.rubikTextTheme(base.textTheme).apply(
       bodyColor: palette.textPrimary,
       displayColor: palette.textPrimary,
     ),
@@ -127,8 +127,6 @@ ThemeData _buildAppTheme() {
         ),
         padding: MaterialStateProperty.all<EdgeInsets>(
             const EdgeInsets.symmetric(vertical: 25.0)),
-        textStyle: MaterialStateProperty.all<TextStyle>(
-            TextStyle(fontSize: 16, color: palette.textPrimary)),
         backgroundColor: MaterialStateProperty.all<Color>(palette.accent),
         foregroundColor: MaterialStateProperty.all<Color>(palette.textPrimary),
         elevation:
