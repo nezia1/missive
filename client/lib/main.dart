@@ -96,38 +96,82 @@ class Missive extends StatelessWidget {
 }
 
 ThemeData _buildAppTheme() {
+  final palette = PurpleDream();
   final ThemeData base = ThemeData.dark();
+
   return base.copyWith(
     brightness: Brightness.dark,
-    textTheme: GoogleFonts.varelaRoundTextTheme(base.textTheme),
-    scaffoldBackgroundColor: AppColors.accentBlue,
-    colorScheme: base.colorScheme.copyWith(
-      primary: AppColors.primaryPurple,
-      onPrimary: AppColors.contrastWhite,
-      secondary: AppColors.accentPink,
-      onSecondary: AppColors.contrastWhite,
-      error: Colors.red,
-      background: AppColors.accentBlue,
-      onBackground: AppColors.contrastWhite,
-      surface: AppColors.secondaryPurple,
-      onSurface: AppColors.primaryPurple,
+    textTheme: GoogleFonts.varelaRoundTextTheme(base.textTheme).apply(
+      bodyColor: palette.textPrimary,
+      displayColor: palette.textPrimary,
     ),
-    iconTheme: const IconThemeData(color: AppColors.contrastWhite),
+    scaffoldBackgroundColor: palette.background,
+    colorScheme: base.colorScheme.copyWith(
+      primary: palette.primary,
+      onPrimary: palette.textPrimary,
+      secondary: palette.secondary,
+      onSecondary: palette.textSecondary,
+      error: palette.error,
+      background: palette.background,
+      onBackground: palette.textSecondary,
+      surface: palette.secondary,
+      onSurface: palette.textPrimary,
+    ),
+    iconTheme: IconThemeData(color: palette.textPrimary),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ), // Lighter border),
         ),
-        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-          const EdgeInsets.symmetric(vertical: 25.0),
-        ),
-        textStyle:
-            MaterialStateProperty.all<TextStyle>(const TextStyle(fontSize: 17)),
-        backgroundColor:
-            MaterialStateProperty.all<Color>(AppColors.secondaryPurple),
-        foregroundColor:
-            MaterialStateProperty.all<Color>(AppColors.contrastWhite),
+        padding: MaterialStateProperty.all<EdgeInsets>(
+            const EdgeInsets.symmetric(vertical: 25.0)),
+        textStyle: MaterialStateProperty.all<TextStyle>(
+            TextStyle(fontSize: 16, color: palette.textPrimary)),
+        backgroundColor: MaterialStateProperty.all<Color>(palette.accent),
+        foregroundColor: MaterialStateProperty.all<Color>(palette.textPrimary),
+        elevation:
+            MaterialStateProperty.all(4.0), // Raised elevation for a 3D effect
       ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: palette.secondary, // Background color for the text field
+      contentPadding: const EdgeInsets.symmetric(
+          vertical: 15.0, horizontal: 20.0), // Padding inside the text field
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15.0), // Fully rounded corners
+        borderSide: BorderSide.none, // No border
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15.0),
+        borderSide: BorderSide(
+            color: palette.accent.withOpacity(0.5),
+            width: 1.0), // Slightly visible border when enabled
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15.0),
+        borderSide: BorderSide(
+            color: palette.accent,
+            width: 2.0), // More visible border when focused
+      ),
+      hintStyle:
+          TextStyle(color: palette.textSecondary), // Style for the hint text
+      labelStyle: TextStyle(
+          color: palette
+              .textPrimary), // Style for the label when the focus is in the text field
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15.0),
+        borderSide:
+            BorderSide(color: palette.error, width: 1.0), // Error state border
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15.0),
+        borderSide: BorderSide(
+            color: palette.error, width: 2.0), // Focused error state border
+      ),
+      // You can also add errorStyle, prefixStyle, suffixStyle as needed.
     ),
   );
 }

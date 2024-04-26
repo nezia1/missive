@@ -82,13 +82,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: Theme.of(context).textTheme.bodyMedium,
                   decoration: const InputDecoration(labelText: 'Name'),
                   onChanged: (value) => _name = value),
+              const SizedBox(height: 10),
               TextField(
                 style: Theme.of(context).textTheme.bodyMedium,
                 decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
                 onChanged: (value) => _password = value,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               ElevatedButton(
                   child: const Text('Register'),
                   onPressed: () async {
