@@ -41,12 +41,22 @@ class Missive extends StatelessWidget {
                   ChatProvider>(
               create: (BuildContext context) => ChatProvider
                   .empty(), // Empty constructor for ChangeNotifierProxyProvider's create method (since we depend on the other providers to be initialized first, and create requires a pure function that doesn't depend on other providers)
-              update: (BuildContext context, authProvider, signalProvider, _) {
-                return ChatProvider(
-                    url: const String.fromEnvironment('WEBSOCKET_URL',
-                        defaultValue: 'ws://localhost'),
-                    authProvider: authProvider,
-                    signalProvider: signalProvider);
+              update: (BuildContext context, authProvider, signalProvider,
+                  chatProvider) {
+                if (chatProvider == null) {
+                  throw Exception(
+                      'ChatProvider should never be null in update');
+                }
+
+                if (chatProvider.needsUpdate()) {
+                  chatProvider.update(
+                      url: const String.fromEnvironment('WEBSOCKET_URL',
+                          defaultValue: 'ws://localhost:8080'),
+                      authProvider: authProvider,
+                      signalProvider: signalProvider);
+                }
+
+                return chatProvider;
               }),
         ],
         child: MaterialApp.router(

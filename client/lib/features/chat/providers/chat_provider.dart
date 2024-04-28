@@ -13,9 +13,9 @@ import 'plain_text_message.dart';
 
 class ChatProvider with ChangeNotifier {
   WebSocketChannel? _channel;
-  final String? _url;
-  final AuthProvider? _authProvider;
-  final SignalProvider? _signalProvider;
+  String? _url;
+  AuthProvider? _authProvider;
+  SignalProvider? _signalProvider;
   final List<String> messages = [];
 
   ChatProvider(
@@ -27,21 +27,32 @@ class ChatProvider with ChangeNotifier {
   // Empty constructor for ChangeNotifierProxyProvider's create method
   ChatProvider.empty() : this();
 
+  void update(
+      {required String url,
+      required AuthProvider authProvider,
+      required SignalProvider signalProvider}) {
+    _url = url;
+    _authProvider = authProvider;
+    _signalProvider = signalProvider;
+  }
+
+  bool needsUpdate() =>
+      _url == null || _authProvider == null || _signalProvider == null;
+
   Future<void> connect() async {
     if (_url == null || _authProvider == null || _signalProvider == null) {
       throw Exception('ChatProvider is not fully initialized');
     }
 
     final ws = await WebSocket.connect(
-      _url,
+      _url!,
       headers: {
         HttpHeaders.authorizationHeader:
-            'Bearer ${await _authProvider.accessToken}'
+            'Bearer ${await _authProvider!.accessToken}'
       },
     );
 
     _channel = IOWebSocketChannel(ws);
-
     print('Connected to $_url');
 
     // Initialize Hive box for storing messages
@@ -66,7 +77,7 @@ class ChatProvider with ChangeNotifier {
         cipherMessage = PreKeySignalMessage(serializedContent);
       }
 
-      final plainText = await _signalProvider.decrypt(
+      final plainText = await _signalProvider!.decrypt(
           cipherMessage, SignalProtocolAddress(messageJson['sender'], 1));
 
       final plainTextMessage = PlainTextMessage(
@@ -91,9 +102,8 @@ class ChatProvider with ChangeNotifier {
     if (_signalProvider == null) {
       throw Exception('SignalProvider is not initialized');
     }
-
     final message =
-        await _signalProvider.encrypt(name: receiver, message: plainText);
+        await _signalProvider!.encrypt(name: receiver, message: plainText);
 
     final messageJson = jsonEncode({
       'content': base64Encode(message.serialize()),
@@ -118,7 +128,7 @@ class ChatProvider with ChangeNotifier {
       throw Exception('AuthProvider is not initialized');
     }
 
-    final name = (await _authProvider.user)!.name;
+    final name = (await _authProvider!.user)!.name;
     const secureStorage = FlutterSecureStorage();
 
     var hiveEncryptionKeyString =
