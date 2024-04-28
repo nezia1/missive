@@ -56,19 +56,14 @@ class _HomeScreenState extends State<HomeScreen> {
     await Hive.initFlutter();
     Hive.registerAdapter(PlainTextMessageAdapter());
 
-    await _chatProvider.connect(
-        accessToken: (await _userProvider.accessToken)!,
-        name: (await _userProvider.user)!.name);
+    await _chatProvider.connect();
     return;
   }
 
   void handleMessageSent() async {
     await _signalProvider.buildSession(
         name: 'carol', accessToken: (await _userProvider.accessToken)!);
-    await _chatProvider.sendMessage(
-        plainText: _message,
-        receiver: 'carol',
-        name: (await _userProvider.user)!.name);
+    await _chatProvider.sendMessage(plainText: _message, receiver: 'carol');
   }
 
   Widget _buildBody() {
