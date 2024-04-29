@@ -96,58 +96,60 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        body: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 80.0, vertical: 20.0),
-            child: Column(children: [
-              Expanded(
-                  //TODO: this probably needs its own widget, it's getting too big
-                  //TODO: the logic behind that needs to change, it is extremely inefficient to parse every single message every time a new message is sent or received
-                  child: ValueListenableBuilder(
-                      valueListenable: _chatProvider.messagesListenable,
-                      builder: (context, box, _) {
-                        return FutureBuilder(
-                            future: _chatProvider.getConversations(),
-                            builder: (context,
-                                AsyncSnapshot<List<Map<String, String>>>
-                                    snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              }
+        body: Column(children: [
+          Text('Conversations',
+              style: Theme.of(context).textTheme.headlineLarge),
+          Expanded(
+              //TODO: this probably needs its own widget, it's getting too big
+              //TODO: the logic behind that needs to change, it is extremely inefficient to parse every single message every time a new message is sent or received
+              child: ValueListenableBuilder(
+                  valueListenable: _chatProvider.messagesListenable,
+                  builder: (context, box, _) {
+                    return FutureBuilder(
+                        future: _chatProvider.getConversations(),
+                        builder: (context,
+                            AsyncSnapshot<List<Map<String, String>>> snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
 
-                              if (snapshot.hasData) {
-                                return ListView.builder(
-                                  itemCount: snapshot.data!.length,
-                                  itemBuilder: (context, index) {
-                                    final conversation = snapshot.data![index];
-                                    return ListTile(
-                                      title: Text(conversation['username']!,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineSmall),
-                                      subtitle:
-                                          Text(conversation['latestMessage']!),
-                                    );
-                                  },
+                          if (snapshot.hasData) {
+                            return ListView.separated(
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                final conversation = snapshot.data![index];
+                                return ListTile(
+                                  title: Text(conversation['username']!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall),
+                                  subtitle:
+                                      Text(conversation['latestMessage']!),
+                                  onTap: () => context.go(
+                                      '/conversations/${conversation['username']}'),
                                 );
-                              }
+                              },
+                              separatorBuilder: (context, index) =>
+                                  const Divider(),
+                            );
+                          }
 
-                              return Text('No conversations yet');
-                            });
-                      })),
-              TextField(
-                decoration: const InputDecoration(
-                  labelText: 'Message',
-                ),
-                onChanged: (value) => _message = value,
-              ),
-              ElevatedButton(
-                child: Text('Send message to carol'),
-                onPressed: handleMessageSent,
-              ),
-            ])));
+                          return Text('No conversations yet');
+                        });
+                  })),
+          TextField(
+            decoration: const InputDecoration(
+              labelText: 'Message',
+            ),
+            onChanged: (value) => _message = value,
+          ),
+          ElevatedButton(
+            child: Text('Send message to carol'),
+            onPressed: handleMessageSent,
+          ),
+        ]));
   }
 
   @override
