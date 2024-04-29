@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:web_socket_channel/io.dart';
@@ -17,7 +18,8 @@ class ChatProvider with ChangeNotifier {
   String? _url;
   AuthProvider? _authProvider;
   SignalProvider? _signalProvider;
-  final List<String> messages = [];
+  ValueListenable<Box> get messagesListenable =>
+      Hive.box<List>('messages').listenable();
 
   ChatProvider(
       {String? url, AuthProvider? authProvider, SignalProvider? signalProvider})
@@ -131,6 +133,8 @@ class ChatProvider with ChangeNotifier {
     messages.add(PlainTextMessage(id: uuid, content: plainText, own: true));
 
     await encryptedBox.put(receiver, messages);
+
+    notifyListeners();
   }
 
   /// Get the messages box for the current authenticated user
@@ -155,6 +159,28 @@ class ChatProvider with ChangeNotifier {
     final hiveCipher = HiveAesCipher(base64Decode(hiveEncryptionKeyString));
 
     return await Hive.openBox<List>('messages', encryptionCipher: hiveCipher);
+  }
+
+  /// Get a list of all conversations for the current authenticated user. Returns a list of usernames, alongside the latest message.
+  Future<List<Map<String, String>>> getConversations() async {
+    if (_authProvider == null) {
+      throw Exception('AuthProvider is not initialized');
+    }
+
+    final encryptedBox = await _getMessagesBox();
+
+    final conversations = <Map<String, String>>[];
+
+    for (var key in encryptedBox.keys) {
+      final messages = encryptedBox.get(key)?.cast<PlainTextMessage>() ?? [];
+      final latestMessage = messages.last;
+      conversations.add({
+        'username': key,
+        'latestMessage': latestMessage.content,
+      });
+    }
+
+    return conversations;
   }
 
   @override

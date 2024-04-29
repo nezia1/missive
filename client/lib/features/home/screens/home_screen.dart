@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
@@ -99,15 +100,43 @@ class _HomeScreenState extends State<HomeScreen> {
             padding:
                 const EdgeInsets.symmetric(horizontal: 80.0, vertical: 20.0),
             child: Column(children: [
-              FutureBuilder(
-                  future: _userProvider.user,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return Text('Welcome, ${snapshot.data?.name}');
-                    } else {
-                      return Text('Welcome');
-                    }
-                  }),
+              Expanded(
+                  //TODO: this probably needs its own widget, it's getting too big
+                  //TODO: the logic behind that needs to change, it is extremely inefficient to parse every single message every time a new message is sent or received
+                  child: ValueListenableBuilder(
+                      valueListenable: _chatProvider.messagesListenable,
+                      builder: (context, box, _) {
+                        return FutureBuilder(
+                            future: _chatProvider.getConversations(),
+                            builder: (context,
+                                AsyncSnapshot<List<Map<String, String>>>
+                                    snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
+
+                              if (snapshot.hasData) {
+                                return ListView.builder(
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, index) {
+                                    final conversation = snapshot.data![index];
+                                    return ListTile(
+                                      title: Text(conversation['username']!,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineSmall),
+                                      subtitle:
+                                          Text(conversation['latestMessage']!),
+                                    );
+                                  },
+                                );
+                              }
+
+                              return Text('No conversations yet');
+                            });
+                      })),
               TextField(
                 decoration: const InputDecoration(
                   labelText: 'Message',
@@ -115,18 +144,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 onChanged: (value) => _message = value,
               ),
               ElevatedButton(
-                child: Text('Send message to Dave'),
+                child: Text('Send message to carol'),
                 onPressed: handleMessageSent,
               ),
-              const SizedBox(height: 20),
-              Consumer<ChatProvider>(
-                builder: (context, chat, child) {
-                  return Column(
-                    children:
-                        chat.messages.map((message) => Text(message)).toList(),
-                  );
-                },
-              )
             ])));
   }
 
