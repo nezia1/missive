@@ -62,6 +62,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBody() {
+    List<Map<String, String>>? currentConversations =
+        []; // this is used to store the current conversations and avoid having a loading spinner every time the user sends a message or receives one
+
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -110,37 +113,35 @@ class _HomeScreenState extends State<HomeScreen> {
                         future: _chatProvider.getConversations(),
                         builder: (context,
                             AsyncSnapshot<List<Map<String, String>>> snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
-
                           if (snapshot.hasData) {
-                            return ListView.separated(
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                final conversation = snapshot.data![index];
-                                return ListTile(
-                                  contentPadding:
-                                      const EdgeInsetsDirectional.symmetric(
-                                          horizontal: 20),
-                                  title: Text(conversation['username']!,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineSmall),
-                                  subtitle:
-                                      Text(conversation['latestMessage']!),
-                                  onTap: () => context.go(
-                                      '/conversations/${conversation['username']}'),
-                                );
-                              },
-                              separatorBuilder: (context, index) =>
-                                  const Divider(),
-                            );
+                            currentConversations = snapshot.data!;
                           }
 
-                          return Text('No conversations yet');
+                          if (currentConversations == null) {
+                            return const Center(
+                                child: Text('No conversations'));
+                          }
+
+                          return ListView.separated(
+                            itemCount: currentConversations!.length,
+                            itemBuilder: (context, index) {
+                              final conversation = currentConversations![index];
+                              return ListTile(
+                                contentPadding:
+                                    const EdgeInsetsDirectional.symmetric(
+                                        horizontal: 20),
+                                title: Text(conversation['username']!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall),
+                                subtitle: Text(conversation['latestMessage']!),
+                                onTap: () => context.go(
+                                    '/conversations/${conversation['username']}'),
+                              );
+                            },
+                            separatorBuilder: (context, index) =>
+                                const Divider(),
+                          );
                         });
                   })),
           TextField(
