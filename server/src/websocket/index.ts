@@ -17,7 +17,6 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.get('/', { websocket: true }, (socket, req) => {
 		if (!req.authenticatedUser)
 			return socket.close(1008, 'User is not authenticated')
-
 		connections.set(req.authenticatedUser.name, socket)
 
 		socket.on('message', async (msg) => {
@@ -25,6 +24,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 
 			// TODO: handle JSON parsing error (if it's not a valid JSON string, it will crash the conneection)
 			const message = JSON.parse(msg.toString()) as {
+				id: string
 				content: string
 				receiver: string
 				sender: string
@@ -68,6 +68,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 					.create({
 						// add receiver id to the pending message
 						data: {
+							id: message.id,
 							content: message.content,
 							receiver: {
 								connect: {
