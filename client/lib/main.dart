@@ -154,6 +154,12 @@ ThemeData _buildAppTheme() {
             MaterialStateProperty.all(8.0), // Raised elevation for a 3D effect
       ),
     ),
+    textButtonTheme: TextButtonThemeData(
+      style: ButtonStyle(
+        foregroundColor: MaterialStateProperty.all<Color>(palette.textPrimary),
+        iconColor: MaterialStateProperty.all<Color>(palette.textPrimary),
+      ), // Icon color
+    ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: palette.secondary, // Background color for the text field
