@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
@@ -65,8 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBody() {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
+          backgroundColor: Colors.transparent,
         ),
         drawer: Drawer(
           backgroundColor: Theme.of(context).canvasColor,
@@ -96,9 +94,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        body: Column(children: [
-          Text('Conversations',
-              style: Theme.of(context).textTheme.headlineLarge),
+        body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 30, left: 20),
+            child: Text('Conversations',
+                style: Theme.of(context).textTheme.headlineMedium),
+          ),
           Expanded(
               //TODO: this probably needs its own widget, it's getting too big
               //TODO: the logic behind that needs to change, it is extremely inefficient to parse every single message every time a new message is sent or received
@@ -121,6 +122,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               itemBuilder: (context, index) {
                                 final conversation = snapshot.data![index];
                                 return ListTile(
+                                  contentPadding:
+                                      const EdgeInsetsDirectional.symmetric(
+                                          horizontal: 20),
                                   title: Text(conversation['username']!,
                                       style: Theme.of(context)
                                           .textTheme
@@ -146,8 +150,8 @@ class _HomeScreenState extends State<HomeScreen> {
             onChanged: (value) => _message = value,
           ),
           ElevatedButton(
-            child: Text('Send message to carol'),
             onPressed: handleMessageSent,
+            child: Text('Send message to carol'),
           ),
         ]));
   }
