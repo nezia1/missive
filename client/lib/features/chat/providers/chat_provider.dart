@@ -9,17 +9,18 @@ import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:hive/hive.dart';
 
 import 'plain_text_message.dart';
 
 class ChatProvider with ChangeNotifier {
   WebSocketChannel? _channel;
   String? _url;
+  String? _name;
   AuthProvider? _authProvider;
   SignalProvider? _signalProvider;
-  ValueListenable<Box> get messagesListenable =>
-      Hive.box<List>('messages').listenable();
+  ValueListenable<Box> get messagesListenable => _name != null
+      ? Hive.box<List>('${_name}_messages').listenable()
+      : throw Exception('ChatProvider is not fully initialized');
 
   ChatProvider(
       {String? url, AuthProvider? authProvider, SignalProvider? signalProvider})
@@ -58,7 +59,7 @@ class ChatProvider with ChangeNotifier {
 
     _channel = IOWebSocketChannel(ws);
     print('Connected to $_url');
-
+    _name = (await _authProvider?.user)?.name;
     // Initialize Hive box for storing messages
     final encryptedBox = await _getMessagesBox();
 
@@ -158,7 +159,8 @@ class ChatProvider with ChangeNotifier {
 
     final hiveCipher = HiveAesCipher(base64Decode(hiveEncryptionKeyString));
 
-    return await Hive.openBox<List>('messages', encryptionCipher: hiveCipher);
+    return await Hive.openBox<List>('${_name}_messages',
+        encryptionCipher: hiveCipher);
   }
 
   /// Get a list of all conversations for the current authenticated user. Returns a list of usernames, alongside the latest message.
