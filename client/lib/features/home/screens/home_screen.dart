@@ -134,7 +134,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineSmall),
-                                subtitle: Text(conversation['latestMessage']!),
+                                subtitle: Text(conversation['latestMessage']!,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis),
                                 onTap: () => context.go(
                                     '/conversations/${conversation['username']}'),
                               );
