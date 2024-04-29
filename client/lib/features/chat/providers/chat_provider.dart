@@ -7,6 +7,7 @@ import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
+import 'package:uuid/uuid.dart';
 import 'package:hive/hive.dart';
 
 import 'plain_text_message.dart';
@@ -44,6 +45,7 @@ class ChatProvider with ChangeNotifier {
       throw Exception('ChatProvider is not fully initialized');
     }
 
+    print(await _authProvider!.accessToken);
     final ws = await WebSocket.connect(
       _url!,
       headers: {
@@ -81,6 +83,7 @@ class ChatProvider with ChangeNotifier {
           cipherMessage, SignalProtocolAddress(messageJson['sender'], 1));
 
       final plainTextMessage = PlainTextMessage(
+        id: messageJson['id'],
         content: plainText,
         own: false,
       );
@@ -90,6 +93,9 @@ class ChatProvider with ChangeNotifier {
           encryptedBox.get(messageJson['sender'])?.cast<PlainTextMessage>() ??
               <PlainTextMessage>[];
       messages.add(plainTextMessage);
+      for (var m in messages) {
+        print(m.content);
+      }
       await encryptedBox.put(messageJson['sender'], messages);
 
       notifyListeners();
@@ -99,16 +105,21 @@ class ChatProvider with ChangeNotifier {
   // TODO: add id to message so that we can update the status
   Future<void> sendMessage(
       {required String plainText, required String receiver}) async {
+    final uuid = const Uuid().v6();
     if (_signalProvider == null) {
       throw Exception('SignalProvider is not initialized');
     }
     final message =
         await _signalProvider!.encrypt(name: receiver, message: plainText);
 
+    print(uuid);
+
     final messageJson = jsonEncode({
+      'id': uuid,
       'content': base64Encode(message.serialize()),
       'receiver': receiver,
     });
+
     // send message over WebSocket
     _channel?.sink.add(messageJson);
 
@@ -117,7 +128,7 @@ class ChatProvider with ChangeNotifier {
     final messages = encryptedBox.get(receiver)?.cast<PlainTextMessage>() ??
         <PlainTextMessage>[];
 
-    messages.add(PlainTextMessage(content: plainText, own: true));
+    messages.add(PlainTextMessage(id: uuid, content: plainText, own: true));
 
     await encryptedBox.put(receiver, messages);
   }

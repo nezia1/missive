@@ -17,6 +17,7 @@ class PlainTextMessageAdapter extends TypeAdapter<PlainTextMessage> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PlainTextMessage(
+      id: fields[4] as String,
       content: fields[0] as String,
       own: fields[1] as bool,
       receiver: fields[2] as String?,
@@ -27,7 +28,9 @@ class PlainTextMessageAdapter extends TypeAdapter<PlainTextMessage> {
   @override
   void write(BinaryWriter writer, PlainTextMessage obj) {
     writer
+      ..writeByte(5)
       ..writeByte(4)
+      ..write(obj.id)
       ..writeByte(0)
       ..write(obj.content)
       ..writeByte(1)
