@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 // screens
 import 'package:missive/features/authentication/landing_screen.dart';
@@ -17,12 +18,17 @@ import 'package:missive/features/home/screens/home_screen.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
+import 'package:missive/features/chat/providers/plain_text_message.dart';
 
 // common
 import 'package:missive/common/http.dart';
 import 'package:missive/constants/app_colors.dart';
 
-void main() => runApp(Missive());
+void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(PlainTextMessageAdapter());
+  runApp(Missive());
+}
 
 class Missive extends StatelessWidget {
   Missive({super.key});

@@ -53,11 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await _signalProvider.initialize(installing: false, name: name!);
     }
 
-    await Hive.initFlutter();
-    Hive.registerAdapter(PlainTextMessageAdapter());
-
     await _chatProvider.connect();
-    return;
   }
 
   void handleMessageSent() async {
