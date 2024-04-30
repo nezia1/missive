@@ -53,6 +53,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     await _chatProvider.connect();
+    _chatProvider.setupUserRealm();
+    print('Realm setup');
   }
 
   void handleMessageSent() async {
@@ -62,9 +64,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBody() {
-    List<Map<String, String>>? currentConversations =
-        []; // this is used to store the current conversations and avoid having a loading spinner every time the user sends a message or receives one
-
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -106,46 +105,28 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
               //TODO: this probably needs its own widget, it's getting too big
               //TODO: the logic behind that needs to change, it is extremely inefficient to parse every single message every time a new message is sent or received
-              child: ValueListenableBuilder(
-                  valueListenable: _chatProvider.messagesListenable,
-                  builder: (context, box, _) {
-                    return FutureBuilder(
-                        future: _chatProvider.getConversations(),
-                        builder: (context,
-                            AsyncSnapshot<List<Map<String, String>>> snapshot) {
-                          if (snapshot.hasData) {
-                            currentConversations = snapshot.data!;
-                          }
-
-                          if (currentConversations == null) {
-                            return const Center(
-                                child: Text('No conversations'));
-                          }
-
-                          return ListView.separated(
-                            itemCount: currentConversations!.length,
-                            itemBuilder: (context, index) {
-                              final conversation = currentConversations![index];
-                              return ListTile(
-                                contentPadding:
-                                    const EdgeInsetsDirectional.symmetric(
-                                        horizontal: 20),
-                                title: Text(conversation['username']!,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall),
-                                subtitle: Text(conversation['latestMessage']!,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis),
-                                onTap: () => context.go(
-                                    '/conversations/${conversation['username']}'),
-                              );
-                            },
-                            separatorBuilder: (context, index) =>
-                                const Divider(),
-                          );
-                        });
-                  })),
+              child: Consumer<ChatProvider>(
+            builder: (context, provider, child) {
+              print('rebuilding conversations');
+              return ListView.separated(
+                itemCount: provider.conversations.length,
+                itemBuilder: (context, index) {
+                  final conversation = provider.conversations[index];
+                  return ListTile(
+                    contentPadding:
+                        const EdgeInsetsDirectional.symmetric(horizontal: 20),
+                    title: Text(conversation.name,
+                        style: Theme.of(context).textTheme.headlineSmall),
+                    subtitle: Text(conversation.messages.last.content,
+                        maxLines: 2, overflow: TextOverflow.ellipsis),
+                    onTap: () =>
+                        context.go('/conversations/${conversation.name}'),
+                  );
+                },
+                separatorBuilder: (context, index) => const Divider(),
+              );
+            },
+          )),
           TextField(
             decoration: const InputDecoration(
               labelText: 'Message',

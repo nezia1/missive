@@ -1,26 +1,29 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
+import 'package:realm/realm.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
-import 'package:uuid/uuid.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart' as uuid_generator;
 
-import 'plain_text_message.dart';
+part 'chat_provider.realm.dart';
 
 class ChatProvider with ChangeNotifier {
   WebSocketChannel? _channel;
   String? _url;
-  String? _name;
   AuthProvider? _authProvider;
   SignalProvider? _signalProvider;
-  ValueListenable<Box> get messagesListenable => _name != null
-      ? Hive.box<List>('${_name}_messages').listenable()
-      : throw Exception('ChatProvider is not fully initialized');
+  List<User> _conversations = [];
+  List<User> get conversations => _conversations;
+  Realm? _userRealm;
+  StreamSubscription? _messagesSubscription;
 
   ChatProvider(
       {String? url, AuthProvider? authProvider, SignalProvider? signalProvider})
@@ -59,10 +62,6 @@ class ChatProvider with ChangeNotifier {
 
     _channel = IOWebSocketChannel(ws);
     print('Connected to $_url');
-    _name = (await _authProvider?.user)?.name;
-    // Initialize Hive box for storing messages
-    final encryptedBox = await _getMessagesBox();
-
     _channel!.stream.listen((message) async {
       final messageJson = jsonDecode(message);
       if (messageJson['status'] != null) {
@@ -85,37 +84,28 @@ class ChatProvider with ChangeNotifier {
       final plainText = await _signalProvider!.decrypt(
           cipherMessage, SignalProtocolAddress(messageJson['sender'], 1));
 
-      final plainTextMessage = PlainTextMessage(
-        id: messageJson['id'],
-        content: plainText,
-        own: false,
-      );
+      // store message in Realm
+      final realm = await _getUserRealm();
+      realm.write(() {
+        var user = realm.find<User>(messageJson['sender']);
 
-      // store message in Hive
-      final messages =
-          encryptedBox.get(messageJson['sender'])?.cast<PlainTextMessage>() ??
-              <PlainTextMessage>[];
-      messages.add(plainTextMessage);
-      for (var m in messages) {
-        print(m.content);
-      }
-      await encryptedBox.put(messageJson['sender'], messages);
+        user ??= realm.add(User(messageJson['sender']));
 
-      notifyListeners();
+        user.messages.add(PlaintextMessage(messageJson['id'], plainText, false,
+            sentAt: DateTime.now()));
+      });
     });
   }
 
   // TODO: add id to message so that we can update the status
   Future<void> sendMessage(
       {required String plainText, required String receiver}) async {
-    final uuid = const Uuid().v6();
+    final uuid = const uuid_generator.Uuid().v6();
     if (_signalProvider == null) {
       throw Exception('SignalProvider is not initialized');
     }
     final message =
         await _signalProvider!.encrypt(name: receiver, message: plainText);
-
-    print(uuid);
 
     final messageJson = jsonEncode({
       'id': uuid,
@@ -126,63 +116,70 @@ class ChatProvider with ChangeNotifier {
     // send message over WebSocket
     _channel?.sink.add(messageJson);
 
-    // store sent message
-    final encryptedBox = await _getMessagesBox();
-    final messages = encryptedBox.get(receiver)?.cast<PlainTextMessage>() ??
-        <PlainTextMessage>[];
+    // store with Realm
+    final realm = await _getUserRealm();
+    final name = (await _authProvider?.user)?.name;
 
-    messages.add(PlainTextMessage(id: uuid, content: plainText, own: true));
+    if (name == null) {
+      throw Exception('User is not logged in');
+    }
 
-    await encryptedBox.put(receiver, messages);
+    realm.write(() {
+      var user = realm.find<User>(name);
 
-    notifyListeners();
+      user ??= realm.add(User(name));
+
+      user.messages.add(PlaintextMessage(uuid, plainText, true));
+    });
   }
 
-  /// Get the messages box for the current authenticated user
-  Future<Box<List>> _getMessagesBox() async {
+  /// Setup the user's Realm database and listen for changes
+  void setupUserRealm() async {
+    _userRealm = await _getUserRealm();
+    // initialize messages
+    final conversations = _userRealm?.all<User>();
+    _conversations = conversations?.toList().cast<User>() ??
+        []; // the cast is here in case the list is null (we can't directly ?? the toList())
+    notifyListeners(); // update UI with initial data load
+
+    // listen for new messages
+    var messages = _userRealm?.all<PlaintextMessage>();
+    _messagesSubscription = messages?.changes.listen((_) {
+      notifyListeners(); // update UI on new messages
+    });
+  }
+
+  /// Gets the user's Realm database
+  Future<Realm> _getUserRealm() async {
     if (_authProvider == null) {
       throw Exception('AuthProvider is not initialized');
     }
 
-    final name = (await _authProvider!.user)!.name;
     const secureStorage = FlutterSecureStorage();
+    final name = (await _authProvider!.user)!.name;
 
-    var hiveEncryptionKeyString =
-        await secureStorage.read(key: '${name}_hiveEncryptionKey');
-    if (hiveEncryptionKeyString == null) {
-      hiveEncryptionKeyString = base64Encode(Hive.generateSecureKey());
+    // Generate a random encryption key if it doesn't exist, otherwise use the stored one
+    var realmEncryptionKeyString =
+        await secureStorage.read(key: '${name}_realmEncryptionKey');
+    if (realmEncryptionKeyString == null) {
+      final rng = Random.secure();
+      final keyString = base64Encode(
+          Uint8List.fromList(List<int>.generate(64, (i) => rng.nextInt(256))));
+      realmEncryptionKeyString = keyString;
       await secureStorage.write(
-        key: '${name}_hiveEncryptionKey',
-        value: hiveEncryptionKeyString,
-      );
+          key: '${name}_realmEncryptionKey', value: keyString);
     }
 
-    final hiveCipher = HiveAesCipher(base64Decode(hiveEncryptionKeyString));
+    final realmKey = base64Decode(realmEncryptionKeyString);
 
-    return await Hive.openBox<List>('${_name}_messages',
-        encryptionCipher: hiveCipher);
-  }
+    final directory = (await getApplicationSupportDirectory()).path;
 
-  /// Get a list of all conversations for the current authenticated user. Returns a list of usernames, alongside the latest message.
-  Future<List<Map<String, String>>> getConversations() async {
-    if (_authProvider == null) {
-      throw Exception('AuthProvider is not initialized');
-    }
-
-    final encryptedBox = await _getMessagesBox();
-
-    final conversations = <Map<String, String>>[];
-
-    for (var key in encryptedBox.keys) {
-      final messages = encryptedBox.get(key)?.cast<PlainTextMessage>() ?? [];
-      final latestMessage = messages.last;
-      conversations.add({
-        'username': key,
-        'latestMessage': latestMessage.content,
-      });
-    }
-
-    return conversations;
+    final realmConfig = Configuration.local(
+      [User.schema, PlaintextMessage.schema],
+      path: '$directory/{name}_realm.realm',
+      encryptionKey: realmKey,
+    );
+    return await Realm.open(realmConfig);
   }
 
   @override
@@ -190,6 +187,25 @@ class ChatProvider with ChangeNotifier {
     if (_channel != null) {
       _channel?.sink.close();
     }
+    _messagesSubscription?.cancel();
     super.dispose();
   }
+}
+
+@RealmModel()
+class _PlaintextMessage {
+  @PrimaryKey()
+  late String id;
+  late String content;
+  late bool own;
+  late String? receiver;
+  late DateTime? sentAt;
+}
+
+@RealmModel()
+class _User {
+  @PrimaryKey()
+  late String name;
+
+  late List<_PlaintextMessage> messages;
 }
