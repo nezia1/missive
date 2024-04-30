@@ -62,6 +62,7 @@ class ChatProvider with ChangeNotifier {
     _channel = IOWebSocketChannel(ws);
     print('Connected to $_url');
     _channel!.stream.listen((message) async {
+      print('Received message: $message');
       final messageJson = jsonDecode(message);
       if (messageJson['status'] != null) {
         print(

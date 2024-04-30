@@ -1,4 +1,4 @@
-package com.example.client
+package io.nezia.missive
 
 import io.flutter.embedding.android.FlutterActivity
 

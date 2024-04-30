@@ -9,6 +9,8 @@ import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:missive/features/home/screens/conversation_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});
 
@@ -117,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     subtitle: Text(conversation.messages.last.content,
                         maxLines: 2, overflow: TextOverflow.ellipsis),
                     onTap: () =>
-                        context.go('/conversations/${conversation.name}'),
+                        context.push('/conversations/${conversation.name}'),
                   );
                 },
                 separatorBuilder: (context, index) => const Divider(),

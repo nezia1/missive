@@ -10,6 +10,7 @@ import 'package:missive/features/authentication/landing_screen.dart';
 import 'package:missive/features/home/screens/settings_screen.dart';
 import 'package:missive/features/authentication/login_screen.dart';
 import 'package:missive/features/authentication/register_screen.dart';
+import 'package:missive/features/home/screens/conversation_screen.dart';
 
 import 'package:missive/features/home/screens/home_screen.dart';
 
@@ -76,6 +77,12 @@ class Missive extends StatelessWidget {
         path: '/',
         builder: (context, state) => const HomeScreen(title: Missive.title),
       ),
+      GoRoute(
+          path: '/conversations/:name',
+          builder: (context, state) {
+            final name = state.pathParameters['name']!;
+            return ConversationScreen(name: name);
+          }),
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(title: Missive.title),
