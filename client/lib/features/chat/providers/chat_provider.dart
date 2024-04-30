@@ -152,6 +152,7 @@ class ChatProvider with ChangeNotifier {
     // listen for new messages
     var messages = _userRealm!.all<PlaintextMessage>();
     _messagesSubscription = messages.changes.listen((_) {
+      _conversations = conversations.toList();
       notifyListeners(); // update UI on new messages
     });
   }

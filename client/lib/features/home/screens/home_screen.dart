@@ -53,7 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     await _chatProvider.connect();
     _chatProvider.setupUserRealm();
-    print('Realm setup');
   }
 
   void handleMessageSent() async {
