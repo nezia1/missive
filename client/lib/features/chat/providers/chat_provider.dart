@@ -51,7 +51,6 @@ class ChatProvider with ChangeNotifier {
       throw Exception('ChatProvider is not fully initialized');
     }
 
-    print(await _authProvider!.accessToken);
     final ws = await WebSocket.connect(
       _url!,
       headers: {
