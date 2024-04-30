@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
