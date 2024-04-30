@@ -188,6 +188,7 @@ class ChatProvider with ChangeNotifier {
       _channel?.sink.close();
     }
     _messagesSubscription?.cancel();
+    _userRealm?.close();
     super.dispose();
   }
 }
