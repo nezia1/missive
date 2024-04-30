@@ -23,7 +23,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.client"
+    namespace "io.nezia.missive"
     compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
