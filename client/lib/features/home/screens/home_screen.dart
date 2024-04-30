@@ -106,7 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
               //TODO: the logic behind that needs to change, it is extremely inefficient to parse every single message every time a new message is sent or received
               child: Consumer<ChatProvider>(
             builder: (context, provider, child) {
-              print('rebuilding conversations');
               return ListView.separated(
                 itemCount: provider.conversations.length,
                 itemBuilder: (context, index) {

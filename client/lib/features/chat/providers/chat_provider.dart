@@ -125,26 +125,34 @@ class ChatProvider with ChangeNotifier {
     }
 
     realm.write(() {
-      var user = realm.find<User>(name);
+      var user = realm.find<User>(receiver);
 
-      user ??= realm.add(User(name));
+      user ??= realm.add(User(receiver));
 
-      user.messages.add(PlaintextMessage(uuid, plainText, true));
+      user.messages.add(PlaintextMessage(
+        uuid,
+        plainText,
+        true,
+        sentAt: DateTime.now(),
+      ));
     });
   }
 
   /// Setup the user's Realm database and listen for changes
   void setupUserRealm() async {
     _userRealm = await _getUserRealm();
+    if (_userRealm == null) {
+      throw Exception('User Realm is not initialized');
+    }
     // initialize messages
-    final conversations = _userRealm?.all<User>();
-    _conversations = conversations?.toList().cast<User>() ??
-        []; // the cast is here in case the list is null (we can't directly ?? the toList())
+    final conversations = _userRealm!.all<User>();
+    _conversations = conversations.toList();
+
     notifyListeners(); // update UI with initial data load
 
     // listen for new messages
-    var messages = _userRealm?.all<PlaintextMessage>();
-    _messagesSubscription = messages?.changes.listen((_) {
+    var messages = _userRealm!.all<PlaintextMessage>();
+    _messagesSubscription = messages.changes.listen((_) {
       notifyListeners(); // update UI on new messages
     });
   }
@@ -176,7 +184,7 @@ class ChatProvider with ChangeNotifier {
 
     final realmConfig = Configuration.local(
       [User.schema, PlaintextMessage.schema],
-      path: '$directory/{name}_realm.realm',
+      path: '$directory/${name}_realm.realm',
       encryptionKey: realmKey,
     );
     return await Realm.open(realmConfig);
