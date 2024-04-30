@@ -27,6 +27,20 @@
 				"WEBSOCKET_URL=ws://10.0.2.2"
 			],
 			"deviceId": "emulator"
+		},
+		{
+			"name": "Launch Client (physical)",
+			"cwd": "${workspaceFolder}/client",
+			"request": "launch",
+			"type": "dart",
+			"program": "lib/main.dart",
+			"args": [
+				"--dart-define",
+				"API_URL=http://10.5.50.59/api/v1",
+				"--dart-define",
+				"WEBSOCKET_URL=ws://10.5.50.59"
+			],
+			"deviceId": "803KPPB1643144"
 		}
 	],
 	"compounds": [
