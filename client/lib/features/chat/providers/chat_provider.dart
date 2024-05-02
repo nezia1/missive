@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
@@ -11,6 +12,7 @@ import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:missive/common/http.dart';
 import 'package:uuid/uuid.dart' as uuid_generator;
 
 part 'chat_provider.realm.dart';
@@ -162,6 +164,51 @@ class ChatProvider with ChangeNotifier {
     _userRealm?.write(() {
       if (_userRealm?.find<User>(name) == null) _userRealm?.add(User(name));
     });
+  }
+
+  void fetchPendingMessages() async {
+    // get pending messages from server
+    final name = (await _authProvider?.user)?.name;
+    final accessToken = await _authProvider?.accessToken;
+    if (name == null || accessToken == null) {
+      throw Exception('User is not logged in');
+    }
+
+    // get messages from server
+    final response = await dio.get('/users/$name/messages',
+        options: Options(
+            headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'}));
+
+    final messages = response.data['data']['messages'];
+
+    // decrypt and store messages
+    for (final message in messages) {
+      CiphertextMessage cipherMessage;
+      final sender = message['sender']['name'];
+      try {
+        // TODO: when switching accounts, it says (no session for sender). Is it because the session is not changed after logout? I think it has something to do with the ProxyProvider not updating the SignalProvider after logout.
+        await _signalProvider?.buildSession(
+            name: sender, accessToken: accessToken);
+        cipherMessage =
+            SignalMessage.fromSerialized(base64Decode(message['content']));
+      } catch (_) {
+        cipherMessage = PreKeySignalMessage(base64Decode(message['content']));
+      }
+      final plainText = await _signalProvider!
+          .decrypt(cipherMessage, SignalProtocolAddress(sender, 1));
+      _userRealm?.write(() {
+        var user = _userRealm?.find<User>(sender);
+
+        user ??= _userRealm?.add(User(sender));
+
+        user?.messages.add(PlaintextMessage(
+          message['id'],
+          plainText,
+          false,
+          sentAt: DateTime.parse(message['sentAt']),
+        ));
+      });
+    }
   }
 
   /// Gets the user's Realm database

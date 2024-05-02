@@ -5,27 +5,36 @@ import { authenticationHook, authorizationHook } from '@/hooks'
 import { Permissions } from '@/permissions'
 import { exclude, parseGenericError } from '@/utils'
 
-import type { APIReply, UserParams } from '@/globals'
+import type { APIReply, MessageParams } from '@/globals'
 
 const messages: FastifyPluginCallback = (fastify, _, done) => {
-	fastify.route<{ Reply: APIReply; Params: UserParams }>({
+	fastify.route<{ Reply: APIReply; Params: MessageParams }>({
 		method: 'GET',
-		url: '/:id/messages',
+		url: '/:name/messages',
 		preParsing: [
 			authenticationHook,
 			authorizationHook([Permissions.MESSAGES_READ]),
 		],
 		handler: async (request, reply) => {
-			if (request.params.id !== request.authenticatedUser?.id)
+			if (request.params.name !== request.authenticatedUser?.name)
 				throw new AuthorizationError('You can only read your own messages')
 
 			const messages = await fastify.prisma.pendingMessage.findMany({
-				where: { receiverId: request.params.id },
+				where: { receiverId: request.authenticatedUser.id },
+				include: {
+					sender: {
+						select: { name: true },
+					},
+				},
 			})
 			const messagesWithoutId = messages.map((message) =>
 				exclude(message, ['receiverId']),
 			)
 			reply.status(200).send({ data: { messages: messagesWithoutId } })
+
+			await fastify.prisma.pendingMessage.deleteMany({
+				where: { receiverId: request.authenticatedUser.id },
+			})
 		},
 	})
 

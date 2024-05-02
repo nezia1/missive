@@ -15,3 +15,7 @@ export interface APIReply {
 export interface UserParams {
 	id: string
 }
+
+export interface MessageParams {
+	name: string
+}

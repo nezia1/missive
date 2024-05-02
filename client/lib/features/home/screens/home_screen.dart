@@ -54,6 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     await _chatProvider.connect();
     _chatProvider.setupUserRealm();
+
+    _chatProvider.fetchPendingMessages();
   }
 
   void handleMessageSent() async {
