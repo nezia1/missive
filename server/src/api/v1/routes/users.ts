@@ -36,6 +36,37 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.register(keys)
 	fastify.register(messages)
 
+	fastify.route<{ Querystring: { search: string }; Reply: APIReply }>({
+		method: 'GET',
+		url: '/',
+		preParsing: [
+			authenticationHook,
+			authorizationHook([Permissions.PROFILE_READ]),
+		],
+		handler: async (request, reply) => {
+			const users = await fastify.prisma.user.findMany({
+				where: {
+					name: {
+						contains: request.query.search,
+					},
+				},
+			})
+
+			reply.status(200).send({
+				data: {
+					users: users.map((user) =>
+						exclude(user, [
+							'password',
+							'identityKey',
+							'registrationId',
+							'totp_url',
+							'updatedAt',
+						]),
+					),
+				},
+			})
+		},
+	})
 	fastify.route<{ Reply: APIReply; Params: UserParams }>({
 		method: 'GET',
 		url: '/:id',
