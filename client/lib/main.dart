@@ -45,6 +45,7 @@ class Missive extends StatelessWidget {
                   ChatProvider>(
               create: (BuildContext context) => ChatProvider
                   .empty(), // Empty constructor for ChangeNotifierProxyProvider's create method (since we depend on the other providers to be initialized first, and create requires a pure function that doesn't depend on other providers)
+              //  This does not update after logout, which breaks the entire app!!!
               update: (BuildContext context, authProvider, signalProvider,
                   chatProvider) {
                 if (chatProvider == null) {
@@ -54,6 +55,14 @@ class Missive extends StatelessWidget {
 
                 if (chatProvider.needsUpdate()) {
                   chatProvider.update(
+                      url: const String.fromEnvironment('WEBSOCKET_URL',
+                          defaultValue: 'ws://localhost:8080'),
+                      authProvider: authProvider,
+                      signalProvider: signalProvider);
+                }
+
+                if (!_authProvider.isLoggedIn) {
+                  return ChatProvider(
                       url: const String.fromEnvironment('WEBSOCKET_URL',
                           defaultValue: 'ws://localhost:8080'),
                       authProvider: authProvider,
@@ -104,19 +113,15 @@ class Missive extends StatelessWidget {
       )
     ],
     redirect: (context, state) async {
-      final onboarding = state.matchedLocation == '/login' ||
+      bool onboarding = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register' ||
           state.matchedLocation == '/landing';
-
-      if (!(await _authProvider.isLoggedIn)) {
-        // this means we just logged out
-        if (!onboarding) return '/landing';
-        return onboarding ? null : '/';
+      // Explicitly handle the logged-out scenario
+      if (!_authProvider.isLoggedIn) {
+        return onboarding ? null : '/landing';
       }
 
-      if (onboarding) return '/';
-
-      return null;
+      return onboarding ? '/' : null;
     },
     refreshListenable: _authProvider,
   );

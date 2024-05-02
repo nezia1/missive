@@ -3,6 +3,7 @@ import type { FastifyPluginCallback } from 'fastify'
 
 import { authenticationHook } from '@/hooks'
 import { exclude, parseGenericError } from '@/utils'
+import { PrismaClient } from '@prisma/client/extension'
 
 enum MessageStatus {
 	SENT = 'sent',
@@ -39,6 +40,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				}),
 			)
 
+			console.log('Message received:', message)
 			if (connections.has(message.receiver)) {
 				const receiver = connections.get(message.receiver)
 				receiver?.send(JSON.stringify(exclude(message, ['receiver'])))

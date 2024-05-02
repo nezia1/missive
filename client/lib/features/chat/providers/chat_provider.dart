@@ -36,6 +36,13 @@ class ChatProvider with ChangeNotifier {
   // Empty constructor for ChangeNotifierProxyProvider's create method
   ChatProvider.empty() : this();
 
+  void reset() {
+    _url = null;
+    _authProvider = null;
+    _signalProvider = null;
+    notifyListeners();
+  }
+
   void update(
       {required String url,
       required AuthProvider authProvider,
@@ -64,7 +71,6 @@ class ChatProvider with ChangeNotifier {
     _channel = IOWebSocketChannel(ws);
     print('Connected to $_url');
     _channel!.stream.listen((message) async {
-      print('Received message: $message');
       final messageJson = jsonDecode(message);
       if (messageJson['status'] != null) {
         print(
@@ -186,9 +192,9 @@ class ChatProvider with ChangeNotifier {
       CiphertextMessage cipherMessage;
       final sender = message['sender']['name'];
       try {
-        // TODO: when switching accounts, it says (no session for sender). Is it because the session is not changed after logout? I think it has something to do with the ProxyProvider not updating the SignalProvider after logout.
         await _signalProvider?.buildSession(
-            name: sender, accessToken: accessToken);
+            name: name, accessToken: accessToken);
+        // TODO: when switching accounts, it says (no session for sender). Is it because the session is not changed after logout? I think it has something to do with the ProxyProvider not updating the SignalProvider after logout.
         cipherMessage =
             SignalMessage.fromSerialized(base64Decode(message['content']));
       } catch (_) {
@@ -252,10 +258,14 @@ class ChatProvider with ChangeNotifier {
     });
     _userRealm?.close();
     Realm.deleteRealm(_userRealm!.config.path);
+    final name = (await _authProvider?.user)?.name;
+    final secureStorage = FlutterSecureStorage();
+    await secureStorage.delete(key: '${name}_realmEncryptionKey');
   }
 
   @override
   void dispose() {
+    print('Disposing... (this should happen after log out)');
     if (_channel != null) {
       _channel?.sink.close();
     }

@@ -21,6 +21,9 @@ class AuthProvider extends ChangeNotifier {
   User? _user;
   final Dio _httpClient;
   final FlutterSecureStorage _secureStorage;
+  bool _isLoggedIn = false;
+
+  bool get isLoggedIn => _isLoggedIn;
 
   /// Returns the access token as [String], or null if it's not available.
   Future<String?> get accessToken async {
@@ -60,11 +63,6 @@ class AuthProvider extends ChangeNotifier {
   Future<User?> get user async {
     if (_user == null) await loadProfile();
     return _user;
-  }
-
-  /// The user is logged in if the refresh token is available.
-  Future<bool> get isLoggedIn async {
-    return await refreshToken != null;
   }
 
   /// Creates a new [AuthProvider] with a [Dio] client and [FlutterSecureStorage].
@@ -112,6 +110,7 @@ class AuthProvider extends ChangeNotifier {
       await _secureStorage.write(key: 'refreshToken', value: refreshToken);
       await _secureStorage.write(key: 'accessToken', value: accessToken);
 
+      _isLoggedIn = true;
       notifyListeners();
 
       return AuthenticationSuccess();
@@ -160,8 +159,9 @@ class AuthProvider extends ChangeNotifier {
       if (firstLogin) {
         (await SharedPreferences.getInstance()).setBool('installed', false);
       }
-      notifyListeners();
 
+      _isLoggedIn = true;
+      notifyListeners();
       return AuthenticationSuccess();
     } on DioException catch (e) {
       switch (e.response?.statusCode) {
@@ -183,6 +183,7 @@ class AuthProvider extends ChangeNotifier {
     await _secureStorage.delete(key: 'accessToken');
 
     _user = null;
+    _isLoggedIn = false;
     notifyListeners();
   }
 

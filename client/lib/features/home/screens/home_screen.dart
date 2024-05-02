@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
@@ -56,12 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _chatProvider.setupUserRealm();
 
     _chatProvider.fetchPendingMessages();
-  }
-
-  void handleMessageSent() async {
-    await _signalProvider.buildSession(
-        name: 'carol', accessToken: (await _userProvider.accessToken)!);
-    await _chatProvider.sendMessage(plainText: _message, receiver: 'carol');
   }
 
   Widget _buildBody() {
@@ -121,8 +116,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           label: const Text('Delete all data and logout'),
                           icon: const Icon(Icons.logout),
                           onPressed: () {
-                            _chatProvider.deleteAll();
-                            _userProvider.logout();
+                            FlutterSecureStorage storage =
+                                const FlutterSecureStorage();
+                            storage.deleteAll().then(
+                                  (value) => _userProvider.logout(),
+                                );
                           })),
                 ),
             ],
@@ -161,16 +159,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           )),
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'Message',
-            ),
-            onChanged: (value) => _message = value,
-          ),
-          ElevatedButton(
-            onPressed: handleMessageSent,
-            child: Text('Send message to carol'),
-          ),
         ]));
   }
 
