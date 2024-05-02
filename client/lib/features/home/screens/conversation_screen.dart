@@ -17,11 +17,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
   late ChatProvider _chatProvider;
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  late final Future<void> _initialization;
 
   @override
   void initState() {
     super.initState();
     _chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    _chatProvider.ensureConversationExists(widget
+        .name); // it could be the first time somebody is accessing this conversation, so we need to ensure it exists
   }
 
   void handleMessageSent() async {
@@ -46,8 +49,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
             Expanded(
               child: Consumer<ChatProvider>(
                   builder: (context, chatProvider, child) {
-                final conversation = chatProvider.conversations
-                    .firstWhere((element) => element.name == widget.name);
+                User conversation;
+                // This is an absolutely abhorrent way of handling the conversation missing: we should have a better way of handling this, but for now, this will do. I just couldn't figure out why the race condition was happening when the conversation was missing. The issue is that ensureConversationExists doesn't seem to create the conversation properly, so we need to wait for it to be created before we can access it.
+                try {
+                  conversation = chatProvider.conversations
+                      .firstWhere((element) => element.name == widget.name);
+                } on StateError catch (_) {
+                  return const Center(
+                    child: Text('No messages yet'),
+                  );
+                }
+
                 return ListView.builder(
                     controller: _scrollController,
                     itemCount: conversation.messages.length,

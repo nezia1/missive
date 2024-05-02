@@ -11,6 +11,7 @@ import 'package:missive/features/home/screens/settings_screen.dart';
 import 'package:missive/features/authentication/login_screen.dart';
 import 'package:missive/features/authentication/register_screen.dart';
 import 'package:missive/features/home/screens/conversation_screen.dart';
+import 'package:missive/features/home/screens/user_search_screen.dart';
 
 import 'package:missive/features/home/screens/home_screen.dart';
 
@@ -77,6 +78,8 @@ class Missive extends StatelessWidget {
         path: '/',
         builder: (context, state) => const HomeScreen(title: Missive.title),
       ),
+      GoRoute(
+          path: '/userSearch', builder: (context, state) => UserSearchScreen()),
       GoRoute(
           path: '/conversations/:name',
           builder: (context, state) {

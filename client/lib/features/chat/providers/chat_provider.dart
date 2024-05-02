@@ -158,6 +158,12 @@ class ChatProvider with ChangeNotifier {
     });
   }
 
+  void ensureConversationExists(String name) {
+    _userRealm?.write(() {
+      if (_userRealm?.find<User>(name) == null) _userRealm?.add(User(name));
+    });
+  }
+
   /// Gets the user's Realm database
   Future<Realm> _getUserRealm() async {
     if (_authProvider == null) {
@@ -189,6 +195,16 @@ class ChatProvider with ChangeNotifier {
       encryptionKey: realmKey,
     );
     return await Realm.open(realmConfig);
+  }
+
+  /// Deletes all messages and the user's Realm database.
+  // THIS IS ONLY FOR DEBUGGING PURPOSES WHEN VALUES COULD NOT BE STORED CORRECTLY (WHEN DELETING USERS FROM THE SERVER FOR INSTANCE), DO NOT USE IN PRODUCTION
+  void deleteAll() async {
+    _userRealm?.write(() {
+      _userRealm?.deleteAll<User>();
+    });
+    _userRealm?.close();
+    Realm.deleteRealm(_userRealm!.config.path);
   }
 
   @override

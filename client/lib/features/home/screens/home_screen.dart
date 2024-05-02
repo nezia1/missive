@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
@@ -8,8 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import 'package:missive/features/home/screens/conversation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});
@@ -66,8 +65,27 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBody() {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
-        ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leadingWidth: double.infinity,
+            leading: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Builder(builder: (context) {
+                  // this is needed to pass in the context to Scaffold.of(context).openDrawer()
+                  return IconButton(
+                    icon: const Icon(Icons.menu, size: 25),
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                  );
+                }),
+                IconButton(
+                    icon: const Icon(Icons.chat, size: 25),
+                    onPressed: () {
+                      context.push(
+                          '/userSearch'); // search for a user and start a conversation
+                    }),
+              ],
+            )),
         drawer: Drawer(
           backgroundColor: Theme.of(context).canvasColor,
           child: ListView(
@@ -93,6 +111,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           _userProvider.logout();
                         })),
               ),
+              if (kDebugMode)
+                SizedBox(
+                  height: 70,
+                  child: DrawerHeader(
+                      child: TextButton.icon(
+                          label: const Text('Delete all data and logout'),
+                          icon: const Icon(Icons.logout),
+                          onPressed: () {
+                            _chatProvider.deleteAll();
+                            _userProvider.logout();
+                          })),
+                ),
             ],
           ),
         ),
@@ -104,7 +134,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Expanded(
               //TODO: this probably needs its own widget, it's getting too big
-              //TODO: the logic behind that needs to change, it is extremely inefficient to parse every single message every time a new message is sent or received
               child: Consumer<ChatProvider>(
             builder: (context, provider, child) {
               return ListView.separated(
@@ -116,8 +145,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         const EdgeInsetsDirectional.symmetric(horizontal: 20),
                     title: Text(conversation.name,
                         style: Theme.of(context).textTheme.headlineSmall),
-                    subtitle: Text(conversation.messages.last.content,
-                        maxLines: 2, overflow: TextOverflow.ellipsis),
+                    subtitle: Text(
+                        conversation.messages.isNotEmpty
+                            ? conversation.messages.last.content
+                            : '',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis),
                     onTap: () =>
                         context.push('/conversations/${conversation.name}'),
                   );
