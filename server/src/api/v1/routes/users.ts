@@ -49,6 +49,9 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 					name: {
 						contains: request.query.search,
 					},
+					NOT: {
+						name: request.authenticatedUser?.name,
+					},
 				},
 			})
 
