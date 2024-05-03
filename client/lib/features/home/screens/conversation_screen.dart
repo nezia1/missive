@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
-import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:missive/features/home/message_bubble.dart';
 
@@ -12,12 +11,11 @@ class ConversationScreen extends StatefulWidget {
   const ConversationScreen({super.key, required this.name});
 
   @override
-  _ConversationScreenState createState() => _ConversationScreenState();
+  ConversationScreenState createState() => ConversationScreenState();
 }
 
-class _ConversationScreenState extends State<ConversationScreen> {
+class ConversationScreenState extends State<ConversationScreen> {
   late ChatProvider _chatProvider;
-  late SignalProvider _signalProvider;
   late AuthProvider _authProvider;
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -27,7 +25,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
   void initState() {
     super.initState();
     _chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    _signalProvider = Provider.of<SignalProvider>(context, listen: false);
     _authProvider = Provider.of<AuthProvider>(context, listen: false);
     _initialization = initialization();
   }
