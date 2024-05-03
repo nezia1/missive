@@ -11,10 +11,10 @@ class ConversationScreen extends StatefulWidget {
   const ConversationScreen({super.key, required this.name});
 
   @override
-  ConversationScreenState createState() => ConversationScreenState();
+  State<ConversationScreen> createState() => _ConversationScreenState();
 }
 
-class ConversationScreenState extends State<ConversationScreen> {
+class _ConversationScreenState extends State<ConversationScreen> {
   late ChatProvider _chatProvider;
   late AuthProvider _authProvider;
   final TextEditingController _controller = TextEditingController();
