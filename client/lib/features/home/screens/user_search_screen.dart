@@ -8,13 +8,15 @@ import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
 
 class UserSearchScreen extends StatefulWidget {
+  const UserSearchScreen({super.key});
+
   @override
   _UserSearchScreenState createState() => _UserSearchScreenState();
 }
 
 class _UserSearchScreenState extends State<UserSearchScreen> {
   List<String> _usernames = [];
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   final _debouncer = Debouncer(milliseconds: 500);
 
   @override

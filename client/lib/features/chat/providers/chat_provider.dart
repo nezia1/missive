@@ -259,7 +259,7 @@ class ChatProvider with ChangeNotifier {
     _userRealm?.close();
     Realm.deleteRealm(_userRealm!.config.path);
     final name = (await _authProvider?.user)?.name;
-    final secureStorage = FlutterSecureStorage();
+    const secureStorage = FlutterSecureStorage();
     await secureStorage.delete(key: '${name}_realmEncryptionKey');
   }
 

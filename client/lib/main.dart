@@ -92,7 +92,7 @@ class Missive extends StatelessWidget {
         builder: (context, state) => const HomeScreen(title: Missive.title),
       ),
       GoRoute(
-          path: '/userSearch', builder: (context, state) => UserSearchScreen()),
+          path: '/userSearch', builder: (context, state) => const UserSearchScreen()),
       GoRoute(
           path: '/conversations/:name',
           pageBuilder: (context, state) {

@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:missive/constants/api.dart';
 
 final dio = Dio(BaseOptions(
   baseUrl:

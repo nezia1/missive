@@ -9,7 +9,7 @@ import 'package:missive/features/home/message_bubble.dart';
 class ConversationScreen extends StatefulWidget {
   final String name;
 
-  ConversationScreen({required this.name});
+  const ConversationScreen({super.key, required this.name});
 
   @override
   _ConversationScreenState createState() => _ConversationScreenState();

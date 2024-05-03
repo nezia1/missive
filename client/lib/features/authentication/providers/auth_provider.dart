@@ -46,7 +46,7 @@ class AuthProvider extends ChangeNotifier {
         token = newToken;
 
         await _secureStorage.write(key: 'accessToken', value: token);
-      } on DioException catch (e) {
+      } on DioException {
         // TODO: handle error better (e.g. log out user, show error message, etc.)
       }
     }
