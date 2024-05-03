@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
@@ -96,10 +97,39 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                     conversation.messages.length - 1 ||
                                 conversation.messages[index + 1].own !=
                                     isOwnMessage; // display tail if the next message is from a different sender or if it's the last message
-                            return MessageBubble(
-                                text: message,
-                                isOwnMessage: isOwnMessage,
-                                tail: isTail);
+                            final previousTimestamp = index == 0
+                                ? null
+                                : conversation.messages[index - 1].sentAt;
+                            final timestamp =
+                                conversation.messages[index].sentAt;
+                            final showTimestamp = previousTimestamp == null ||
+                                (timestamp != null &&
+                                    timestamp
+                                            .difference(previousTimestamp)
+                                            .inMinutes >
+                                        5 // show timestamp if it's the first message or if the previous message was sent more than 5 minutes ago
+                                );
+
+                            final showDate = previousTimestamp == null ||
+                                (timestamp != null &&
+                                    timestamp
+                                            .difference(previousTimestamp)
+                                            .inDays >
+                                        0 // show date if it's the first message or if the previous message was sent more than 1 day ago
+                                );
+                            return Column(
+                              children: [
+                                if (timestamp != null && showDate)
+                                  Text(DateFormat('dd MMM yyyy HH:mm')
+                                      .format(timestamp))
+                                else if (timestamp != null && showTimestamp)
+                                  Text(DateFormat('HH:mm').format(timestamp)),
+                                MessageBubble(
+                                    text: message,
+                                    isOwnMessage: isOwnMessage,
+                                    tail: isTail),
+                              ],
+                            );
                           });
                     }),
                   ),
