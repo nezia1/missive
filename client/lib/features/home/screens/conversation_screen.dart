@@ -44,7 +44,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   void handleMessageSent() async {
     await _chatProvider.sendMessage(
-        plainText: _controller.text, receiver: widget.name);
+        plainText: _controller.text.trim(), receiver: widget.name);
     setState(() {
       _controller.clear();
     });
