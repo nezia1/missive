@@ -40,7 +40,6 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				}),
 			)
 
-			console.log('Message received:', message)
 			if (connections.has(message.receiver)) {
 				const receiver = connections.get(message.receiver)
 				receiver?.send(JSON.stringify(exclude(message, ['receiver'])))
