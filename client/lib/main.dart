@@ -25,27 +25,31 @@ import 'package:missive/common/http.dart';
 import 'package:missive/constants/app_colors.dart';
 
 void main() async {
-  runApp(Missive());
+  WidgetsFlutterBinding.ensureInitialized();
+  const secureStorage = FlutterSecureStorage();
+  final AuthProvider authProvider =
+      AuthProvider(httpClient: dio, secureStorage: secureStorage);
+  await authProvider.initializeLoginState();
+  runApp(Missive(
+    authProvider: authProvider,
+  ));
 }
 
 class Missive extends StatelessWidget {
-  Missive({super.key});
+  final AuthProvider authProvider;
+  Missive({super.key, required this.authProvider});
 
-  final AuthProvider _authProvider = AuthProvider(
-      httpClient: dio, secureStorage: const FlutterSecureStorage());
-  final SignalProvider _signalProvider = SignalProvider();
   static const title = 'Missive';
 
   @override
   Widget build(BuildContext context) => MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => _authProvider),
-          ChangeNotifierProvider(create: (_) => _signalProvider),
+          ChangeNotifierProvider(create: (_) => authProvider),
+          ChangeNotifierProvider(create: (_) => SignalProvider()),
           ChangeNotifierProxyProvider2<AuthProvider, SignalProvider,
                   ChatProvider>(
               create: (BuildContext context) => ChatProvider
                   .empty(), // Empty constructor for ChangeNotifierProxyProvider's create method (since we depend on the other providers to be initialized first, and create requires a pure function that doesn't depend on other providers)
-              //  This does not update after logout, which breaks the entire app!!!
               update: (BuildContext context, authProvider, signalProvider,
                   chatProvider) {
                 if (chatProvider == null) {
@@ -61,7 +65,7 @@ class Missive extends StatelessWidget {
                       signalProvider: signalProvider);
                 }
 
-                if (!_authProvider.isLoggedIn) {
+                if (!authProvider.isLoggedIn) {
                   return ChatProvider(
                       url: const String.fromEnvironment('WEBSOCKET_URL',
                           defaultValue: 'ws://localhost:8080'),
@@ -91,9 +95,22 @@ class Missive extends StatelessWidget {
           path: '/userSearch', builder: (context, state) => UserSearchScreen()),
       GoRoute(
           path: '/conversations/:name',
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final name = state.pathParameters['name']!;
-            return ConversationScreen(name: name);
+            return CustomTransitionPage(
+              child: ConversationScreen(name: name),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) =>
+                      SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(1, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+              transitionDuration: const Duration(milliseconds: 150),
+              reverseTransitionDuration: const Duration(milliseconds: 150),
+            );
           }),
       GoRoute(
         path: '/login',
@@ -117,13 +134,13 @@ class Missive extends StatelessWidget {
           state.matchedLocation == '/register' ||
           state.matchedLocation == '/landing';
       // Explicitly handle the logged-out scenario
-      if (!_authProvider.isLoggedIn) {
+      if (!authProvider.isLoggedIn) {
         return onboarding ? null : '/landing';
       }
 
       return onboarding ? '/' : null;
     },
-    refreshListenable: _authProvider,
+    refreshListenable: authProvider,
   );
 }
 

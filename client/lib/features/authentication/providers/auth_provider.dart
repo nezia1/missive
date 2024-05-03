@@ -110,6 +110,7 @@ class AuthProvider extends ChangeNotifier {
       await _secureStorage.write(key: 'refreshToken', value: refreshToken);
       await _secureStorage.write(key: 'accessToken', value: accessToken);
 
+      await _secureStorage.write(key: 'isLoggedIn', value: 'true');
       _isLoggedIn = true;
       notifyListeners();
 
@@ -160,6 +161,7 @@ class AuthProvider extends ChangeNotifier {
         (await SharedPreferences.getInstance()).setBool('installed', false);
       }
 
+      await _secureStorage.write(key: 'isLoggedIn', value: 'true');
       _isLoggedIn = true;
       notifyListeners();
       return AuthenticationSuccess();
@@ -183,6 +185,8 @@ class AuthProvider extends ChangeNotifier {
     await _secureStorage.delete(key: 'accessToken');
 
     _user = null;
+
+    await _secureStorage.write(key: 'isLoggedIn', value: 'false');
     _isLoggedIn = false;
     notifyListeners();
   }
@@ -208,6 +212,12 @@ class AuthProvider extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
+  }
+
+  Future<void> initializeLoginState() async {
+    final isLoggedIn = await _secureStorage.read(key: 'isLoggedIn');
+    _isLoggedIn = isLoggedIn == 'true';
+    notifyListeners();
   }
 }
 
