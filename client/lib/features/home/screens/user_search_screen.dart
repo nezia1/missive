@@ -11,7 +11,7 @@ class UserSearchScreen extends StatefulWidget {
   const UserSearchScreen({super.key});
 
   @override
-  _UserSearchScreenState createState() => _UserSearchScreenState();
+  State<UserSearchScreen> createState() => _UserSearchScreenState();
 }
 
 class _UserSearchScreenState extends State<UserSearchScreen> {

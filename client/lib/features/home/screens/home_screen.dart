@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late SecureStorageIdentityKeyStore identityKeyStore;
   late ChatProvider _chatProvider;
   late Future _initialization;
-  final String _message = '';
+
   @override
   void initState() {
     super.initState();
