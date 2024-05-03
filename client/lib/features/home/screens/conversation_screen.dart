@@ -20,6 +20,23 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late final Future<void> _initialization;
+  bool _enableAutoScroll = true;
+
+  void jumpToBottom({animate = false}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        if (animate) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+          return;
+        }
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -37,6 +54,20 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
     _chatProvider.ensureConversationExists(widget
         .name); // it could be the first time somebody is accessing this conversation, so we need to ensure it exists
+    jumpToBottom();
+
+    // only allow scrolling on new messages when the user is close to the bottom
+    _scrollController.addListener(() {
+      double currentScrollPosition = _scrollController.offset;
+      double maxScrollPosition = _scrollController.position.maxScrollExtent;
+
+      // Check if close to the bottom, then allow auto-scroll
+      if (maxScrollPosition - currentScrollPosition < 100) {
+        _enableAutoScroll = true;
+      } else {
+        _enableAutoScroll = false;
+      }
+    });
   }
 
   void handleMessageSent() async {
@@ -72,6 +103,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     child: Consumer<ChatProvider>(
                         builder: (context, chatProvider, child) {
                       User conversation;
+                      if (_enableAutoScroll) jumpToBottom(animate: true);
                       // This is an absolutely abhorrent way of handling the conversation missing: we should have a better way of handling this, but for now, this will do. I just couldn't figure out why the race condition was happening when the conversation was missing. The issue is that ensureConversationExists doesn't seem to create the conversation properly, so we need to wait for it to be created before we can access it.
                       try {
                         conversation = chatProvider.conversations.firstWhere(
