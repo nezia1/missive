@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:missive/features/home/message_bubble.dart';
+import 'package:missive/features/chat/screens/message_bubble.dart';
 
 class ConversationScreen extends StatefulWidget {
   final String name;
