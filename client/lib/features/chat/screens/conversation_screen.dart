@@ -6,6 +6,7 @@ import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:missive/features/chat/screens/message_bubble.dart';
 
+/// This screen is used to display a conversation with a user. It displays the messages in a chat-like interface, and allows the user to send messages.
 class ConversationScreen extends StatefulWidget {
   final String name;
 

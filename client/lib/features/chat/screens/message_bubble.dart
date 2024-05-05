@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+/// This widget is used to display a message bubble in the chat screen. It can be used to display messages from the sender or from the receiver.
+/// ## Parameters
+/// - [text] (required): The text to display in the message bubble.
+/// - [isOwnMessage] (optional): Whether the message is from the sender or the receiver. Defaults to `false`.
+/// note: [isOwnMessage] is used to determine the color and alignment of the message bubble.
+/// - [alignment] (optional): The alignment of the message bubble. Defaults to `CrossAxisAlignment.start`.
 class MessageBubble extends StatelessWidget {
   final String text;
   final bool isOwnMessage;

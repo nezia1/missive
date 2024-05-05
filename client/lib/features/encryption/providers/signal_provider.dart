@@ -22,6 +22,11 @@ class SignalProvider extends ChangeNotifier {
   late SecureStorageSessionStore _sessionStore;
 
   /// Initializes the Signal protocol stores. If [installing] is true, generates a new identity key pair, registration ID, signed pre key, and pre keys.
+  /// ## Parameters
+  /// - [installing] (required): Whether the protocol is being installed for the first time.
+  /// - [name] (required): The name of the user.
+  /// - [accessToken]: The access token of the user.
+  /// ## Notes
   /// [name] and [accessToken] are required when [installing] is true, and is used to upload the keys to the server.
   Future<void> initialize(
       {required bool installing,
@@ -70,8 +75,11 @@ class SignalProvider extends ChangeNotifier {
     _identityKeyStore = SecureStorageIdentityKeyStore(storageManager);
   }
 
-  // TODO: this needs error handling in case user doesn't exist, server is down, or user has no keys
   /// Fetch a pre-key bundle from the server. This is used when a user wants to start a conversation with another user.
+  /// Returns a [PreKeyBundle] if the user exists and has keys, otherwise returns null.
+  /// ## Parameters
+  /// - [name] (required): The name of the user to fetch the keys from.
+  /// - [accessToken] (required): The access token of the user fetching the keys.
   Future<PreKeyBundle?> fetchPreKeyBundle(
       String name, String accessToken) async {
     final response = await dio.get('/users/$name/keys',
@@ -99,6 +107,11 @@ class SignalProvider extends ChangeNotifier {
         identityKey);
   }
 
+  /// Build a Signal session with a given user.
+  ///
+  /// ## Parameters
+  /// - [name] - The name of the user to build a session with.
+  /// - [accessToken] - The current access token to fetch the pre-key bundle from.
   Future<void> buildSession({
     required String name,
     required String accessToken,
@@ -116,6 +129,10 @@ class SignalProvider extends ChangeNotifier {
   }
 
   /// Encrypts a message for a given user. Returns a [CiphertextMessage].
+  ///
+  /// ## Parameters
+  /// - [name] - the name of the user to encrypt the message for.
+  /// - [message] - the plain text message to encrypt.
   Future<CiphertextMessage> encrypt(
       {required String name, required String message}) async {
     final remoteAddress = SignalProtocolAddress(name, 1);
@@ -126,7 +143,11 @@ class SignalProvider extends ChangeNotifier {
     return cipherText;
   }
 
-  // TODO: handle case where the session might have changed (e.g. user logs out and logs back in, user logs back out, to another account, and in again, or user deletes their account and creates a new one with the same name). The signed key needs to be updated. Perhaps we should store all the accounts the user has logged on separately?
+  /// Decrypts a message for a given [SignalProtocolAddress].
+  ///
+  /// ## Parameters
+  /// - [message] - The [CiphertextMessage] to decrypt.
+  /// - [senderAddress] - The [SignalProtocolAddress] the message has been sent from.
   Future<String> decrypt(
       CiphertextMessage message, SignalProtocolAddress senderAddress) async {
     final sessionCipher = SessionCipher(_sessionStore, _preKeyStore,

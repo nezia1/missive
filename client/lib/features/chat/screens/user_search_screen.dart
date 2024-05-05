@@ -7,6 +7,7 @@ import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
 
+/// This screen is used to search for users by their username, and start a conversation with them.
 class UserSearchScreen extends StatefulWidget {
   const UserSearchScreen({super.key});
 

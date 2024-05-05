@@ -14,9 +14,16 @@ import 'package:missive/features/encryption/secure_storage_identity_key_store.da
 import 'package:missive/features/encryption/secure_storage_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Provides everything related to the user, such as:
-/// -  authentication (login, logout, token management)
-/// - profile
+/// Provides everything related to authentication and user management.
+///
+/// This provider is responsible for:
+/// - Registering new users
+/// - Logging in users
+/// - Logging out users
+/// - Loading the currently authenticated user
+/// - Managing access and refresh tokens
+/// - Handling errors during authentication
+/// Relies on a [Dio] client for making HTTP requests, a [FlutterSecureStorage] for storing tokens, and a [SecureStorageManager] for storing user-related data at its own namespace.
 class AuthProvider extends ChangeNotifier {
   User? _user;
   final Dio _httpClient;

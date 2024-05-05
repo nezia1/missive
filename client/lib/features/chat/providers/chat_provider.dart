@@ -17,6 +17,15 @@ import 'package:uuid/uuid.dart' as uuid_generator;
 
 import 'package:missive/features/chat/models/conversation.dart';
 
+/// Provides chat-related functionalities, handling messaging operations, WebSocket connections,
+/// and encrypted local storage in a Realm database.
+///
+/// This provider is responsible for:
+/// - Managing WebSocket connections to receive and send messages.
+/// - When receiving and sending messages, takes care of encrypting and decrypting messages using the [SignalProvider].
+/// - Storing messages locally in a Realm database for persistent storage.
+///
+/// It relies on [AuthProvider] for authentication details and [SignalProvider] for encryption.
 class ChatProvider with ChangeNotifier {
   WebSocketChannel? _channel;
   String? _url;

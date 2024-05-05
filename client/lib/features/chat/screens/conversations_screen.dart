@@ -11,6 +11,7 @@ import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+/// This screen is used to display the list of conversations the user has.
 class ConversationsScreen extends StatefulWidget {
   const ConversationsScreen({super.key});
 
