@@ -23,7 +23,7 @@ build_mkdocs:
     - 'mkdocs build --verbose --site-dir public'
   artifacts:
     paths:
-      - documentation/public
+      - public
   rules:
     - changes:
       - documentation/**  # Assumes your MkDocs content is in the 'documentation' directory
@@ -37,12 +37,10 @@ build_flutter_docs:
       - .pub-cache
   script:
     - cd client
-    - dart pub get
-    - dart pub global activate dartdoc
-    - dart pub global run dartdoc --output public/client-api  # Output Dartdoc to 'public/client-api
+    - dart doc --output='public/client-api'
   artifacts:
     paths:
-      - client/public/client-api
+      - public/client-api
   rules:
     - changes:
       - client/**  # Assumes your Dart code is in the 'client' directory
@@ -56,3 +54,6 @@ pages:
       - public
   rules:
     - when: on_success
+  dependencies:
+    - build_mkdocs
+    - build_flutter_docs
