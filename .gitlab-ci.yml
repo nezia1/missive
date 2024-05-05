@@ -23,7 +23,7 @@ build_mkdocs:
     - 'mkdocs build --verbose --site-dir public'
   artifacts:
     paths:
-      - public
+      - documentation/public
   rules:
     - changes:
       - documentation/**  # Assumes your MkDocs content is in the 'documentation' directory
@@ -40,7 +40,7 @@ build_flutter_docs:
     - dart doc --output='public/client-api'
   artifacts:
     paths:
-      - public/client-api
+      - client/public/client-api
   rules:
     - changes:
       - client/**  # Assumes your Dart code is in the 'client' directory
@@ -48,7 +48,9 @@ build_flutter_docs:
 pages:
   stage: deploy
   script:
-    - echo "Deploying to GitLab Pages..."
+    - mkdir -p public/client-api
+    - cp -r documentation/public/* public/
+    - cp -r client/public/client-api public/api/
   artifacts:
     paths:
       - public
