@@ -1,46 +1,56 @@
 image: python:3.10-bullseye
 
 variables:
-  PIP_CACHE_DIR: '$CI_PROJECT_DIR/documentation/.cache/pip'
+  PIP_CACHE_DIR: '$CI_PROJECT_DIR/.cache/pip'
   GIT_SUBMODULE_STRATEGY: recursive
   GIT_SUBMODULE_FORCE_HTTPS: 'true'
 
-.prepare_docs: &prepare_docs
-  - cd documentation
+.prepare_python_docs: &prepare_python_docs
   - python3 -m venv venv
   - source venv/bin/activate
   - pip install --upgrade pip
   - pip install -r requirements.txt
 
-build_docs:
+build_mkdocs:
+  stage: build
   cache:
-    key: '$CI_COMMIT_REF_SLUG'
+    key: '${CI_COMMIT_REF_SLUG}-mkdocs'
     paths:
       - '.cache/pip'
-  stage: build
-  variables:
-    ENABLE_PDF_EXPORT: 1
   script:
-    - *prepare_docs
-    - 'mkdocs build --verbose --site-dir build'
+    - *prepare_python_docs
+    - 'mkdocs build --verbose --site-dir public'
   artifacts:
-    when: on_success
     paths:
-      - documentation/build
+      - public
   rules:
-    - changes: 
-      - documentation
+    - changes:
+      - documentation/**  # Assumes your MkDocs content is in the 'documentation' directory
+
+build_dart_docs:
+  image: dart:stable
+  stage: build
+  cache:
+    key: '${CI_COMMIT_REF_SLUG}-dart'
+    paths:
+      - .pub-cache
+  script:
+    - dart pub get
+    - dart pub global activate dartdoc
+    - dart pub global run dartdoc --output public/client-api  # Output Dartdoc to 'public/client-api
+  artifacts:
+    paths:
+      - public/client-api
+  rules:
+    - changes:
+      - client/**  # Assumes your Dart code is in the 'client' directory
 
 pages:
   stage: deploy
   script:
-    - mv documentation/build public
+    - echo "Deploying to GitLab Pages..."
   artifacts:
-    when: on_success
     paths:
       - public
-  dependencies:
-    - build_docs
   rules:
-    - changes:
-      - documentation
+    - when: on_success
