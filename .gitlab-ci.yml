@@ -50,7 +50,7 @@ pages:
   script:
     - mkdir -p public/client-api
     - cp -r documentation/public/* public/
-    - cp -r client/public/client-api public/api/
+    - cp -r client/public/client-api/* public/api/
   artifacts:
     paths:
       - public
