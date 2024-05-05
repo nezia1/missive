@@ -89,17 +89,6 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                 height: 70,
                 child: DrawerHeader(
                     child: TextButton.icon(
-                  label: const Text('Settings'),
-                  icon: const Icon(Icons.settings),
-                  onPressed: () {
-                    context.push('/settings');
-                  },
-                )),
-              ),
-              SizedBox(
-                height: 70,
-                child: DrawerHeader(
-                    child: TextButton.icon(
                         label: const Text('Logout'),
                         icon: const Icon(Icons.logout),
                         onPressed: () {
