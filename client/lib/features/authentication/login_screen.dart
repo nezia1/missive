@@ -4,9 +4,7 @@ import 'package:provider/provider.dart';
 import 'totp_modal.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.title});
-
-  final String title;
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();

@@ -11,16 +11,14 @@ import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.title});
-
-  final String title;
+class ConversationsScreen extends StatefulWidget {
+  const ConversationsScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<ConversationsScreen> createState() => _ConversationsScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _ConversationsScreenState extends State<ConversationsScreen> {
   // late is needed here because AuthProvider requires context and IdentityKeyStore is initialized in initState (the constructor needs to be different whether or not the user just created their account)
   late AuthProvider _userProvider;
   late SignalProvider _signalProvider;

@@ -7,13 +7,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 // screens
 import 'package:missive/features/authentication/landing_screen.dart';
-import 'package:missive/features/home/screens/settings_screen.dart';
 import 'package:missive/features/authentication/login_screen.dart';
 import 'package:missive/features/authentication/register_screen.dart';
-import 'package:missive/features/home/screens/conversation_screen.dart';
-import 'package:missive/features/home/screens/user_search_screen.dart';
+import 'package:missive/features/chat/screens/conversation_screen.dart';
+import 'package:missive/features/chat/screens/user_search_screen.dart';
 
-import 'package:missive/features/home/screens/home_screen.dart';
+import 'package:missive/features/chat/screens/conversations_screen.dart';
 
 // providers
 import 'package:missive/features/authentication/providers/auth_provider.dart';
@@ -38,8 +37,6 @@ void main() async {
 class Missive extends StatelessWidget {
   final AuthProvider authProvider;
   Missive({super.key, required this.authProvider});
-
-  static const title = 'Missive';
 
   @override
   Widget build(BuildContext context) => MultiProvider(
@@ -77,7 +74,6 @@ class Missive extends StatelessWidget {
               }),
         ],
         child: MaterialApp.router(
-          title: title,
           theme: _buildAppTheme(),
           routerConfig: _router,
           debugShowCheckedModeBanner: false,
@@ -89,10 +85,11 @@ class Missive extends StatelessWidget {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => const HomeScreen(title: Missive.title),
+        builder: (context, state) => const ConversationsScreen(),
       ),
       GoRoute(
-          path: '/userSearch', builder: (context, state) => const UserSearchScreen()),
+          path: '/userSearch',
+          builder: (context, state) => const UserSearchScreen()),
       GoRoute(
           path: '/conversations/:name',
           pageBuilder: (context, state) {
@@ -114,26 +111,22 @@ class Missive extends StatelessWidget {
           }),
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginScreen(title: Missive.title),
+        builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
           path: '/register',
-          builder: (context, state) =>
-              const RegisterScreen(title: Missive.title)),
+          builder: (context, state) => const RegisterScreen()),
       GoRoute(
         path: '/landing',
-        builder: (context, state) => const LandingScreen(title: Missive.title),
+        builder: (context, state) => const LandingScreen(),
       ),
-      GoRoute(
-        path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
-      )
     ],
+    // Redirect to the appropriate page based on the user's authentication state
     redirect: (context, state) async {
+      // Determine if the user is in the onboarding flow (trying to login or register)
       bool onboarding = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register' ||
           state.matchedLocation == '/landing';
-      // Explicitly handle the logged-out scenario
       if (!authProvider.isLoggedIn) {
         return onboarding ? null : '/landing';
       }
@@ -144,9 +137,9 @@ class Missive extends StatelessWidget {
   );
 }
 
-ThemeData _buildAppTheme() {
+ThemeData _buildAppTheme({bool dark = true}) {
   final palette = PurpleDream();
-  final ThemeData base = ThemeData.dark();
+  final ThemeData base = dark ? ThemeData.dark() : ThemeData.light();
 
   return base.copyWith(
     brightness: Brightness.dark,
@@ -224,7 +217,6 @@ ThemeData _buildAppTheme() {
         borderSide: BorderSide(
             color: palette.error, width: 2.0), // Focused error state border
       ),
-      // You can also add errorStyle, prefixStyle, suffixStyle as needed.
     ),
   );
 }

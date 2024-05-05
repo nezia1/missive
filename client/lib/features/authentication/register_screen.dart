@@ -3,9 +3,7 @@ import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key, required this.title});
-
-  final String title;
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();

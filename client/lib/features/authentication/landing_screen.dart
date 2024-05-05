@@ -3,8 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class LandingScreen extends StatelessWidget {
-  final String title;
-  const LandingScreen({super.key, required this.title});
+  const LandingScreen({super.key});
   final String logoName = 'assets/missive_logo.svg';
 
   @override
