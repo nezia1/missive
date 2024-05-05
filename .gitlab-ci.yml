@@ -42,7 +42,7 @@ build_flutter_docs:
     - dart pub global run dartdoc --output public/client-api  # Output Dartdoc to 'public/client-api
   artifacts:
     paths:
-      - public/client-api
+      - client/public/client-api
   rules:
     - changes:
       - client/**  # Assumes your Dart code is in the 'client' directory
