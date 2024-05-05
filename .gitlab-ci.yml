@@ -6,6 +6,7 @@ variables:
   GIT_SUBMODULE_FORCE_HTTPS: 'true'
 
 .prepare_python_docs: &prepare_python_docs
+  - cd documentation
   - python3 -m venv venv
   - source venv/bin/activate
   - pip install --upgrade pip
