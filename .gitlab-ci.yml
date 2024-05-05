@@ -36,6 +36,7 @@ build_dart_docs:
     paths:
       - .pub-cache
   script:
+    - cd client
     - dart pub get
     - dart pub global activate dartdoc
     - dart pub global run dartdoc --output public/client-api  # Output Dartdoc to 'public/client-api
