@@ -28,8 +28,8 @@ build_mkdocs:
     - changes:
       - documentation/**  # Assumes your MkDocs content is in the 'documentation' directory
 
-build_dart_docs:
-  image: dart:stable
+build_flutter_docs:
+  image: ghcr.io/cirruslabs/flutter:3.19.6
   stage: build
   cache:
     key: '${CI_COMMIT_REF_SLUG}-dart'
