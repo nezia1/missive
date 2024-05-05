@@ -130,7 +130,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                   return ListTile(
                     contentPadding:
                         const EdgeInsetsDirectional.symmetric(horizontal: 20),
-                    title: Text(conversation.name,
+                    title: Text(conversation.username,
                         style: Theme.of(context).textTheme.headlineSmall),
                     subtitle: Text(
                         conversation.messages.isNotEmpty
@@ -139,7 +139,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis),
                     onTap: () =>
-                        context.push('/conversations/${conversation.name}'),
+                        context.push('/conversations/${conversation.username}'),
                   );
                 },
                 separatorBuilder: (context, index) => const Divider(),

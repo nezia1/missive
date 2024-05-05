@@ -1,12 +1,83 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'chat_provider.dart';
+part of 'conversation.dart';
 
 // **************************************************************************
 // RealmObjectGenerator
 // **************************************************************************
 
 // ignore_for_file: type=lint
+class Conversation extends _Conversation
+    with RealmEntity, RealmObjectBase, RealmObject {
+  Conversation(
+    String username, {
+    Iterable<PlaintextMessage> messages = const [],
+  }) {
+    RealmObjectBase.set(this, 'username', username);
+    RealmObjectBase.set<RealmList<PlaintextMessage>>(
+        this, 'messages', RealmList<PlaintextMessage>(messages));
+  }
+
+  Conversation._();
+
+  @override
+  String get username =>
+      RealmObjectBase.get<String>(this, 'username') as String;
+  @override
+  set username(String value) => RealmObjectBase.set(this, 'username', value);
+
+  @override
+  RealmList<PlaintextMessage> get messages =>
+      RealmObjectBase.get<PlaintextMessage>(this, 'messages')
+          as RealmList<PlaintextMessage>;
+  @override
+  set messages(covariant RealmList<PlaintextMessage> value) =>
+      throw RealmUnsupportedSetError();
+
+  @override
+  Stream<RealmObjectChanges<Conversation>> get changes =>
+      RealmObjectBase.getChanges<Conversation>(this);
+
+  @override
+  Conversation freeze() => RealmObjectBase.freezeObject<Conversation>(this);
+
+  EJsonValue toEJson() {
+    return <String, dynamic>{
+      'username': username.toEJson(),
+      'messages': messages.toEJson(),
+    };
+  }
+
+  static EJsonValue _toEJson(Conversation value) => value.toEJson();
+  static Conversation _fromEJson(EJsonValue ejson) {
+    return switch (ejson) {
+      {
+        'username': EJsonValue username,
+        'messages': EJsonValue messages,
+      } =>
+        Conversation(
+          fromEJson(username),
+          messages: fromEJson(messages),
+        ),
+      _ => raiseInvalidEJson(ejson),
+    };
+  }
+
+  static final schema = () {
+    RealmObjectBase.registerFactory(Conversation._);
+    register(_toEJson, _fromEJson);
+    return SchemaObject(ObjectType.realmObject, Conversation, 'Conversation', [
+      SchemaProperty('username', RealmPropertyType.string, primaryKey: true),
+      SchemaProperty('messages', RealmPropertyType.object,
+          linkTarget: 'PlaintextMessage',
+          collectionType: RealmCollectionType.list),
+    ]);
+  }();
+
+  @override
+  SchemaObject get objectSchema => RealmObjectBase.getSchema(this) ?? schema;
+}
+
 class PlaintextMessage extends _PlaintextMessage
     with RealmEntity, RealmObjectBase, RealmObject {
   PlaintextMessage(
@@ -101,75 +172,6 @@ class PlaintextMessage extends _PlaintextMessage
       SchemaProperty('own', RealmPropertyType.bool),
       SchemaProperty('receiver', RealmPropertyType.string, optional: true),
       SchemaProperty('sentAt', RealmPropertyType.timestamp, optional: true),
-    ]);
-  }();
-
-  @override
-  SchemaObject get objectSchema => RealmObjectBase.getSchema(this) ?? schema;
-}
-
-class User extends _User with RealmEntity, RealmObjectBase, RealmObject {
-  User(
-    String name, {
-    Iterable<PlaintextMessage> messages = const [],
-  }) {
-    RealmObjectBase.set(this, 'name', name);
-    RealmObjectBase.set<RealmList<PlaintextMessage>>(
-        this, 'messages', RealmList<PlaintextMessage>(messages));
-  }
-
-  User._();
-
-  @override
-  String get name => RealmObjectBase.get<String>(this, 'name') as String;
-  @override
-  set name(String value) => RealmObjectBase.set(this, 'name', value);
-
-  @override
-  RealmList<PlaintextMessage> get messages =>
-      RealmObjectBase.get<PlaintextMessage>(this, 'messages')
-          as RealmList<PlaintextMessage>;
-  @override
-  set messages(covariant RealmList<PlaintextMessage> value) =>
-      throw RealmUnsupportedSetError();
-
-  @override
-  Stream<RealmObjectChanges<User>> get changes =>
-      RealmObjectBase.getChanges<User>(this);
-
-  @override
-  User freeze() => RealmObjectBase.freezeObject<User>(this);
-
-  EJsonValue toEJson() {
-    return <String, dynamic>{
-      'name': name.toEJson(),
-      'messages': messages.toEJson(),
-    };
-  }
-
-  static EJsonValue _toEJson(User value) => value.toEJson();
-  static User _fromEJson(EJsonValue ejson) {
-    return switch (ejson) {
-      {
-        'name': EJsonValue name,
-        'messages': EJsonValue messages,
-      } =>
-        User(
-          fromEJson(name),
-          messages: fromEJson(messages),
-        ),
-      _ => raiseInvalidEJson(ejson),
-    };
-  }
-
-  static final schema = () {
-    RealmObjectBase.registerFactory(User._);
-    register(_toEJson, _fromEJson);
-    return SchemaObject(ObjectType.realmObject, User, 'User', [
-      SchemaProperty('name', RealmPropertyType.string, primaryKey: true),
-      SchemaProperty('messages', RealmPropertyType.object,
-          linkTarget: 'PlaintextMessage',
-          collectionType: RealmCollectionType.list),
     ]);
   }();
 

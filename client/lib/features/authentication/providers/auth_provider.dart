@@ -221,7 +221,7 @@ class AuthProvider extends ChangeNotifier {
   }
 }
 
-// This function adds padding to a base64 string if needed so it can be decoded properly.
+/// Adds padding to a base64 string if needed so it can be decoded properly. Base64 strings need to have a length that is a multiple of 4 to be decoded, and some JWT tokens might not have correct padding.
 String _normalizeBase64(String base64Url) {
   String normalized = base64Url
       .replaceAll('-', '+') // Replace - with +
@@ -230,6 +230,7 @@ String _normalizeBase64(String base64Url) {
       '='); // Pad with = to make the length a multiple of 4
 }
 
+/// Extracts the 'sub' claim from a JWT token. Allows us to get the user ID.
 String _getSubFromToken(String token) {
   final normalizedPayload = _normalizeBase64(token.split('.')[1]);
   final payload =
@@ -257,18 +258,22 @@ class AuthenticationError extends AuthenticationResult implements Error {
   AuthenticationError([this.message]);
 }
 
+/// Represents an error during an authentication attempt due to a timeout.
 class AuthenticationTimeoutError extends AuthenticationError {
   AuthenticationTimeoutError();
 }
 
+/// Represents an error during an authentication attempt due to invalid credentials.
 class InvalidCredentialsError extends AuthenticationError {
   InvalidCredentialsError();
 }
 
+/// Represents an error during an authentication attempt due to a required TOTP. This is not exactly an error, but still a special case that requires different handling.
 class TOTPRequiredError extends AuthenticationError {
   TOTPRequiredError();
 }
 
+/// Represents an error during an authentication attempt due to an invalid TOTP.
 class TOTPInvalidError extends AuthenticationError {
   TOTPInvalidError();
 }

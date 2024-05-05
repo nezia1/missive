@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+/// The landing screen for the application. Allows users to register or login, and provides a nice entry point to the application.
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
   final String logoName = 'assets/missive_logo.svg';

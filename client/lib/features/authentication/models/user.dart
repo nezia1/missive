@@ -1,3 +1,4 @@
+/// Represents a user. Used in the authentication flow.
 class User {
   String id;
   String name;

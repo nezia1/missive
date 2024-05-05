@@ -15,15 +15,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:missive/common/http.dart';
 import 'package:uuid/uuid.dart' as uuid_generator;
 
-part 'chat_provider.realm.dart';
+import 'package:missive/features/chat/models/conversation.dart';
 
 class ChatProvider with ChangeNotifier {
   WebSocketChannel? _channel;
   String? _url;
   AuthProvider? _authProvider;
   SignalProvider? _signalProvider;
-  List<User> _conversations = [];
-  List<User> get conversations => _conversations;
+  List<Conversation> _conversations = [];
+  List<Conversation> get conversations => _conversations;
   Realm? _userRealm;
   StreamSubscription? _messagesSubscription;
 
@@ -36,6 +36,9 @@ class ChatProvider with ChangeNotifier {
   // Empty constructor for ChangeNotifierProxyProvider's create method
   ChatProvider.empty() : this();
 
+  /// Resets the provider to its initial state. This method is used when the user logs out.
+  ///
+  /// It clears the WebSocket connection, the URL, and the providers. It also notifies the listeners to update the UI.
   void reset() {
     _url = null;
     _authProvider = null;
@@ -43,6 +46,7 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Updates the provider with new values. This method is used when the user logs in, as we cannot initialize a provider in ProxyProvider with the user's data, and have to do it after the user logs in.
   void update(
       {required String url,
       required AuthProvider authProvider,
@@ -52,12 +56,16 @@ class ChatProvider with ChangeNotifier {
     _signalProvider = signalProvider;
   }
 
+  /// Checks if the provider needs to be updated. This method is used to determine if the provider is fully initialized, so we don't update it multiple times.
   bool needsUpdate() =>
       _url == null || _authProvider == null || _signalProvider == null;
 
+  /// Connects to the WebSocket server and listens for incoming messages.
+  ///
+  /// When the WebSocket connection is established, the provider listens for incoming messages. If the message is a status update, it updates the corresponding message status accordingly. If the message is a new message, it decrypts the message using [SignalProvider] and stores it locally in the user's Realm database as a [PlaintextMessage].
   Future<void> connect() async {
     if (_url == null || _authProvider == null || _signalProvider == null) {
-      throw Exception('ChatProvider is not fully initialized');
+      throw InitializationError('ChatProvider is not fully initialized');
     }
 
     final ws = await WebSocket.connect(
@@ -95,9 +103,9 @@ class ChatProvider with ChangeNotifier {
       // store message in Realm
       final realm = await _getUserRealm();
       realm.write(() {
-        var user = realm.find<User>(messageJson['sender']);
+        var user = realm.find<Conversation>(messageJson['sender']);
 
-        user ??= realm.add(User(messageJson['sender']));
+        user ??= realm.add(Conversation(messageJson['sender']));
 
         user.messages.add(PlaintextMessage(messageJson['id'], plainText, false,
             sentAt: DateTime.now()));
@@ -106,11 +114,31 @@ class ChatProvider with ChangeNotifier {
   }
 
   // TODO: add id to message so that we can update the status
+  /// Sends an encrypted message to the server and stores it locally in the user's Realm database.
+  ///
+  /// This method takes a plaintext message and a receiver's identifier, encrypts the message using
+  /// the [SignalProvider], and then performs two main actions:
+  /// 1. Sends the encrypted message to the server.
+  /// 2. Stores the encrypted message locally in the Realm database for persistence.
+  ///
+  /// ## Parameters:
+  /// - [plainText]: The text of the message that needs to be sent. This should not be empty.
+  /// - [receiver]: The identifier of the recipient who will receive the message.
+  ///
+  /// ## Throws:
+  /// - `Exception` if the [SignalProvider] has not been initialized prior to calling this method,
+  ///
+  /// ## Usage:
+  /// ```dart
+  ///   await sendMessage(plainText: 'Hello, World!', receiver: 'alice');
+  /// ```
+  ///
+  /// Ensure that [SignalProvider] is properly initialized before invoking this method.
   Future<void> sendMessage(
       {required String plainText, required String receiver}) async {
     final uuid = const uuid_generator.Uuid().v6();
     if (_signalProvider == null) {
-      throw Exception('SignalProvider is not initialized');
+      throw InitializationError('SignalProvider is not initialized');
     }
     final message =
         await _signalProvider!.encrypt(name: receiver, message: plainText);
@@ -129,13 +157,13 @@ class ChatProvider with ChangeNotifier {
     final name = (await _authProvider?.user)?.name;
 
     if (name == null) {
-      throw Exception('User is not logged in');
+      throw InitializationError('User is not logged in');
     }
 
     realm.write(() {
-      var user = realm.find<User>(receiver);
+      var user = realm.find<Conversation>(receiver);
 
-      user ??= realm.add(User(receiver));
+      user ??= realm.add(Conversation(receiver));
 
       user.messages.add(PlaintextMessage(
         uuid,
@@ -150,10 +178,10 @@ class ChatProvider with ChangeNotifier {
   void setupUserRealm() async {
     _userRealm = await _getUserRealm();
     if (_userRealm == null) {
-      throw Exception('User Realm is not initialized');
+      throw InitializationError('User Realm is not initialized');
     }
     // initialize messages
-    final conversations = _userRealm!.all<User>();
+    final conversations = _userRealm!.all<Conversation>();
     _conversations = conversations.toList();
 
     notifyListeners(); // update UI with initial data load
@@ -168,7 +196,9 @@ class ChatProvider with ChangeNotifier {
 
   void ensureConversationExists(String name) {
     _userRealm?.write(() {
-      if (_userRealm?.find<User>(name) == null) _userRealm?.add(User(name));
+      if (_userRealm?.find<Conversation>(name) == null) {
+        _userRealm?.add(Conversation(name));
+      }
     });
   }
 
@@ -194,7 +224,6 @@ class ChatProvider with ChangeNotifier {
       try {
         await _signalProvider?.buildSession(
             name: name, accessToken: accessToken);
-        // TODO: when switching accounts, it says (no session for sender). Is it because the session is not changed after logout? I think it has something to do with the ProxyProvider not updating the SignalProvider after logout.
         cipherMessage =
             SignalMessage.fromSerialized(base64Decode(message['content']));
       } catch (_) {
@@ -203,9 +232,9 @@ class ChatProvider with ChangeNotifier {
       final plainText = await _signalProvider!
           .decrypt(cipherMessage, SignalProtocolAddress(sender, 1));
       _userRealm?.write(() {
-        var user = _userRealm?.find<User>(sender);
+        var user = _userRealm?.find<Conversation>(sender);
 
-        user ??= _userRealm?.add(User(sender));
+        user ??= _userRealm?.add(Conversation(sender));
 
         user?.messages.add(PlaintextMessage(
           message['id'],
@@ -243,7 +272,7 @@ class ChatProvider with ChangeNotifier {
     final directory = (await getApplicationSupportDirectory()).path;
 
     final realmConfig = Configuration.local(
-      [User.schema, PlaintextMessage.schema],
+      [Conversation.schema, PlaintextMessage.schema],
       path: '$directory/${name}_realm.realm',
       encryptionKey: realmKey,
     );
@@ -254,7 +283,7 @@ class ChatProvider with ChangeNotifier {
   // THIS IS ONLY FOR DEBUGGING PURPOSES WHEN VALUES COULD NOT BE STORED CORRECTLY (WHEN DELETING USERS FROM THE SERVER FOR INSTANCE), DO NOT USE IN PRODUCTION
   void deleteAll() async {
     _userRealm?.write(() {
-      _userRealm?.deleteAll<User>();
+      _userRealm?.deleteAll<Conversation>();
     });
     _userRealm?.close();
     Realm.deleteRealm(_userRealm!.config.path);
@@ -263,6 +292,7 @@ class ChatProvider with ChangeNotifier {
     await secureStorage.delete(key: '${name}_realmEncryptionKey');
   }
 
+  /// Disposes the provider and closes the WebSocket connection. This method is called when the user logs out, as we need to clean up the resources to avoid sessions getting mixed up.
   @override
   void dispose() {
     print('Disposing... (this should happen after log out)');
@@ -275,20 +305,12 @@ class ChatProvider with ChangeNotifier {
   }
 }
 
-@RealmModel()
-class _PlaintextMessage {
-  @PrimaryKey()
-  late String id;
-  late String content;
-  late bool own;
-  late String? receiver;
-  late DateTime? sentAt;
-}
+/// Represents an initialization error. Used when the [ChatProvider] is not fully initialized, and an operation is attempted.
+class InitializationError extends Error {
+  final String message;
 
-@RealmModel()
-class _User {
-  @PrimaryKey()
-  late String name;
+  InitializationError(this.message);
 
-  late List<_PlaintextMessage> messages;
+  @override
+  String toString() => 'InitializationError: $message';
 }

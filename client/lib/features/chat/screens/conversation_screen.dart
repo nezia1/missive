@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
+import 'package:missive/features/chat/models/conversation.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:missive/features/chat/screens/message_bubble.dart';
@@ -102,12 +103,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   Expanded(
                     child: Consumer<ChatProvider>(
                         builder: (context, chatProvider, child) {
-                      User conversation;
+                      Conversation conversation;
                       if (_enableAutoScroll) jumpToBottom(animate: true);
                       // This is an absolutely abhorrent way of handling the conversation missing: we should have a better way of handling this, but for now, this will do. I just couldn't figure out why the race condition was happening when the conversation was missing. The issue is that ensureConversationExists doesn't seem to create the conversation properly, so we need to wait for it to be created before we can access it.
                       try {
                         conversation = chatProvider.conversations.firstWhere(
-                            (element) => element.name == widget.name);
+                            (element) => element.username == widget.name);
                       } on StateError catch (_) {
                         return const Center(
                           child: Text('No messages yet'),
