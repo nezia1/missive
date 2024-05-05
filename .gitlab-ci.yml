@@ -23,7 +23,7 @@ build_mkdocs:
     - 'mkdocs build --verbose --site-dir public'
   artifacts:
     paths:
-      - public
+      - documentation/public
   rules:
     - changes:
       - documentation/**  # Assumes your MkDocs content is in the 'documentation' directory
