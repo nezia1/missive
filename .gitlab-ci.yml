@@ -26,7 +26,7 @@ build_mkdocs:
       - documentation/public
   rules:
     - changes:
-      - documentation/**  # Assumes your MkDocs content is in the 'documentation' directory
+      - documentation  # Assumes your MkDocs content is in the 'documentation' directory
 
 build_flutter_docs:
   image: ghcr.io/cirruslabs/flutter:3.19.6
@@ -76,5 +76,5 @@ pages:
       - public
   rules:
     - changes:
-      - documentation/**
+      - documentation
       - client/**/*
