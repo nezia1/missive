@@ -62,11 +62,7 @@ flutter_unit_tests:
     paths:
       - .pub-cache/
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
-      changes:
-        - client/**
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
+      - changes:
         - client/**
 
 pages:
