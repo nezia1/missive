@@ -57,8 +57,6 @@ flutter_unit_tests:
     when: always
     reports:
       junit: client/junit-report.xml
-  except:
-    - schedules
   cache:
     key: "${CI_COMMIT_REF_SLUG}"
     paths:
