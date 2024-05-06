@@ -76,5 +76,5 @@ pages:
       - public
   rules:
     - changes:
-      - documentation/**/*
+      - documentation/**
       - client/**/*
