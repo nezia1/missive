@@ -45,6 +45,27 @@ build_flutter_docs:
     - changes:
       - client/**  # Assumes your Dart code is in the 'client' directory
 
+flutter_unit_tests:
+  image: ghcr.io/cirruslabs/flutter:3.19.6
+  stage: test
+  script:
+    - flutter pub get
+    - flutter test
+  artifacts:
+    when: always
+    reports:
+      junit: test-results/**/*.xml
+  only:
+    - merge_requests
+    - main
+  except:
+    - schedules
+  cache:
+    key: "${CI_COMMIT_REF_SLUG}"
+    paths:
+      - .pub-cache/
+
+
 pages:
   stage: deploy
   script:
