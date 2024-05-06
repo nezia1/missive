@@ -18,6 +18,8 @@ build_mkdocs:
     key: '${CI_COMMIT_REF_SLUG}-mkdocs'
     paths:
       - '.cache/pip'
+  variables:
+    ENABLE_PDF_EXPORT: 1
   script:
     - *prepare_python_docs
     - 'mkdocs build --verbose --site-dir public'
