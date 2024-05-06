@@ -63,7 +63,7 @@ flutter_unit_tests:
       - .pub-cache/
   rules:
     - changes:
-      - client/**
+      - client/**/*
 
 pages:
   stage: deploy
