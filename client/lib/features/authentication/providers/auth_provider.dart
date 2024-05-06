@@ -11,7 +11,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:missive/features/authentication/models/user.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
-import 'package:missive/features/encryption/secure_storage_manager.dart';
+import 'package:missive/features/encryption/namespaced_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Provides everything related to authentication and user management.
@@ -23,7 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// - Loading the currently authenticated user
 /// - Managing access and refresh tokens
 /// - Handling errors during authentication
-/// Relies on a [Dio] client for making HTTP requests, a [FlutterSecureStorage] for storing tokens, and a [SecureStorageManager] for storing user-related data at its own namespace.
+/// Relies on a [Dio] client for making HTTP requests, a [FlutterSecureStorage] for storing tokens, and a [NamespacedSecureStorage] for storing user-related data at its own namespace.
 class AuthProvider extends ChangeNotifier {
   User? _user;
   final Dio _httpClient;
@@ -96,8 +96,8 @@ class AuthProvider extends ChangeNotifier {
           .timeout(const Duration(seconds: 5));
 
       // we need a namespace to store user related data
-      final storageManager =
-          SecureStorageManager(secureStorage: _secureStorage, namespace: name);
+      final storageManager = NamespacedSecureStorage(
+          secureStorage: _secureStorage, namespace: name);
 
       SecureStorageIdentityKeyStore.fromIdentityKeyPair(
           storageManager, identityKeyPair, registrationId);
@@ -157,8 +157,8 @@ class AuthProvider extends ChangeNotifier {
       await _secureStorage.write(key: 'refreshToken', value: refreshToken);
       await _secureStorage.write(key: 'accessToken', value: accessToken);
 
-      SecureStorageManager storageManager =
-          SecureStorageManager(secureStorage: _secureStorage, namespace: name);
+      NamespacedSecureStorage storageManager = NamespacedSecureStorage(
+          secureStorage: _secureStorage, namespace: name);
 
       // If user didn't log in yet, we need to install the app
       final firstLogin =

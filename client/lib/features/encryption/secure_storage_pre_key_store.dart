@@ -1,13 +1,13 @@
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'dart:convert';
 
-import 'package:missive/features/encryption/secure_storage_manager.dart';
+import 'package:missive/features/encryption/namespaced_secure_storage.dart';
 
 class SecureStoragePreKeyStore implements PreKeyStore {
-  final SecureStorageManager _storageManager;
+  final SecureStorage _secureStorage;
 
-  SecureStoragePreKeyStore(SecureStorageManager storageManager)
-      : _storageManager = storageManager;
+  SecureStoragePreKeyStore(SecureStorage secureStorage)
+      : _secureStorage = secureStorage;
 
   @override
   Future<bool> containsPreKey(int preKeyId) async {
@@ -18,7 +18,7 @@ class SecureStoragePreKeyStore implements PreKeyStore {
 
   @override
 
-  /// Loads a serialized [PreKeyRecord] from [SecureStorageManager] and returns it as a [PreKeyRecord].
+  /// Loads a serialized [PreKeyRecord] from [SecureStorage] and returns it as a [PreKeyRecord].
   /// Throws a n [InvalidKeyIdException] if the pre key is not found.
   Future<PreKeyRecord> loadPreKey(int preKeyId) async {
     final preKeys = await _loadKeys();
@@ -41,7 +41,7 @@ class SecureStoragePreKeyStore implements PreKeyStore {
     final preKeys = await _loadKeys();
     if (preKeys == null) return;
     preKeys.remove(preKeyId.toString());
-    await _storageManager.write(key: 'preKeys', value: jsonEncode(preKeys));
+    await _secureStorage.write(key: 'preKeys', value: jsonEncode(preKeys));
   }
 
   @override
@@ -57,13 +57,13 @@ class SecureStoragePreKeyStore implements PreKeyStore {
     // Serialize the record as a UInt8List and encode it as a base64 string (SecureStorage expects strings. This will need to be decoded when retrieved)
     preKeys[preKeyId.toString()] = base64Encode(record.serialize());
 
-    await _storageManager.write(key: 'preKeys', value: jsonEncode(preKeys));
+    await _secureStorage.write(key: 'preKeys', value: jsonEncode(preKeys));
   }
 
   /// Loads all pre keys from the secure storage
   /// Returns a [Map] of [PreKeyRecord]s
   Future<Map<String, dynamic>?> _loadKeys() async {
-    final preKeysJson = await _storageManager.read(key: 'preKeys');
+    final preKeysJson = await _secureStorage.read(key: 'preKeys');
     if (preKeysJson == null) return null;
     final preKeys = jsonDecode(preKeysJson);
 

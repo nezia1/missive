@@ -7,7 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
 
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
-import 'package:missive/features/encryption/secure_storage_manager.dart';
+import 'package:missive/features/encryption/namespaced_secure_storage.dart';
 import 'package:missive/features/encryption/secure_storage_session_store.dart';
 import 'package:missive/features/encryption/secure_storage_pre_key_store.dart';
 import 'package:missive/features/encryption/secure_storage_signed_pre_key_store.dart';
@@ -34,7 +34,7 @@ class SignalProvider extends ChangeNotifier {
       String? accessToken}) async {
     const secureStorage = FlutterSecureStorage();
     final storageManager =
-        SecureStorageManager(secureStorage: secureStorage, namespace: name);
+        NamespacedSecureStorage(secureStorage: secureStorage, namespace: name);
 
     _preKeyStore = SecureStoragePreKeyStore(storageManager);
     _signedPreKeyStore = SecureStorageSignedPreKeyStore(storageManager);
