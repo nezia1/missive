@@ -62,8 +62,8 @@ flutter_unit_tests:
     paths:
       - .pub-cache/
   rules:
-      - changes:
-        - client/**
+    - changes:
+      - client/**
 
 pages:
   stage: deploy
