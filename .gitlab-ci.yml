@@ -55,7 +55,7 @@ flutter_unit_tests:
   artifacts:
     when: always
     reports:
-      junit: junit-report.xml
+      junit: client/junit-report.xml
   only:
     - merge_requests
     - main
