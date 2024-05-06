@@ -59,3 +59,6 @@ pages:
   dependencies:
     - build_mkdocs
     - build_flutter_docs
+  except:
+    changes:
+      - .gitlab-ci.yml
