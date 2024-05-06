@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:dio/dio.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:missive/common/http.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -88,7 +89,10 @@ class AuthProvider extends ChangeNotifier {
         'name': name,
         'password': password,
         'registrationId': registrationId,
-        'identityKey': base64Encode(identityKeyPair.getPublicKey().serialize())
+        'identityKey': base64Encode(
+          identityKeyPair.getPublicKey().serialize(),
+        ),
+        'oneSignalId': await OneSignal.User.getOnesignalId(),
       });
 
       final response = await _httpClient

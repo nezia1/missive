@@ -24,7 +24,9 @@
 				"--dart-define",
 				"API_URL=http://10.0.2.2/api/v1",
 				"--dart-define",
-				"WEBSOCKET_URL=ws://10.0.2.2"
+				"WEBSOCKET_URL=ws://10.0.2.2",
+				"--dart-define",
+				"ONESIGNAL_APP_ID=4b170031-70ac-4bce-97c4-9f639f182598"
 			],
 			"deviceId": "emulator"
 		},
@@ -38,7 +40,9 @@
 				"--dart-define",
 				"API_URL=http://10.5.50.59/api/v1",
 				"--dart-define",
-				"WEBSOCKET_URL=ws://10.5.50.59"
+				"WEBSOCKET_URL=ws://10.5.50.59",
+				"--dart-define",
+				"ONESIGNAL_APP_ID=4b170031-70ac-4bce-97c4-9f639f182598"
 			],
 			"deviceId": "803KPPB1643144"
 		}
