@@ -37,10 +37,10 @@ build_flutter_docs:
       - .pub-cache
   script:
     - cd client
-    - dart doc --output='public/client-api'
+    - dart doc --output='public'
   artifacts:
     paths:
-      - client/public/client-api
+      - client/public
   rules:
     - changes:
       - client/**  # Assumes your Dart code is in the 'client' directory
@@ -50,7 +50,7 @@ pages:
   script:
     - mkdir -p public/client-api
     - if [ -d documentation/public ]; then cp -r documentation/public/* public/; fi
-    - if [ -d client/public ]; then cp -r client/public/client-api/* public/client-api/; fi
+    - if [ -d client/public ]; then cp -r client/public/* public/client-api/; fi
   artifacts:
     paths:
       - public
