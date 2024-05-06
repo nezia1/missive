@@ -54,8 +54,6 @@ pages:
   artifacts:
     paths:
       - public
-  rules:
-    - when: on_success
   dependencies:
     - build_mkdocs
     - build_flutter_docs
