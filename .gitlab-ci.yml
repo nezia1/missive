@@ -51,9 +51,7 @@ flutter_unit_tests:
   script:
     - cd client
     - flutter pub get
-    - dart pub global activate junitreport
-    - flutter test
-    - flutter test --machine | tojunit --output junit-report.xml
+    - flutter test --machine | dart pub global run junitreport:tojunit --output junit-report.xml
   artifacts:
     when: always
     reports:
