@@ -92,7 +92,8 @@ class AuthProvider extends ChangeNotifier {
         'identityKey': base64Encode(
           identityKeyPair.getPublicKey().serialize(),
         ),
-        'oneSignalId': await OneSignal.User.getOnesignalId(),
+        'oneSignalId': await OneSignal.User
+            .getOnesignalId(), // get the OneSignal ID that was generated for this device
       });
 
       final response = await _httpClient
@@ -123,6 +124,7 @@ class AuthProvider extends ChangeNotifier {
 
       await _secureStorage.write(key: 'isLoggedIn', value: 'true');
       _isLoggedIn = true;
+      // TODO: update currently logged in user with OneSignal ID
       notifyListeners();
 
       return AuthenticationSuccess();
@@ -199,6 +201,7 @@ class AuthProvider extends ChangeNotifier {
 
     await _secureStorage.write(key: 'isLoggedIn', value: 'false');
     _isLoggedIn = false;
+    // TODO: remove OneSignal ID from user, both from the server and from the device
     notifyListeners();
   }
 
