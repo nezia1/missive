@@ -54,9 +54,7 @@ pages:
   artifacts:
     paths:
       - public
-  dependencies:
-    - build_mkdocs
-    - build_flutter_docs
-  except:
-    changes:
-      - .gitlab-ci.yml
+  rules:
+    - changes:
+      - documentation/**
+      - client/**
