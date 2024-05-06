@@ -101,4 +101,49 @@ void main() {
             address, identityKey, Direction.receiving),
         isTrue);
   });
+
+  test('isTrustedIdentity should return false if identity is not trusted',
+      () async {
+    final secureStorage = MockSecureStorage();
+    final identityKeyPair = generateIdentityKeyPair();
+    final registrationId = generateRegistrationId(false);
+    final identityKeyStore = SecureStorageIdentityKeyStore.fromIdentityKeyPair(
+        secureStorage, identityKeyPair, registrationId);
+
+    const address = SignalProtocolAddress('test', 1);
+    final identityKey = identityKeyPair.getPublicKey();
+    final identityKeyString = base64Encode(identityKey.serialize());
+
+    when(secureStorage.read(key: address.toString()))
+        .thenAnswer((_) => Future.value(identityKeyString));
+
+    final newIdentityKeyPair = generateIdentityKeyPair();
+    final newIdentityKey = newIdentityKeyPair.getPublicKey();
+
+    expect(
+        await identityKeyStore.isTrustedIdentity(
+            address, newIdentityKey, Direction.receiving),
+        isFalse);
+  });
+
+  test('saveIdentity should save the identity key', () async {
+    final secureStorage = MockSecureStorage();
+    final identityKeyPair = generateIdentityKeyPair();
+    final registrationId = generateRegistrationId(false);
+    final identityKeyStore = SecureStorageIdentityKeyStore.fromIdentityKeyPair(
+        secureStorage, identityKeyPair, registrationId);
+
+    const address = SignalProtocolAddress('test', 1);
+    final identityKey = identityKeyPair.getPublicKey();
+    final identityKeyString = base64Encode(identityKey.serialize());
+
+    when(secureStorage.read(key: address.toString()))
+        .thenAnswer((_) => Future.value(identityKeyString));
+
+    final newIdentityKeyPair = generateIdentityKeyPair();
+    final newIdentityKey = newIdentityKeyPair.getPublicKey();
+
+    expect(
+        await identityKeyStore.saveIdentity(address, newIdentityKey), isTrue);
+  });
 }
