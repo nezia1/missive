@@ -57,9 +57,6 @@ flutter_unit_tests:
     when: always
     reports:
       junit: client/junit-report.xml
-  only:
-    - merge_requests
-    - main
   except:
     - schedules
   cache:
@@ -67,8 +64,12 @@ flutter_unit_tests:
     paths:
       - .pub-cache/
   rules:
-    - changes:
-      - client/**
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - client/**
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - client/**
 
 pages:
   stage: deploy
