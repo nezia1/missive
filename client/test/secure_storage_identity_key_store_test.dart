@@ -64,7 +64,9 @@ void main() {
         .thenAnswer((_) => Future.value(identityKeyPairString));
 
     expect(await identityKeyStore.getIdentityKeyPair(), isNotNull);
-    expect(await identityKeyStore.getIdentityKeyPair(), identityKeyPair);
+    // testing serialized values because the object references are different
+    expect((await identityKeyStore.getIdentityKeyPair()).serialize(),
+        identityKeyPair.serialize());
   });
 
   test('getLocalRegistrationId should return the correct registration ID',

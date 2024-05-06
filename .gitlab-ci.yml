@@ -49,6 +49,7 @@ flutter_unit_tests:
   image: ghcr.io/cirruslabs/flutter:3.19.6
   stage: test
   script:
+    - cd client
     - flutter pub get
     - flutter test
   artifacts:
