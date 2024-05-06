@@ -45,7 +45,7 @@ build_flutter_docs:
       - client/public
   rules:
     - changes:
-      - client/**  # Assumes your Dart code is in the 'client' directory
+      - client/**/* # Assumes your Dart code is in the 'client' directory
 
 flutter_unit_tests:
   image: ghcr.io/cirruslabs/flutter:3.19.6
