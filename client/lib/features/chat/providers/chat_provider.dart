@@ -130,14 +130,14 @@ class ChatProvider with ChangeNotifier {
   /// 1. Sends the encrypted message to the server.
   /// 2. Stores the encrypted message locally in the Realm database for persistence.
   ///
-  /// ## Parameters:
+  /// ## Parameters
   /// - [plainText]: The text of the message that needs to be sent. This should not be empty.
   /// - [receiver]: The identifier of the recipient who will receive the message.
   ///
-  /// ## Throws:
-  /// - `Exception` if the [SignalProvider] has not been initialized prior to calling this method,
+  /// ## Throws
+  /// - [InitializationError] if the [SignalProvider] has not been initialized prior to calling this method,
   ///
-  /// ## Usage:
+  /// ## Usage
   /// ```dart
   ///   await sendMessage(plainText: 'Hello, World!', receiver: 'alice');
   /// ```
