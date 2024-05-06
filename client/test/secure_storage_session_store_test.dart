@@ -30,14 +30,7 @@ void main() {
       final sessionStore = SecureStorageSessionStore(secureStorage);
 
       when(secureStorage.read(key: 'sessions'))
-          .thenAnswer((_) => Future.value(jsonEncode({
-                'test': {
-                  '1': {
-                    'session': 'session',
-                    'created_at': DateTime.now().toIso8601String()
-                  }
-                }
-              })));
+          .thenAnswer((_) => Future.value(jsonEncode({'test:1': 'session'})));
 
       expect(
           await sessionStore
