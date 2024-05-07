@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -13,20 +13,20 @@ datasource db {
 
 // User model
 model User {
-  id        String         @id @default(uuid()) @db.Uuid
-  name      String         @unique
-  password  String
-  totp_url  String?
-  registrationId Int?
-  identityKey String?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  tokens    RefreshToken[]
+  id              String           @id @default(uuid()) @db.Uuid
+  name            String           @unique
+  password        String
+  totp_url        String?
+  registrationId  Int?
+  identityKey     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  tokens          RefreshToken[]
   pendingMessages PendingMessage[] @relation("ReceivedMessages")
   // this is a virtual relation to comply with Prisma's limitation of not being able to have a relation with the same model twice if one of them is unidirectional
-  sentMessages    PendingMessage[]  @relation("SentMessages", references: [], fields: [])
+  sentMessages    PendingMessage[] @relation("SentMessages", references: [], fields: [])
   oneTimePreKeys  OneTimePreKey[]
-  signedPreKey SignedPreKey?
+  signedPreKey    SignedPreKey?
 }
 
 // RefreshToken model
@@ -39,26 +39,40 @@ model RefreshToken {
 }
 
 model PendingMessage {
-  id          String   @id @default(uuid()) @db.Uuid
-  content     String  
-  receiverId  String   @db.Uuid
-  receiver    User     @relation(name: "ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
-  senderId    String   @db.Uuid
-  sender      User     @relation(name: "SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  sentAt      DateTime @default(now())
+  id            String          @id @default(uuid()) @db.Uuid
+  content       String
+  receiverId    String          @db.Uuid
+  receiver      User            @relation(name: "ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  senderId      String          @db.Uuid
+  sender        User            @relation(name: "SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  sentAt        DateTime        @default(now())
+  MessageStatus MessageStatus[]
+}
+
+enum Status {
+  SENT
+  DELIVERED
+  READ
+}
+
+model MessageStatus {
+  id        String         @id @default(uuid()) @db.Uuid
+  messageId String         @db.Uuid
+  message   PendingMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  status    Status         @default(SENT)
 }
 
 model OneTimePreKey {
-  id        String   @id @default(uuid()) @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String   @db.Uuid
-  key       String
+  id     String @id @default(uuid()) @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+  key    String
 }
 
 model SignedPreKey {
-  id        String   @id @default(uuid()) @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
-  userId    String   @db.Uuid @unique
+  id        String @id @default(uuid()) @db.Uuid
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String @unique @db.Uuid
   key       String
   signature String
 }
