@@ -1,5 +1,10 @@
 image: python:3.10-bullseye
 
+stages:
+  - test
+  - build
+  - deploy
+
 variables:
   PIP_CACHE_DIR: '$CI_PROJECT_DIR/.cache/pip'
   GIT_SUBMODULE_STRATEGY: recursive
@@ -11,9 +16,6 @@ variables:
   - source venv/bin/activate
   - pip install --upgrade pip
   - pip install -r requirements.txt
-
-
-
 
 flutter_unit_tests:
   image: ghcr.io/cirruslabs/flutter:3.19.6
