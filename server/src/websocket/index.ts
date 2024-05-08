@@ -70,6 +70,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 						},
 					})
 					.then((storedPendingMessage) => {
+						sendStatusUpdate(Status.RECEIVED, message.id, socket)
 						// TODO send push notification to the receiver
 					})
 			}
