@@ -12,42 +12,8 @@ variables:
   - pip install --upgrade pip
   - pip install -r requirements.txt
 
-build_mkdocs:
-  stage: build
-  cache:
-    key: '${CI_COMMIT_REF_SLUG}-mkdocs'
-    paths:
-      - '.cache/pip'
-  variables:
-    ENABLE_PDF_EXPORT: 1
-  script:
-    - *prepare_python_docs
-    - 'mkdocs build --verbose --site-dir public'
-  artifacts:
-    paths:
-      - documentation/public
-  rules:
-    - changes:
-      - documentation  # Assumes your MkDocs content is in the 'documentation' directory
-  dependencies:
-    - build_flutter_docs
 
-build_flutter_docs:
-  image: ghcr.io/cirruslabs/flutter:3.19.6
-  stage: build
-  cache:
-    key: '${CI_COMMIT_REF_SLUG}-dart'
-    paths:
-      - .pub-cache
-  script:
-    - cd client
-    - dart doc --output='public'
-  artifacts:
-    paths:
-      - client/public
-  rules:
-    - changes:
-      - client/**/* # Assumes your Dart code is in the 'client' directory
+
 
 flutter_unit_tests:
   image: ghcr.io/cirruslabs/flutter:3.19.6
@@ -68,6 +34,43 @@ flutter_unit_tests:
   rules:
     - changes:
       - client/**/*
+
+build_flutter_docs:
+  image: ghcr.io/cirruslabs/flutter:3.19.6
+  stage: build
+  cache:
+    key: '${CI_COMMIT_REF_SLUG}-dart'
+    paths:
+      - .pub-cache
+  script:
+    - cd client
+    - dart doc --output='public'
+  artifacts:
+    paths:
+      - client/public
+  rules:
+    - changes:
+      - client/**/* # Assumes your Dart code is in the 'client' directory
+
+build_mkdocs:
+  stage: build
+  cache:
+    key: '${CI_COMMIT_REF_SLUG}-mkdocs'
+    paths:
+      - '.cache/pip'
+  variables:
+    ENABLE_PDF_EXPORT: 1
+  script:
+    - *prepare_python_docs
+    - 'mkdocs build --verbose --site-dir public'
+  artifacts:
+    paths:
+      - documentation/public
+  rules:
+    - changes:
+      - documentation  # Assumes your MkDocs content is in the 'documentation' directory
+  dependencies:
+    - build_flutter_docs
 
 pages:
   stage: deploy
