@@ -29,6 +29,8 @@ build_mkdocs:
   rules:
     - changes:
       - documentation  # Assumes your MkDocs content is in the 'documentation' directory
+  dependencies:
+    - build_flutter_docs
 
 build_flutter_docs:
   image: ghcr.io/cirruslabs/flutter:3.19.6
