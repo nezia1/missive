@@ -1,4 +1,5 @@
 // external packages
+import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,15 +33,17 @@ void main() async {
       AuthProvider(httpClient: dio, secureStorage: secureStorage);
   await authProvider.initializeLoginState();
   // if in debug, set the log level to verbose
-  if (kDebugMode) {
-    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  }
+  if (Platform.isAndroid || Platform.isIOS) {
+    if (kDebugMode) {
+      OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    }
 
-  OneSignal.initialize(
-      const String.fromEnvironment('ONESIGNAL_APP_ID', defaultValue: ''));
+    OneSignal.initialize(
+        const String.fromEnvironment('ONESIGNAL_APP_ID', defaultValue: ''));
 
 // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
-  OneSignal.Notifications.requestPermission(true);
+    OneSignal.Notifications.requestPermission(true);
+  }
 
   runApp(Missive(
     authProvider: authProvider,

@@ -89,9 +89,21 @@ class ChatProvider with ChangeNotifier {
     print('Connected to $_url');
     _channel!.stream.listen((message) async {
       final messageJson = jsonDecode(message);
-      if (messageJson['status'] != null) {
-        print(
-            'This is a status update, update corresponding message status accordingly. $message');
+      // check if message is a status update
+      if (messageJson['state'] != null) {
+        Status messageStatus;
+        switch (messageJson['state']) {
+          case 'sent':
+            messageStatus = Status.sent;
+            break;
+          case 'received':
+            messageStatus = Status.received;
+            break;
+          default:
+            messageStatus = Status.error;
+            break;
+        }
+        _updateMessageStatus(messageJson['messageId'], messageStatus);
         return;
       }
 
@@ -122,7 +134,6 @@ class ChatProvider with ChangeNotifier {
     });
   }
 
-  // TODO: add id to message so that we can update the status
   /// Sends an encrypted message to the server and stores it locally in the user's Realm database.
   ///
   /// This method takes a plaintext message and a receiver's identifier, encrypts the message using
@@ -179,7 +190,20 @@ class ChatProvider with ChangeNotifier {
         plainText,
         true,
         sentAt: DateTime.now(),
+        statusString: Status.pending.toShortString(),
       ));
+    });
+  }
+
+  void _updateMessageStatus(String messageId, Status status) {
+    final realm = _userRealm;
+    if (realm == null) {
+      throw InitializationError('User Realm is not initialized');
+    }
+
+    realm.write(() {
+      final message = realm.find<PlaintextMessage>(messageId);
+      message?.status = status;
     });
   }
 

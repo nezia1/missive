@@ -31,4 +31,26 @@ class _PlaintextMessage {
   late bool own;
   late String? receiver;
   late DateTime? sentAt;
+  late String?
+      statusString; // if null, message is from someone else (we only want to store status for sent messages)
+
+  Status? get status => statusString != null
+      ? StatusExtension.fromShortString(statusString!)
+      : null;
+  set status(Status? status) => statusString = status?.toShortString();
+}
+
+enum Status { pending, sent, received, read, error }
+
+// Realm does not support enums, so we have to do this workaround
+// Extension method to convert Status to string
+extension StatusExtension on Status {
+  String toShortString() {
+    return toString().split('.').last;
+  }
+
+  /// Converts a string to a [Status] enum.
+  static Status fromShortString(String statusString) {
+    return Status.values.firstWhere((s) => s.toShortString() == statusString);
+  }
 }

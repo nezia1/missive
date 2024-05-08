@@ -86,12 +86,14 @@ class PlaintextMessage extends _PlaintextMessage
     bool own, {
     String? receiver,
     DateTime? sentAt,
+    String? statusString,
   }) {
     RealmObjectBase.set(this, 'id', id);
     RealmObjectBase.set(this, 'content', content);
     RealmObjectBase.set(this, 'own', own);
     RealmObjectBase.set(this, 'receiver', receiver);
     RealmObjectBase.set(this, 'sentAt', sentAt);
+    RealmObjectBase.set(this, 'statusString', statusString);
   }
 
   PlaintextMessage._();
@@ -124,6 +126,13 @@ class PlaintextMessage extends _PlaintextMessage
   set sentAt(DateTime? value) => RealmObjectBase.set(this, 'sentAt', value);
 
   @override
+  String? get statusString =>
+      RealmObjectBase.get<String>(this, 'statusString') as String?;
+  @override
+  set statusString(String? value) =>
+      RealmObjectBase.set(this, 'statusString', value);
+
+  @override
   Stream<RealmObjectChanges<PlaintextMessage>> get changes =>
       RealmObjectBase.getChanges<PlaintextMessage>(this);
 
@@ -138,6 +147,7 @@ class PlaintextMessage extends _PlaintextMessage
       'own': own.toEJson(),
       'receiver': receiver.toEJson(),
       'sentAt': sentAt.toEJson(),
+      'statusString': statusString.toEJson(),
     };
   }
 
@@ -150,6 +160,7 @@ class PlaintextMessage extends _PlaintextMessage
         'own': EJsonValue own,
         'receiver': EJsonValue receiver,
         'sentAt': EJsonValue sentAt,
+        'statusString': EJsonValue statusString,
       } =>
         PlaintextMessage(
           fromEJson(id),
@@ -157,6 +168,7 @@ class PlaintextMessage extends _PlaintextMessage
           fromEJson(own),
           receiver: fromEJson(receiver),
           sentAt: fromEJson(sentAt),
+          statusString: fromEJson(statusString),
         ),
       _ => raiseInvalidEJson(ejson),
     };
@@ -172,6 +184,7 @@ class PlaintextMessage extends _PlaintextMessage
       SchemaProperty('own', RealmPropertyType.bool),
       SchemaProperty('receiver', RealmPropertyType.string, optional: true),
       SchemaProperty('sentAt', RealmPropertyType.timestamp, optional: true),
+      SchemaProperty('statusString', RealmPropertyType.string, optional: true),
     ]);
   }();
 
