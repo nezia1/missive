@@ -1,16 +1,8 @@
-import type { Prisma } from '@prisma/client'
+import { type Prisma, Status } from '@prisma/client'
 import type { FastifyPluginCallback } from 'fastify'
 
 import { authenticationHook } from '@/hooks'
 import { exclude, parseGenericError } from '@/utils'
-import { PrismaClient } from '@prisma/client/extension'
-
-enum MessageStatus {
-	SENT = 'sent',
-	DELIVERED = 'delivered',
-	READ = 'read',
-	ERROR = 'error',
-}
 
 const connections = new Map<string, WebSocket>()
 const websocket: FastifyPluginCallback = (fastify, _, done) => {
@@ -33,22 +25,12 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 
 			message.sender = req.authenticatedUser.name
 
-			socket.send(
-				JSON.stringify({
-					status: MessageStatus.SENT,
-					message: exclude(message, ['sender']),
-				}),
-			)
+			sendStatusUpdate(Status.SENT, message.id, socket)
 
 			if (connections.has(message.receiver)) {
 				const receiver = connections.get(message.receiver)
 				receiver?.send(JSON.stringify(exclude(message, ['receiver'])))
-				socket.send(
-					JSON.stringify({
-						status: MessageStatus.DELIVERED,
-						message: exclude(message, ['sender']),
-					}),
-				)
+				sendStatusUpdate(Status.RECEIVED, message.id, socket)
 			} else {
 				// Check if receiver exists
 				const offlineReceiver = await fastify.prisma.user.findUnique({
@@ -60,7 +42,6 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				if (!offlineReceiver)
 					return socket.send(
 						JSON.stringify({
-							status: MessageStatus.ERROR,
 							error: 'Receiver not found',
 						}),
 					)
@@ -81,10 +62,15 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 									id: req.authenticatedUser.id,
 								},
 							},
+							status: {
+								create: {
+									state: Status.RECEIVED,
+								},
+							},
 						},
 					})
 					.then((storedPendingMessage) => {
-						// TODO send push notification to the receiver. If successful, update the message status to delivered for the sender.
+						// TODO send push notification to the receiver
 					})
 			}
 		})
@@ -104,6 +90,18 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 	})
 
 	done()
+}
+
+function sendStatusUpdate(
+	Status: Status,
+	messageId: string,
+	socket: WebSocket,
+) {
+	const statusUpdate: Prisma.MessageStatusCreateManyInput = {
+		messageId,
+		state: Status,
+	}
+	socket.send(JSON.stringify(statusUpdate))
 }
 
 export default websocket

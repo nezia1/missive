@@ -38,6 +38,27 @@ const messages: FastifyPluginCallback = (fastify, _, done) => {
 		},
 	})
 
+	fastify.route<{ Reply: APIReply; Params: MessageParams }>({
+		method: 'GET',
+		url: '/:name/messages/status',
+		preParsing: [
+			authenticationHook,
+			authorizationHook([Permissions.MESSAGES_READ]),
+		],
+		handler: async (request, reply) => {
+			if (request.params.name !== request.authenticatedUser?.name)
+				throw new AuthorizationError('You can only read your own messages')
+
+			// fetch the status of the messages sent by the authenticated user
+			const messagesStatus = await fastify.prisma.messageStatus.findMany({
+				where: { message: { senderId: request.authenticatedUser.id } },
+				select: { state: true, messageId: true },
+			})
+
+			reply.status(200).send({ data: { messagesStatus } })
+		},
+	})
+
 	fastify.setErrorHandler(async (error, request, reply) => {
 		const apiError = parseGenericError(error)
 
