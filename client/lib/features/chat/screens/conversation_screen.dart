@@ -73,6 +73,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   void handleMessageSent() async {
+    if (_controller.text.trim().isEmpty) return;
     await _chatProvider.sendMessage(
         plainText: _controller.text.trim(), receiver: widget.name);
     setState(() {
@@ -86,6 +87,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        title: Text(widget.name),
+        centerTitle: true,
       ),
       body: FutureBuilder(
           future: _initialization,
