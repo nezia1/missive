@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:logging/logging.dart';
 
 // screens
 import 'package:missive/features/authentication/landing_screen.dart';
@@ -32,7 +33,14 @@ void main() async {
   final AuthProvider authProvider =
       AuthProvider(httpClient: dio, secureStorage: secureStorage);
   await authProvider.initializeLoginState();
-  // if in debug, set the log level to verbose
+  if (kDebugMode) {
+    Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((record) {
+      // ignore: avoid_print
+      print(
+          '${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
+    });
+  }
   if (Platform.isAndroid || Platform.isIOS) {
     if (kDebugMode) {
       OneSignal.Debug.setLogLevel(OSLogLevel.verbose);

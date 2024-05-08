@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
+import 'package:logging/logging.dart';
 
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
 import 'package:missive/features/encryption/namespaced_secure_storage.dart';
@@ -20,6 +21,7 @@ class SignalProvider extends ChangeNotifier {
   late SecureStoragePreKeyStore _preKeyStore;
   late SecureStorageSignedPreKeyStore _signedPreKeyStore;
   late SecureStorageSessionStore _sessionStore;
+  final _logger = Logger('SignalProvider');
 
   /// Initializes the Signal protocol stores. If [installing] is true, generates a new identity key pair, registration ID, signed pre key, and pre keys.
   /// ## Parameters
@@ -68,7 +70,7 @@ class SignalProvider extends ChangeNotifier {
                 .toList()
           },
           options: Options(headers: {'Authorization': 'Bearer $accessToken'}));
-      print('Protocol successfully installed');
+      _logger.log(Level.INFO, 'Protocol successfully installed');
       return;
     }
 

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +27,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   late SecureStorageIdentityKeyStore identityKeyStore;
   late ChatProvider _chatProvider;
   late Future _initialization;
+  final Logger _logger = Logger('ConversationsScreen');
 
   @override
   void initState() {
@@ -40,7 +42,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     final prefs = await SharedPreferences.getInstance();
     final name = (await _userProvider.user)?.name;
 
-    print('installed state: ${prefs.getBool('installed')}');
+    _logger.log(Level.INFO, 'installed state: ${prefs.getBool('installed')}');
     if (prefs.getBool('installed') == false) {
       await _signalProvider.initialize(
         installing: true,

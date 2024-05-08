@@ -79,7 +79,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
     setState(() {
       _controller.clear();
     });
-    // TODO: scroll to bottom after message sent (and after the ListView gets updated, doesn't work if it's done right after the message is sent since the ListView hasn't updated yet)
   }
 
   @override

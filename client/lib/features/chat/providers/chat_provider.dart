@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
+import 'package:logging/logging.dart';
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:realm/realm.dart';
 import 'package:web_socket_channel/io.dart';
@@ -35,6 +36,7 @@ class ChatProvider with ChangeNotifier {
   List<Conversation> get conversations => _conversations;
   Realm? _userRealm;
   StreamSubscription? _messagesSubscription;
+  final Logger _logger = Logger('ChatProvider');
 
   ChatProvider(
       {String? url, AuthProvider? authProvider, SignalProvider? signalProvider})
@@ -86,7 +88,7 @@ class ChatProvider with ChangeNotifier {
     );
 
     _channel = IOWebSocketChannel(ws);
-    print('Connected to $_url');
+    _logger.log(Level.INFO, 'Connected to $_url');
     _channel!.stream.listen((message) async {
       final messageJson = jsonDecode(message);
       // check if message is a status update
@@ -104,7 +106,8 @@ class ChatProvider with ChangeNotifier {
             break;
         }
         _updateMessageStatus(messageJson['messageId'], messageStatus);
-        print('Message status updated: ${messageJson['state']}');
+        _logger.log(
+            Level.INFO, 'Message status updated: ${messageJson['state']}');
         return;
       }
 
@@ -329,7 +332,7 @@ class ChatProvider with ChangeNotifier {
   /// Disposes the provider and closes the WebSocket connection. This method is called when the user logs out, as we need to clean up the resources to avoid sessions getting mixed up.
   @override
   void dispose() {
-    print('Disposing... (this should happen after log out)');
+    _logger.log(Level.INFO, 'Disposing... (this should happen after log out)');
     if (_channel != null) {
       _channel?.sink.close();
     }

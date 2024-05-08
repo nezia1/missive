@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:dio/dio.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
+import 'package:logging/logging.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:missive/common/http.dart';
 
@@ -30,6 +31,7 @@ class AuthProvider extends ChangeNotifier {
   final Dio _httpClient;
   final FlutterSecureStorage _secureStorage;
   bool _isLoggedIn = false;
+  final Logger _logger = Logger('AuthProvider');
 
   bool get isLoggedIn => _isLoggedIn;
 
@@ -63,7 +65,6 @@ class AuthProvider extends ChangeNotifier {
 
   /// Returns the refresh token as [String], or null if it's not available.
   Future<String?> get refreshToken async {
-    // TODO: logout on refresh token expiration
     return await _secureStorage.read(key: 'refreshToken');
   }
 
@@ -169,7 +170,7 @@ class AuthProvider extends ChangeNotifier {
       // If user didn't log in yet, we need to install the app
       final firstLogin =
           await storageManager.read(key: 'identityKeyPair') == null;
-      print('first time logged in: $firstLogin');
+      _logger.log(Level.INFO, 'first time logged in: $firstLogin');
       if (firstLogin) {
         (await SharedPreferences.getInstance()).setBool('installed', false);
       }
@@ -208,6 +209,8 @@ class AuthProvider extends ChangeNotifier {
   Future<void> loadProfile() async {
     if (await accessToken == null) {
       // TODO handle/log error (this should never happen)
+      _logger.log(Level.SEVERE,
+          'No access token found when loading profile, this should never happen.');
       return;
     }
 
@@ -221,7 +224,8 @@ class AuthProvider extends ChangeNotifier {
       User user = User.fromJson(response.data);
       _user = user;
     } catch (e) {
-      // TODO handle/log error
+      // TODO handle error
+      _logger.log(Level.SEVERE, e.toString());
       _user = null;
     } finally {
       notifyListeners();
