@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:missive/features/chat/models/conversation.dart';
 
 /// This widget is used to display a message bubble in the chat screen. It can be used to display messages from the sender or from the receiver.
 /// ## Parameters
@@ -11,13 +12,17 @@ class MessageBubble extends StatelessWidget {
   final bool isOwnMessage;
   final CrossAxisAlignment alignment;
   final bool tail;
+  final Status? status;
 
   const MessageBubble(
       {super.key,
       required this.text,
       this.isOwnMessage = false,
       this.tail = false,
-      this.alignment = CrossAxisAlignment.start});
+      this.alignment = CrossAxisAlignment.start,
+      this.status})
+      : assert(!isOwnMessage || status != null,
+            'Status must be provided if isOwnMessage is true');
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +51,25 @@ class MessageBubble extends StatelessWidget {
                       ? const Radius.circular(0.0)
                       : const Radius.circular(16.0)),
         ),
-        child: Text(text,
-            style:
-                TextStyle(color: isOwnMessage ? Colors.white : Colors.black)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(text,
+                style: TextStyle(
+                    color: isOwnMessage ? Colors.white : Colors.black)),
+            const SizedBox(width: 8.0),
+            switch (status) {
+              Status.pending => const CircularProgressIndicator(),
+              Status.sent => const Icon(Icons.check, size: 16.0),
+              Status.received => const Icon(Icons.done_all, size: 16.0),
+              Status.read =>
+                const Icon(Icons.done_all, color: Colors.blue, size: 16.0),
+              Status.error => const Icon(Icons.error, size: 16.0),
+              null => const SizedBox(),
+            },
+          ],
+        ),
       ),
     );
   }

@@ -92,7 +92,7 @@ class ChatProvider with ChangeNotifier {
       // check if message is a status update
       if (messageJson['state'] != null) {
         Status messageStatus;
-        switch (messageJson['state']) {
+        switch (messageJson['state'].toString().toLowerCase()) {
           case 'sent':
             messageStatus = Status.sent;
             break;
@@ -104,6 +104,7 @@ class ChatProvider with ChangeNotifier {
             break;
         }
         _updateMessageStatus(messageJson['messageId'], messageStatus);
+        print('Message status updated: ${messageJson['state']}');
         return;
       }
 

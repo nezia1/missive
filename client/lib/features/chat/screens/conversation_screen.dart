@@ -158,7 +158,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                 MessageBubble(
                                     text: message,
                                     isOwnMessage: isOwnMessage,
-                                    tail: isTail),
+                                    tail: isTail,
+                                    status:
+                                        conversation.messages[index].status),
                               ],
                             );
                           });
