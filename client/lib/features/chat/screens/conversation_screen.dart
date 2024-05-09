@@ -5,6 +5,7 @@ import 'package:missive/features/chat/models/conversation.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:missive/features/chat/screens/message_bubble.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 /// This screen is used to display a conversation with a user. It displays the messages in a chat-like interface, and allows the user to send messages.
 class ConversationScreen extends StatefulWidget {
@@ -150,6 +151,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                             .inDays >
                                         0 // show date if it's the first message or if the previous message was sent more than 1 day ago
                                 );
+                            print(
+                                'Message status: ${conversation.messages[index].status}');
                             return Column(
                               children: [
                                 if (timestamp != null && showDate)
@@ -157,12 +160,25 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                       .format(timestamp))
                                 else if (timestamp != null && showTimestamp)
                                   Text(DateFormat('HH:mm').format(timestamp)),
-                                MessageBubble(
-                                    text: message,
-                                    isOwnMessage: isOwnMessage,
-                                    tail: isTail,
-                                    status:
-                                        conversation.messages[index].status),
+                                VisibilityDetector(
+                                    key: Key(conversation.messages[index].id),
+                                    child: MessageBubble(
+                                      key: Key(conversation.messages[index].id),
+                                      text: message,
+                                      isOwnMessage: isOwnMessage,
+                                      tail: isTail,
+                                      status: isOwnMessage
+                                          ? conversation.messages[index].status
+                                          : null,
+                                    ),
+                                    onVisibilityChanged: (info) =>
+                                        !isOwnMessage &&
+                                                conversation.messages[index]
+                                                        .status !=
+                                                    Status.read
+                                            ? chatProvider.notifyRead(
+                                                conversation.messages[index].id)
+                                            : null),
                               ],
                             );
                           });

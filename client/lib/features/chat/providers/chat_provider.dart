@@ -101,6 +101,9 @@ class ChatProvider with ChangeNotifier {
           case 'received':
             messageStatus = Status.received;
             break;
+          case 'read':
+            messageStatus = Status.read;
+            break;
           default:
             messageStatus = Status.error;
             break;
@@ -197,6 +200,14 @@ class ChatProvider with ChangeNotifier {
         statusString: Status.pending.toShortString(),
       ));
     });
+  }
+
+  /// Notifies the server that a message has been read, and updates the local Realm database accordingly.
+  void notifyRead(String messageId) {
+    _logger.log(
+        Level.INFO, 'Notifying server that message $messageId was read');
+    _updateMessageStatus(messageId, Status.read);
+    _channel?.sink.add(jsonEncode({'id': messageId, 'state': 'read'}));
   }
 
   void _updateMessageStatus(String messageId, Status status) {

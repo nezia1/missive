@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:missive/features/chat/models/conversation.dart';
+import 'package:missive/features/chat/providers/chat_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 /// This widget is used to display a message bubble in the chat screen. It can be used to display messages from the sender or from the receiver.
 /// ## Parameters
@@ -14,14 +17,14 @@ class MessageBubble extends StatelessWidget {
   final bool tail;
   final Status? status;
 
-  const MessageBubble(
-      {super.key,
-      required this.text,
-      this.isOwnMessage = false,
-      this.tail = false,
-      this.alignment = CrossAxisAlignment.start,
-      this.status})
-      : assert(!isOwnMessage || status != null,
+  const MessageBubble({
+    super.key,
+    required this.text,
+    this.isOwnMessage = false,
+    this.tail = false,
+    this.alignment = CrossAxisAlignment.start,
+    this.status,
+  }) : assert(!isOwnMessage || status != null,
             'Status must be provided if isOwnMessage is true');
 
   @override

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -93,8 +94,9 @@ class AuthProvider extends ChangeNotifier {
         'identityKey': base64Encode(
           identityKeyPair.getPublicKey().serialize(),
         ),
-        'oneSignalId': await OneSignal.User
-            .getOnesignalId(), // get the OneSignal ID that was generated for this device
+        'oneSignalId': Platform.isAndroid || Platform.isIOS
+            ? OneSignal.User.getOnesignalId()
+            : null, // get the OneSignal ID that was generated for this device only if user is on mobile
       });
 
       final response = await _httpClient

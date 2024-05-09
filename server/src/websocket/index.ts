@@ -21,17 +21,36 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				content: string
 				receiver: string
 				sender: string
+				state: Status | undefined
 			}
 
 			message.sender = req.authenticatedUser.name
 
-			sendStatusUpdate(Status.SENT, message.id, socket)
+			// If message has no state, it's a new message (not a status update)
+			if (!message.state) sendStatusUpdate(Status.SENT, message.id, socket)
 
+			// Receiver is online
 			if (connections.has(message.receiver)) {
+				// if message has state (status update), send it to the receiver
+
 				const receiver = connections.get(message.receiver)
-				receiver?.send(JSON.stringify(exclude(message, ['receiver'])))
-				sendStatusUpdate(Status.RECEIVED, message.id, socket)
+
+				// if a message has a state, it's a status update
+				message.state === undefined
+					? receiver?.send(JSON.stringify(exclude(message, ['receiver'])))
+					: sendStatusUpdate(Status.RECEIVED, message.id, receiver as WebSocket)
 			} else {
+				if (message.state) {
+					// if message has state (status update), store it in the database
+					// TODO: this does not work because it's a foreign key, and the message might not exist in the database due to privacy reasons. We need to update the Prisma schema to untie the message status from the message model.
+					await fastify.prisma.messageStatus.create({
+						data: {
+							messageId: message.id,
+							state: message.state.toUpperCase() as Status,
+						},
+					})
+					return
+				}
 				// Check if receiver exists
 				const offlineReceiver = await fastify.prisma.user.findUnique({
 					where: {
