@@ -58,7 +58,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     _chatProvider.setupUserRealm();
 
     _chatProvider.fetchPendingMessages();
-    // TODO: update status of sent messages after fetching pending messages
+    _chatProvider.fetchMessageStatuses();
   }
 
   Widget _buildBody() {

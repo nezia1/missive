@@ -177,7 +177,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                                         .status !=
                                                     Status.read
                                             ? chatProvider.notifyRead(
-                                                conversation.messages[index].id)
+                                                conversation.messages[index].id,
+                                                widget.name)
                                             : null),
                               ],
                             );

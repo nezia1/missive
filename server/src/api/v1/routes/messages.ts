@@ -50,12 +50,12 @@ const messages: FastifyPluginCallback = (fastify, _, done) => {
 				throw new AuthorizationError('You can only read your own messages')
 
 			// fetch the status of the messages sent by the authenticated user
-			const messagesStatus = await fastify.prisma.messageStatus.findMany({
-				where: { message: { senderId: request.authenticatedUser.id } },
+			const statuses = await fastify.prisma.messageStatus.findMany({
+				where: { senderId: request.authenticatedUser.id },
 				select: { state: true, messageId: true },
 			})
 
-			reply.status(200).send({ data: { messagesStatus } })
+			reply.status(200).send({ data: { statuses } })
 		},
 	})
 

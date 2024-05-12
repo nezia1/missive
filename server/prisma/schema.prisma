@@ -27,6 +27,7 @@ model User {
   sentMessages    PendingMessage[] @relation("SentMessages", references: [], fields: [])
   oneTimePreKeys  OneTimePreKey[]
   signedPreKey    SignedPreKey?
+  MessageStatus   MessageStatus[]
 }
 
 // RefreshToken model
@@ -58,6 +59,8 @@ model MessageStatus {
   id        String @id @default(uuid()) @db.Uuid
   messageId String @db.Uuid
   state     Status @default(SENT)
+  sender    User   @relation(fields: [senderId], references: [id])
+  senderId  String @db.Uuid
 }
 
 model OneTimePreKey {

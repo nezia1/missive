@@ -42,11 +42,13 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 			} else {
 				if (message.state) {
 					// if message has state (status update), store it in the database
-					// TODO: this does not work because it's a foreign key, and the message might not exist in the database due to privacy reasons. We need to update the Prisma schema to untie the message status from the message model.
+					// TODO: this crashes because apparently one of the IDs are not valid UUIDs. Need to investigate
+					console.log(message)
 					await fastify.prisma.messageStatus.create({
 						data: {
 							messageId: message.id,
 							state: message.state.toUpperCase() as Status,
+							senderId: message.sender,
 						},
 					})
 					return
@@ -87,6 +89,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 					data: {
 						messageId: pendingMessage.id,
 						state: Status.RECEIVED,
+						senderId: message.sender,
 					},
 				})
 
@@ -117,7 +120,7 @@ function sendStatusUpdate(
 	messageId: string,
 	socket: WebSocket,
 ) {
-	const statusUpdate: Prisma.MessageStatusCreateManyInput = {
+	const statusUpdate = {
 		messageId,
 		state: Status,
 	}

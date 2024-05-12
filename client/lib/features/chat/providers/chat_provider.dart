@@ -109,8 +109,6 @@ class ChatProvider with ChangeNotifier {
             break;
         }
         _updateMessageStatus(messageJson['messageId'], messageStatus);
-        _logger.log(
-            Level.INFO, 'Message status updated: ${messageJson['state']}');
         return;
       }
 
@@ -203,11 +201,12 @@ class ChatProvider with ChangeNotifier {
   }
 
   /// Notifies the server that a message has been read, and updates the local Realm database accordingly.
-  void notifyRead(String messageId) {
+  void notifyRead(String messageId, String sender) {
     _logger.log(
         Level.INFO, 'Notifying server that message $messageId was read');
     _updateMessageStatus(messageId, Status.read);
-    _channel?.sink.add(jsonEncode({'id': messageId, 'state': 'read'}));
+    _channel?.sink
+        .add(jsonEncode({'id': messageId, 'state': 'read', 'sender': sender}));
   }
 
   void _updateMessageStatus(String messageId, Status status) {
@@ -291,6 +290,33 @@ class ChatProvider with ChangeNotifier {
           sentAt: DateTime.parse(message['sentAt']),
         ));
       });
+    }
+  }
+
+  /// Fetches the latest message statuses from the server and updates the local Realm database accordingly.
+  Future<void> fetchMessageStatuses() async {
+    final name = (await _authProvider?.user)?.name;
+    final accessToken = await _authProvider?.accessToken;
+    if (name == null || accessToken == null) {
+      throw Exception('User is not logged in');
+    }
+
+    final response = await dio.get('/users/$name/messages/status',
+        options: Options(
+            headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'}));
+
+    final statuses = response.data['data']['statuses'];
+
+    for (final status in statuses) {
+      _logger.log(Level.INFO, 'Updating message status: $status');
+      final message = _userRealm?.find<PlaintextMessage>(status['messageId']);
+      if (message != null) {
+        _updateMessageStatus(
+            status['messageId'],
+            Status.values.firstWhere((element) =>
+                element.toShortString() ==
+                status['state'].toString().toLowerCase()));
+      }
     }
   }
 
