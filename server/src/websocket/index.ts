@@ -65,33 +65,33 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 						}),
 					)
 
-				fastify.prisma.pendingMessage
-					.create({
-						// add receiver id to the pending message
-						data: {
-							id: message.id,
-							content: message.content,
-							receiver: {
-								connect: {
-									name: message.receiver,
-								},
-							},
-							sender: {
-								connect: {
-									id: req.authenticatedUser.id,
-								},
-							},
-							status: {
-								create: {
-									state: Status.RECEIVED,
-								},
+				const pendingMessage = await fastify.prisma.pendingMessage.create({
+					// add receiver id to the pending message
+					data: {
+						id: message.id,
+						content: message.content,
+						receiver: {
+							connect: {
+								name: message.receiver,
 							},
 						},
-					})
-					.then((storedPendingMessage) => {
-						sendStatusUpdate(Status.RECEIVED, message.id, socket)
-						// TODO send push notification to the receiver
-					})
+						sender: {
+							connect: {
+								id: req.authenticatedUser.id,
+							},
+						},
+					},
+				})
+
+				await fastify.prisma.messageStatus.create({
+					data: {
+						messageId: pendingMessage.id,
+						state: Status.RECEIVED,
+					},
+				})
+
+				sendStatusUpdate(Status.RECEIVED, message.id, socket)
+				// TODO send push notification to the receiver
 			}
 		})
 

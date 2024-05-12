@@ -39,14 +39,13 @@ model RefreshToken {
 }
 
 model PendingMessage {
-  id         String          @id @default(uuid()) @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
   content    String
-  receiverId String          @db.Uuid
-  receiver   User            @relation(name: "ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
-  senderId   String          @db.Uuid
-  sender     User            @relation(name: "SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  sentAt     DateTime        @default(now())
-  status     MessageStatus[]
+  receiverId String   @db.Uuid
+  receiver   User     @relation(name: "ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  senderId   String   @db.Uuid
+  sender     User     @relation(name: "SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  sentAt     DateTime @default(now())
 }
 
 enum Status {
@@ -56,10 +55,9 @@ enum Status {
 }
 
 model MessageStatus {
-  id        String         @id @default(uuid()) @db.Uuid
-  messageId String         @db.Uuid
-  message   PendingMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  state     Status         @default(SENT)
+  id        String @id @default(uuid()) @db.Uuid
+  messageId String @db.Uuid
+  state     Status @default(SENT)
 }
 
 model OneTimePreKey {
