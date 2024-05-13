@@ -20,12 +20,11 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				id: string
 				content: string
 				receiver: string
-				sender: string
 				state: Status | undefined
+				sender: string
 			}
-
-			message.sender = req.authenticatedUser.name
-
+			message.state = message.state?.toUpperCase() as Status
+			console.log(message)
 			// If message has no state, it's a new message (not a status update)
 			if (!message.state) sendStatusUpdate(Status.SENT, message.id, socket)
 
@@ -38,19 +37,32 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				// if a message has a state, it's a status update
 				message.state === undefined
 					? receiver?.send(JSON.stringify(exclude(message, ['receiver'])))
-					: sendStatusUpdate(Status.RECEIVED, message.id, receiver as WebSocket)
+					: sendStatusUpdate(message.state, message.id, receiver as WebSocket)
 			} else {
 				if (message.state) {
 					// if message has state (status update), store it in the database
-					// TODO: this crashes because apparently one of the IDs are not valid UUIDs. Need to investigate
-					console.log(message)
-					await fastify.prisma.messageStatus.create({
-						data: {
-							messageId: message.id,
-							state: message.state.toUpperCase() as Status,
-							senderId: message.sender,
-						},
-					})
+					// TODO: get the sender id from the message (impossible as of now, as it is not sent from the client)
+					const senderId = (
+						await fastify.prisma.user.findUnique({
+							where: {
+								name: message.sender,
+							},
+							select: {
+								id: true,
+							},
+						})
+					)?.id
+
+					console.log(`Sender id is ${senderId}`)
+					if (senderId)
+						await fastify.prisma.messageStatus.create({
+							data: {
+								messageId: message.id,
+								state: message.state,
+								senderId: senderId,
+							},
+						})
+
 					return
 				}
 				// Check if receiver exists
@@ -89,7 +101,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 					data: {
 						messageId: pendingMessage.id,
 						state: Status.RECEIVED,
-						senderId: message.sender,
+						senderId: req.authenticatedUser.id,
 					},
 				})
 
