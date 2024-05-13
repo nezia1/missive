@@ -50,9 +50,6 @@ build_flutter_docs:
   artifacts:
     paths:
       - client/public
-  rules:
-    - changes:
-      - client/**/* # Assumes your Dart code is in the 'client' directory
 
 build_mkdocs:
   stage: build
@@ -68,9 +65,6 @@ build_mkdocs:
   artifacts:
     paths:
       - documentation/public
-  rules:
-    - changes:
-      - documentation  # Assumes your MkDocs content is in the 'documentation' directory
   dependencies:
     - build_flutter_docs
 
@@ -83,7 +77,3 @@ pages:
   artifacts:
     paths:
       - public
-  rules:
-    - changes:
-      - documentation
-      - client/**/*
