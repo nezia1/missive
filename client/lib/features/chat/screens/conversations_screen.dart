@@ -38,6 +38,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     _initialization = initialize();
   }
 
+  /// Initializes stores, providers, and fetches pending data. It also installs the app (generates all required keys and upload them) in case it's the first time the user opens the appa.
   Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
     final name = (await _userProvider.user)?.name;
