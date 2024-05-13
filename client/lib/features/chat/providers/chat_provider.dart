@@ -50,6 +50,11 @@ class ChatProvider with ChangeNotifier {
   /// Resets the provider to its initial state. This method is used when the user logs out.
   ///
   /// It clears the WebSocket connection, the URL, and the providers. It also notifies the listeners to update the UI.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// provider.reset();
+  /// ```
   void reset() {
     _url = null;
     _authProvider = null;
@@ -58,6 +63,16 @@ class ChatProvider with ChangeNotifier {
   }
 
   /// Updates the provider with new values. This method is used when the user logs in, as we cannot initialize a provider in ProxyProvider with the user's data, and have to do it after the user logs in.
+  ///
+  /// ## Parameters
+  /// - [url]: The WebSocket server URL.
+  /// - [authProvider]: The authentication provider.
+  /// - [signalProvider]: The encryption (Signal protocol) provider.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// provider.update(url: 'ws://example.com', authProvider: authProvider, signalProvider: signalProvider);
+  /// ```
   void update(
       {required String url,
       required AuthProvider authProvider,
@@ -68,12 +83,29 @@ class ChatProvider with ChangeNotifier {
   }
 
   /// Checks if the provider needs to be updated. This method is used to determine if the provider is fully initialized, so we don't update it multiple times.
+  ///
+  /// ## Returns
+  /// - `true` if the provider is not fully initialized.
+  /// - `false` if all required properties (`_url`, `_authProvider`, `_signalProvider`) are set.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// bool updateNeeded = provider.needsUpdate();
+  /// ```
   bool needsUpdate() =>
       _url == null || _authProvider == null || _signalProvider == null;
 
   /// Connects to the WebSocket server and listens for incoming messages.
   ///
   /// When the WebSocket connection is established, the provider listens for incoming messages. If the message is a status update, it updates the corresponding message status accordingly. If the message is a new message, it decrypts the message using [SignalProvider] and stores it locally in the user's Realm database as a [PlaintextMessage].
+  ///
+  /// ## Throws
+  /// - [InitializationError] if the provider is not fully initialized (`_url`, `_authProvider`, `_signalProvider`).
+  ///
+  /// ## Usage
+  /// ```dart
+  /// await provider.connect();
+  /// ```
   Future<void> connect() async {
     if (_url == null || _authProvider == null || _signalProvider == null) {
       throw InitializationError('ChatProvider is not fully initialized');
@@ -200,7 +232,16 @@ class ChatProvider with ChangeNotifier {
     });
   }
 
-  /// Notifies the server that a message has been read, and updates the local Realm database accordingly.
+  // Notifies the server that a message has been read, and updates the local Realm database accordingly.
+  ///
+  /// ## Parameters
+  /// - [messageId]: The unique identifier of the message that has been read.
+  /// - [sender]: The identifier of the sender of the message.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// provider.notifyRead(messageId: '12345', sender: 'bob');
+  /// ```
   void notifyRead(String messageId, String sender) {
     _logger.log(
         Level.INFO, 'Notifying server that message $messageId was read');
@@ -221,7 +262,17 @@ class ChatProvider with ChangeNotifier {
     });
   }
 
-  /// Setup the user's Realm database and listen for changes
+  /// Sets up the user's Realm database and listens for changes.
+  ///
+  /// This method initializes the Realm database for storing conversations and messages. It also sets up a listener to update the UI when new messages arrive.
+  ///
+  /// ## Throws
+  /// - [InitializationError] if the Realm database is not initialized properly.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// provider.setupUserRealm();
+  /// ```
   void setupUserRealm() async {
     _userRealm = await _getUserRealm();
     if (_userRealm == null) {
@@ -249,6 +300,17 @@ class ChatProvider with ChangeNotifier {
     });
   }
 
+  /// Fetches pending messages from the server and stores them locally in the user's Realm database.
+  ///
+  /// This method retrieves any messages that have been sent to the user but not yet fetched, decrypts them, and stores them locally.
+  ///
+  /// ## Throws
+  /// - `Exception` if the user is not logged in or the [AuthProvider] is not initialized.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// await provider.fetchPendingMessages();
+  /// ```
   void fetchPendingMessages() async {
     // get pending messages from server
     final name = (await _authProvider?.user)?.name;
@@ -294,6 +356,16 @@ class ChatProvider with ChangeNotifier {
   }
 
   /// Fetches the latest message statuses from the server and updates the local Realm database accordingly.
+  ///
+  /// This method queries the server for the latest statuses of messages (like 'read', 'received') and updates these statuses in the local database.
+  ///
+  /// ## Throws
+  /// - `Exception` if the user is not logged in or the [AuthProvider] is not initialized.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// await provider.fetchMessageStatuses();
+  /// ```
   Future<void> fetchMessageStatuses() async {
     final name = (await _authProvider?.user)?.name;
     final accessToken = await _authProvider?.accessToken;
@@ -354,7 +426,13 @@ class ChatProvider with ChangeNotifier {
   }
 
   /// Deletes all messages and the user's Realm database.
-  // THIS IS ONLY FOR DEBUGGING PURPOSES WHEN VALUES COULD NOT BE STORED CORRECTLY (WHEN DELETING USERS FROM THE SERVER FOR INSTANCE), DO NOT USE IN PRODUCTION
+  ///
+  /// This method is primarily for debugging purposes when values could not be stored correctly (e.g., when deleting users from the server), and should not be used in production.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// provider.deleteAll();
+  /// ```
   void deleteAll() async {
     _userRealm?.write(() {
       _userRealm?.deleteAll<Conversation>();
@@ -366,7 +444,13 @@ class ChatProvider with ChangeNotifier {
     await secureStorage.delete(key: '${name}_realmEncryptionKey');
   }
 
-  /// Disposes the provider and closes the WebSocket connection. This method is called when the user logs out, as we need to clean up the resources to avoid sessions getting mixed up.
+  /// Disposes the provider and closes the WebSocket connection.
+  /// This method is called when the user logs out, as we need to clean up the resources to avoid sessions getting mixed up.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// provider.dispose();
+  /// ```
   @override
   void dispose() {
     _logger.log(Level.INFO, 'Disposing... (this should happen after log out)');

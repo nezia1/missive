@@ -36,7 +36,20 @@ class AuthProvider extends ChangeNotifier {
 
   bool get isLoggedIn => _isLoggedIn;
 
-  /// Returns the access token as [String], or null if it's not available.
+  /// Returns the access token as a [String], or null if it's not available.
+  ///
+  /// This method checks if the current access token is expired. If it is,
+  /// it tries to refresh it using the refresh token. If the refresh token is
+  /// also expired or not available, it returns null.
+  ///
+  /// ## Returns
+  /// - The current access token as a [String] if available and valid.
+  /// - `null` if the token is not available or cannot be refreshed.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// String? token = await provider.accessToken;
+  /// ```
   Future<String?> get accessToken async {
     var token = await _secureStorage.read(key: 'accessToken');
 
@@ -64,12 +77,34 @@ class AuthProvider extends ChangeNotifier {
     return token;
   }
 
-  /// Returns the refresh token as [String], or null if it's not available.
+  /// Returns the refresh token as a [String], or null if it's not available.
+  ///
+  /// This method retrieves the refresh token from secure storage.
+  ///
+  /// ## Returns
+  /// - The refresh token as a [String] if available.
+  /// - `null` if the token is not available.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// String? token = await provider.refreshToken;
+  /// ```
   Future<String?> get refreshToken async {
     return await _secureStorage.read(key: 'refreshToken');
   }
 
   /// Returns the currently authenticated [User], or null if it's not available.
+  ///
+  /// This method checks if the user is already loaded and cached. If not, it attempts to load the user's profile.
+  ///
+  /// ## Returns
+  /// - The currently authenticated [User] if available.
+  /// - `null` if the user is not available or not loaded.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// User? currentUser = await provider.user;
+  /// ```
   Future<User?> get user async {
     if (_user == null) await loadProfile();
     return _user;
@@ -81,7 +116,22 @@ class AuthProvider extends ChangeNotifier {
       : _httpClient = httpClient,
         _secureStorage = secureStorage;
 
-  /// Registers a new user and returns a [AuthenticationResult], that can either be [AuthenticationSuccess] or [AuthenticationError].
+  /// Registers a new user and returns an [AuthenticationResult], that can either be [AuthenticationSuccess] or [AuthenticationError].
+  ///
+  /// This method attempts to register a new user using their name and password. It generates a new identity key pair and registration ID for the user, sends these along with the registration request, and stores the necessary tokens and user data in secure storage.
+  ///
+  /// ## Parameters
+  /// - [name]: The name of the user trying to register.
+  /// - [password]: The password of the user trying to register.
+  ///
+  /// ## Returns
+  /// - [AuthenticationSuccess] if the registration is successful.
+  /// - [AuthenticationError] if an error occurs during the registration process.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// AuthenticationResult result = await provider.register('username', 'password');
+  /// ```
   Future<AuthenticationResult> register(String name, String password) async {
     try {
       final identityKeyPair = generateIdentityKeyPair();
@@ -136,7 +186,23 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Logs in a user and returns a [AuthenticationResult], that can either be [AuthenticationSuccess] or [AuthenticationError].
+  /// Logs in a user and returns an [AuthenticationResult], that can either be [AuthenticationSuccess] or [AuthenticationError].
+  ///
+  /// This method attempts to log in a user using their name and password. If a TOTP is required or provided, it includes this in the request. It then stores the necessary tokens and updates the user's login state.
+  ///
+  /// ## Parameters
+  /// - [name]: The name of the user trying to log in.
+  /// - [password]: The password of the user trying to log in.
+  /// - [totp]: The Time-based One-Time Password (TOTP), if required or available.
+  ///
+  /// ## Returns
+  /// - [AuthenticationSuccess] if the login is successful.
+  /// - [AuthenticationError] if an error occurs during the login process.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// AuthenticationResult result = await provider.login('username', 'password');
+  /// ```
   Future<AuthenticationResult> login(String name, String password,
       [String? totp]) async {
     try {
@@ -195,6 +261,13 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Logs out a user and clears the stored tokens.
+  ///
+  /// This method clears the access and refresh tokens from secure storage, resets the user's profile, and updates the login state.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// provider.logout();
+  /// ```
   void logout() async {
     // TODO revoke the refresh token from the server, not only client-side
     await _secureStorage.delete(key: 'refreshToken');
@@ -208,6 +281,14 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Loads the user's profile from the server and updates the locally cached user.
+  ///
+  /// This method fetches the user's profile using the current access token and updates the locally stored user data.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// await provider.loadProfile();
+  /// ```
   Future<void> loadProfile() async {
     if (await accessToken == null) {
       // TODO handle/log error (this should never happen)

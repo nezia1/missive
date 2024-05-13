@@ -24,12 +24,21 @@ class SignalProvider extends ChangeNotifier {
   final _logger = Logger('SignalProvider');
 
   /// Initializes the Signal protocol stores. If [installing] is true, generates a new identity key pair, registration ID, signed pre key, and pre keys.
+  ///
+  /// This method sets up the necessary stores and, if installing for the first time, generates the necessary keys and uploads them to the server.
+  ///
   /// ## Parameters
-  /// - [installing] (required): Whether the protocol is being installed for the first time.
-  /// - [name] (required): The name of the user.
-  /// - [accessToken]: The access token of the user.
-  /// ## Notes
-  /// [name] and [accessToken] are required when [installing] is true, and is used to upload the keys to the server.
+  /// - [installing]: Whether the protocol is being installed for the first time.
+  /// - [name]: The name of the user.
+  /// - [accessToken]: The access token of the user, required if installing.
+  ///
+  /// ## Throws
+  /// - [MissingTokenError] if [accessToken] is not provided when installing.
+
+  /// ## Usage
+  /// ```dart
+  /// await provider.initialize(installing: true, name: 'username', accessToken: 'access-token');
+  /// ```
   Future<void> initialize(
       {required bool installing,
       required String name,
@@ -43,6 +52,10 @@ class SignalProvider extends ChangeNotifier {
     _sessionStore = SecureStorageSessionStore(storageManager);
 
     if (installing) {
+      if (accessToken == null) {
+        throw MissingTokenError(
+            'Access token is required when installing the protocol');
+      }
       final identityKeyPair = generateIdentityKeyPair();
       final registrationId = generateRegistrationId(false);
       final signedPreKey = generateSignedPreKey(identityKeyPair, 0);
@@ -77,11 +90,22 @@ class SignalProvider extends ChangeNotifier {
     _identityKeyStore = SecureStorageIdentityKeyStore(storageManager);
   }
 
-  /// Fetch a pre-key bundle from the server. This is used when a user wants to start a conversation with another user.
+  /// Fetches a pre-key bundle from the server. This is used when a user wants to start a conversation with another user.
+  ///
   /// Returns a [PreKeyBundle] if the user exists and has keys, otherwise returns null.
+  ///
   /// ## Parameters
-  /// - [name] (required): The name of the user to fetch the keys from.
-  /// - [accessToken] (required): The access token of the user fetching the keys.
+  /// - [name]: The name of the user to fetch the keys from.
+  /// - [accessToken]: The access token of the user fetching the keys.
+  ///
+  /// ## Returns
+  /// - A [PreKeyBundle] if the user exists and has keys.
+  /// - `null` if the keys cannot be fetched.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// PreKeyBundle? bundle = await provider.fetchPreKeyBundle('username', 'access-token');
+  /// ```
   Future<PreKeyBundle?> fetchPreKeyBundle(
       String name, String accessToken) async {
     final response = await dio.get('/users/$name/keys',
@@ -109,11 +133,18 @@ class SignalProvider extends ChangeNotifier {
         identityKey);
   }
 
-  /// Build a Signal session with a given user.
+  /// Builds a Signal session with a given user. This session is used for subsequent message encryption and decryption.
+  ///
+  /// If a session with the user already exists, this method does nothing. Otherwise, it fetches the user's pre-key bundle and processes it to establish a new session.
   ///
   /// ## Parameters
-  /// - [name] - The name of the user to build a session with.
-  /// - [accessToken] - The current access token to fetch the pre-key bundle from.
+  /// - [name]: The name of the user to build a session with.
+  /// - [accessToken]: The access token to authenticate the request.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// await provider.buildSession(name: 'username', accessToken: 'access-token');
+  /// ```
   Future<void> buildSession({
     required String name,
     required String accessToken,
@@ -130,11 +161,21 @@ class SignalProvider extends ChangeNotifier {
     await sessionBuilder.processPreKeyBundle(remotePreKeyBundle);
   }
 
-  /// Encrypts a message for a given user. Returns a [CiphertextMessage].
+  /// Encrypts a plaintext message for a given user and returns a [CiphertextMessage].
+  ///
+  /// This method uses the existing session with the user to encrypt the message. If no session exists, an exception is thrown.
   ///
   /// ## Parameters
-  /// - [name] - the name of the user to encrypt the message for.
-  /// - [message] - the plain text message to encrypt.
+  /// - [name]: The name of the user to encrypt the message for.
+  /// - [message]: The plaintext message to encrypt.
+  ///
+  /// ## Returns
+  /// - A [CiphertextMessage] which can be sent securely.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// CiphertextMessage cipherText = await provider.encrypt(name: 'username', message: 'Hello, World!');
+  /// ```
   Future<CiphertextMessage> encrypt(
       {required String name, required String message}) async {
     final remoteAddress = SignalProtocolAddress(name, 1);
@@ -145,11 +186,21 @@ class SignalProvider extends ChangeNotifier {
     return cipherText;
   }
 
-  /// Decrypts a message for a given [SignalProtocolAddress].
+  /// Decrypts a [CiphertextMessage] received from a given [SignalProtocolAddress].
+  ///
+  /// This method uses the existing session with the sender to decrypt the message. If no session exists, or the message type is not recognized, an exception is thrown.
   ///
   /// ## Parameters
-  /// - [message] - The [CiphertextMessage] to decrypt.
-  /// - [senderAddress] - The [SignalProtocolAddress] the message has been sent from.
+  /// - [message]: The [CiphertextMessage] to decrypt.
+  /// - [senderAddress]: The [SignalProtocolAddress] the message has been sent from.
+  ///
+  /// ## Returns
+  /// - A [String] representing the decrypted plaintext message.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// String message = await provider.decrypt(cipherMessage, senderAddress);
+  /// ```
   Future<String> decrypt(
       CiphertextMessage message, SignalProtocolAddress senderAddress) async {
     final sessionCipher = SessionCipher(_sessionStore, _preKeyStore,
@@ -164,4 +215,11 @@ class SignalProvider extends ChangeNotifier {
     }
     return utf8.decode(plainText);
   }
+}
+
+/// Error thrown when an access token is missing.
+class MissingTokenError extends Error {
+  final String message;
+
+  MissingTokenError(this.message);
 }
