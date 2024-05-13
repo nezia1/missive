@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:missive/features/chat/models/conversation.dart';
-import 'package:missive/features/chat/providers/chat_provider.dart';
-import 'package:provider/provider.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 /// This widget is used to display a message bubble in the chat screen. It can be used to display messages from the sender or from the receiver.
 /// ## Parameters
@@ -37,7 +34,9 @@ class MessageBubble extends StatelessWidget {
         constraints:
             BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
         decoration: BoxDecoration(
-          color: isOwnMessage ? Colors.blue : Colors.grey[300],
+          color: isOwnMessage
+              ? Theme.of(context).colorScheme.primary
+              : Colors.grey[300],
           borderRadius: isOwnMessage
               ? BorderRadius.only(
                   topLeft: const Radius.circular(16.0),
