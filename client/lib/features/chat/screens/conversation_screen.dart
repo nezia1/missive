@@ -151,8 +151,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                             .inDays >
                                         0 // show date if it's the first message or if the previous message was sent more than 1 day ago
                                 );
-                            print(
-                                'Message status: ${conversation.messages[index].status}');
                             return Column(
                               children: [
                                 if (timestamp != null && showDate)

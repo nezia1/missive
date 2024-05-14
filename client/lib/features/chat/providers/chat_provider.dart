@@ -38,6 +38,10 @@ class ChatProvider with ChangeNotifier {
   StreamSubscription? _messagesSubscription;
   final Logger _logger = Logger('ChatProvider');
 
+  Timer? _reconnectionTimer;
+  bool _isConnecting = false;
+  int _reconnectionAttempts = 0;
+
   ChatProvider(
       {String? url, AuthProvider? authProvider, SignalProvider? signalProvider})
       : _url = url,
@@ -111,6 +115,10 @@ class ChatProvider with ChangeNotifier {
       throw InitializationError('ChatProvider is not fully initialized');
     }
 
+    if (_isConnecting) return;
+
+    _isConnecting = true;
+
     final ws = await WebSocket.connect(
       _url!,
       headers: {
@@ -122,52 +130,78 @@ class ChatProvider with ChangeNotifier {
     _channel = IOWebSocketChannel(ws);
     _logger.log(Level.INFO, 'Connected to $_url');
     _channel!.stream.listen((message) async {
-      final messageJson = jsonDecode(message);
-      // check if message is a status update
-      if (messageJson['state'] != null) {
-        Status messageStatus;
-        switch (messageJson['state'].toString().toLowerCase()) {
-          case 'sent':
-            messageStatus = Status.sent;
-            break;
-          case 'received':
-            messageStatus = Status.received;
-            break;
-          case 'read':
-            messageStatus = Status.read;
-            break;
-          default:
-            messageStatus = Status.error;
-            break;
-        }
-        _updateMessageStatus(messageJson['messageId'], messageStatus);
-        return;
+      await _handleMessage(message);
+    },
+        onDone: _handleConnectionClosed,
+        onError: (error) =>
+            {_logger.log(Level.SEVERE, 'WebSocket Error: $error')});
+  }
+
+  Future<void> _handleMessage(String message) async {
+    final messageJson = jsonDecode(message);
+    // check if message is a status update
+    if (messageJson['state'] != null) {
+      Status messageStatus;
+      switch (messageJson['state'].toString().toLowerCase()) {
+        case 'sent':
+          messageStatus = Status.sent;
+          break;
+        case 'received':
+          messageStatus = Status.received;
+          break;
+        case 'read':
+          messageStatus = Status.read;
+          break;
+        default:
+          messageStatus = Status.error;
+          break;
       }
+      _logger.log(Level.INFO, 'Updating message status: $message');
+      _updateMessageStatus(messageJson['messageId'], messageStatus);
+      return;
+    }
 
-      CiphertextMessage cipherMessage;
+    CiphertextMessage cipherMessage;
 
-      final serializedContent = base64Decode(messageJson['content']);
+    final serializedContent = base64Decode(messageJson['content']);
 
-      // Try parsing it as a SignalMessage, if it fails, it's a PreKeySignalMessage
-      try {
-        cipherMessage = SignalMessage.fromSerialized(serializedContent);
-      } catch (_) {
-        cipherMessage = PreKeySignalMessage(serializedContent);
-      }
+    // Try parsing it as a SignalMessage, if it fails, it's a PreKeySignalMessage
+    try {
+      cipherMessage = SignalMessage.fromSerialized(serializedContent);
+    } catch (_) {
+      cipherMessage = PreKeySignalMessage(serializedContent);
+    }
 
-      final plainText = await _signalProvider!.decrypt(
-          cipherMessage, SignalProtocolAddress(messageJson['sender'], 1));
+    final plainText = await _signalProvider!.decrypt(
+        cipherMessage, SignalProtocolAddress(messageJson['sender'], 1));
 
-      // store message in Realm
-      final realm = await _getUserRealm();
-      realm.write(() {
-        var user = realm.find<Conversation>(messageJson['sender']);
+    // store message in Realm
+    final realm = await _getUserRealm();
+    realm.write(() {
+      var user = realm.find<Conversation>(messageJson['sender']);
 
-        user ??= realm.add(Conversation(messageJson['sender']));
+      user ??= realm.add(Conversation(messageJson['sender']));
 
-        user.messages.add(PlaintextMessage(messageJson['id'], plainText, false,
-            sentAt: DateTime.now()));
-      });
+      user.messages.add(PlaintextMessage(messageJson['id'], plainText, false,
+          sentAt: DateTime.now()));
+    });
+  }
+
+  void _handleConnectionClosed() {
+    _logger.log(Level.WARNING,
+        'WebSocket connection closed. Attempting to reconnect...');
+    _channel = null;
+    _scheduleReconnection();
+  }
+
+  void _scheduleReconnection() {
+    if (_reconnectionTimer != null && _reconnectionTimer!.isActive) return;
+
+    _reconnectionAttempts++;
+    final delay = min(_reconnectionAttempts * 2,
+        30); // take more and more time to reconnect after each failed attempt (max 30s)
+    _reconnectionTimer = Timer(Duration(seconds: delay), () {
+      connect();
     });
   }
 

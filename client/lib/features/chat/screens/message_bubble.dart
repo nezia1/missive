@@ -58,11 +58,19 @@ class MessageBubble extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Expanded(
-              child: Text(text,
-                  style: TextStyle(
-                      color: isOwnMessage ? Colors.white : Colors.black)),
+            Flexible(
+              child: Text(
+                text,
+                style: TextStyle(
+                  color: isOwnMessage
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Colors.black,
+                ),
+              ),
             ),
+            isOwnMessage // add spacing only if its our message (because of the status icon)
+                ? const SizedBox(width: 8.0)
+                : const SizedBox(),
             _getStatusIcon(status)
           ],
         ),
@@ -73,7 +81,14 @@ class MessageBubble extends StatelessWidget {
   Widget _getStatusIcon(Status? status) {
     switch (status) {
       case Status.pending:
-        return const CircularProgressIndicator();
+        return const SizedBox(
+          width: 16.0,
+          height: 16.0,
+          child: CircularProgressIndicator(
+            color: Colors.white,
+            strokeWidth: 2.0,
+          ),
+        );
       case Status.sent:
         return const Icon(Icons.check, size: 16.0);
       case Status.received:
