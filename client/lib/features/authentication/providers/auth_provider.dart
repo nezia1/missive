@@ -145,7 +145,7 @@ class AuthProvider extends ChangeNotifier {
           identityKeyPair.getPublicKey().serialize(),
         ),
         'oneSignalId': Platform.isAndroid || Platform.isIOS
-            ? OneSignal.User.getOnesignalId()
+            ? await OneSignal.User.getOnesignalId()
             : null, // get the OneSignal ID that was generated for this device only if user is on mobile
       });
 
