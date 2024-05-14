@@ -39,6 +39,11 @@ class Conversation extends _Conversation
       RealmObjectBase.getChanges<Conversation>(this);
 
   @override
+  Stream<RealmObjectChanges<Conversation>> changesFor(
+          [List<String>? keyPaths]) =>
+      RealmObjectBase.getChangesFor<Conversation>(this, keyPaths);
+
+  @override
   Conversation freeze() => RealmObjectBase.freezeObject<Conversation>(this);
 
   EJsonValue toEJson() {
@@ -135,6 +140,11 @@ class PlaintextMessage extends _PlaintextMessage
   @override
   Stream<RealmObjectChanges<PlaintextMessage>> get changes =>
       RealmObjectBase.getChanges<PlaintextMessage>(this);
+
+  @override
+  Stream<RealmObjectChanges<PlaintextMessage>> changesFor(
+          [List<String>? keyPaths]) =>
+      RealmObjectBase.getChangesFor<PlaintextMessage>(this, keyPaths);
 
   @override
   PlaintextMessage freeze() =>
