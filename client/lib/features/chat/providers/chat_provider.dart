@@ -240,9 +240,6 @@ class ChatProvider with ChangeNotifier {
       'receiver': receiver,
     });
 
-    // send message over WebSocket
-    _channel?.sink.add(messageJson);
-
     // store with Realm
     final realm = await _getUserRealm();
     final name = (await _authProvider?.user)?.name;
@@ -264,6 +261,9 @@ class ChatProvider with ChangeNotifier {
         statusString: Status.pending.toShortString(),
       ));
     });
+
+    // send message over WebSocket
+    _channel?.sink.add(messageJson);
   }
 
   // Notifies the server that a message has been read, and updates the local Realm database accordingly.
