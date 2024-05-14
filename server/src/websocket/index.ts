@@ -21,9 +21,10 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				content: string
 				receiver: string
 				state: Status | undefined
-				sender: string
+				sender: string // name of the user who sent the message originally
 			}
 			message.state = message.state?.toUpperCase() as Status
+
 			console.log(message)
 			// If message has no state, it's a new message (not a status update)
 			if (!message.state) sendStatusUpdate(Status.SENT, message.id, socket)
@@ -33,11 +34,19 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				// if message has state (status update), send it to the receiver
 
 				const receiver = connections.get(message.receiver)
+				message.sender = message.sender || req.authenticatedUser.name
 
 				// if a message has a state, it's a status update
-				message.state === undefined
-					? receiver?.send(JSON.stringify(exclude(message, ['receiver'])))
-					: sendStatusUpdate(message.state, message.id, receiver as WebSocket)
+				// TODO: real-time status updates do not work (read is not working because it sends to the wrong person, fix the logic)
+				if (message.state) {
+					const sender = connections.get(message.sender)
+					console.log(message.sender)
+					sendStatusUpdate(message.state, message.id, sender as WebSocket)
+					return
+				}
+
+				receiver?.send(JSON.stringify(exclude(message, ['receiver'])))
+				sendStatusUpdate(Status.RECEIVED, message.id, socket)
 			} else {
 				if (message.state) {
 					// if message has state (status update), store it in the database
@@ -53,7 +62,6 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 						})
 					)?.id
 
-					console.log(`Sender id is ${senderId}`)
 					if (senderId)
 						await fastify.prisma.messageStatus.create({
 							data: {

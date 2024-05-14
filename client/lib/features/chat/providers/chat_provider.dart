@@ -276,6 +276,7 @@ class ChatProvider with ChangeNotifier {
   /// ```dart
   /// provider.notifyRead(messageId: '12345', sender: 'bob');
   /// ```
+  // TODO: change from sender to receiver to be more consistent with sendMessage, and make server logic more consistent
   void notifyRead(String messageId, String sender) {
     _logger.log(
         Level.INFO, 'Notifying server that message $messageId was read');
@@ -284,6 +285,16 @@ class ChatProvider with ChangeNotifier {
         .add(jsonEncode({'id': messageId, 'state': 'read', 'sender': sender}));
   }
 
+  /// Updates the status of a message in the local Realm database.
+  ///
+  /// ## Parameters
+  /// - [messageId]: The unique identifier of the message that needs to be updated.
+  /// - [status]: The new status of the message.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// _updateMessageStatus('12345', Status.sent);
+  /// ```
   void _updateMessageStatus(String messageId, Status status) {
     final realm = _userRealm;
     if (realm == null) {
