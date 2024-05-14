@@ -47,6 +47,9 @@ class SecureStorageSignedPreKeyStore implements SignedPreKeyStore {
     if (signedPreKeys == null) return;
 
     signedPreKeys.remove(signedPreKeyId.toString());
+
+    await _secureStorage.write(
+        key: 'signedPreKeys', value: jsonEncode(signedPreKeys));
   }
 
   @override
@@ -57,6 +60,7 @@ class SecureStorageSignedPreKeyStore implements SignedPreKeyStore {
     signedPreKeys ??= <String, String>{};
 
     signedPreKeys[signedPreKeyId.toString()] = base64Encode(record.serialize());
+
     await _secureStorage.write(
         key: 'signedPreKeys', value: jsonEncode(signedPreKeys));
   }
