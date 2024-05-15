@@ -71,8 +71,60 @@ class AuthProvider extends ChangeNotifier {
 
         await _secureStorage.write(key: 'accessToken', value: token);
       } on DioException catch (e) {
-        _logger.log(Level.SEVERE, 'Error refreshing token: $e');
-        logout();
+        if (e.error is SocketException) {
+          _logger.log(
+              Level.SEVERE, 'Error refreshing token: No internet connection');
+        } else {
+          if (e.response?.statusCode == 401) {
+            // refresh token is expired, log out the user
+            logout();
+          }
+          if (e.response?.statusCode == 403) {
+            // refresh token is invalid, log out the user
+            logout();
+          }
+          if (e.response?.statusCode == 500) {
+            // server error, log out the user
+            logout();
+          }
+          if (e.response?.statusCode == 503) {
+            // server error, log out the user
+            logout();
+          }
+          if (e.response?.statusCode == 504) {
+            // server error, log out the user
+            logout();
+          }
+          if (e.response?.statusCode == 429) {
+            // too many requests, log out the user
+            logout();
+          }
+          if (e.response?.statusCode == 404) {
+            // user not found, log out the user
+            logout();
+          }
+          if (e.response?.statusCode == 400) {
+            // bad request, log out the user
+            logout();
+          }
+          if (e.response?.statusCode == 401) {
+            // unauthorized, log out the user
+            logout();
+          }
+          if (e.response?.statusCode == 403) {
+            // forbidden, log out the user
+            logout();
+          }
+          if (e.response?.statusCode == 404) {
+            // user not found, log out the user
+            logout();
+          }
+          if (e.response?.statusCode == 500) {
+            // server error, log out the user
+            logout();
+          }
+          _logger.log(Level.SEVERE, 'Error refreshing token: $e');
+        }
       }
     }
     return token;
@@ -107,6 +159,7 @@ class AuthProvider extends ChangeNotifier {
   /// User? currentUser = await provider.user;
   /// ```
   Future<User?> get user async {
+    // If user is not in memory yet, try to load it from storage. Otherwise, get it from the network.
     if (_user == null) await loadProfile();
     return _user;
   }
@@ -273,6 +326,7 @@ class AuthProvider extends ChangeNotifier {
     // TODO revoke the refresh token from the server, not only client-side
     await _secureStorage.delete(key: 'refreshToken');
     await _secureStorage.delete(key: 'accessToken');
+    await _secureStorage.delete(key: 'user');
 
     _user = null;
 
@@ -298,6 +352,14 @@ class AuthProvider extends ChangeNotifier {
       return;
     }
 
+    final storedUser = await _secureStorage.read(key: 'user');
+    if (storedUser != null) {
+      _user = User.fromJson(jsonDecode(storedUser));
+      _logger.log(Level.FINE, 'User loaded from storage: $_user');
+      notifyListeners();
+      return;
+    }
+
     try {
       final userId = _getSubFromToken((await accessToken)!);
       final response = await _httpClient.get('/users/$userId',
@@ -305,8 +367,9 @@ class AuthProvider extends ChangeNotifier {
             'Authorization': 'Bearer ${await accessToken}',
           }));
 
-      User user = User.fromJson(response.data);
+      User user = User.fromJson(response.data['data']);
       _user = user;
+      _secureStorage.write(key: 'user', value: jsonEncode(user.toJson()));
     } catch (e) {
       _logger.log(Level.SEVERE, e.toString());
       _user = null;
