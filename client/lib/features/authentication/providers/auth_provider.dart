@@ -73,8 +73,12 @@ class AuthProvider extends ChangeNotifier {
       } on DioException catch (e) {
         if (e.error is SocketException) {
           _logger.log(
-              Level.SEVERE, 'Error refreshing token: No internet connection');
+              Level.WARNING, 'Error refreshing token: No internet connection');
         } else {
+          if (e.response?.statusCode == 400) {
+            // bad request, log out the user
+            logout();
+          }
           if (e.response?.statusCode == 401) {
             // refresh token is expired, log out the user
             logout();
@@ -83,44 +87,8 @@ class AuthProvider extends ChangeNotifier {
             // refresh token is invalid, log out the user
             logout();
           }
-          if (e.response?.statusCode == 500) {
-            // server error, log out the user
-            logout();
-          }
-          if (e.response?.statusCode == 503) {
-            // server error, log out the user
-            logout();
-          }
-          if (e.response?.statusCode == 504) {
-            // server error, log out the user
-            logout();
-          }
-          if (e.response?.statusCode == 429) {
-            // too many requests, log out the user
-            logout();
-          }
           if (e.response?.statusCode == 404) {
             // user not found, log out the user
-            logout();
-          }
-          if (e.response?.statusCode == 400) {
-            // bad request, log out the user
-            logout();
-          }
-          if (e.response?.statusCode == 401) {
-            // unauthorized, log out the user
-            logout();
-          }
-          if (e.response?.statusCode == 403) {
-            // forbidden, log out the user
-            logout();
-          }
-          if (e.response?.statusCode == 404) {
-            // user not found, log out the user
-            logout();
-          }
-          if (e.response?.statusCode == 500) {
-            // server error, log out the user
             logout();
           }
           _logger.log(Level.SEVERE, 'Error refreshing token: $e');
@@ -346,7 +314,6 @@ class AuthProvider extends ChangeNotifier {
   /// ```
   Future<void> loadProfile() async {
     if (await accessToken == null) {
-      // TODO handle/log error (this should never happen)
       _logger.log(Level.SEVERE,
           'No access token found when loading profile, this should never happen.');
       return;
