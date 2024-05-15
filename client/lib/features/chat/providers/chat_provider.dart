@@ -280,7 +280,7 @@ class ChatProvider with ChangeNotifier {
     _channel?.sink.add(messageJson);
   }
 
-  // Notifies the server that a message has been read, and updates the local Realm database accordingly.
+  /// Notifies the server that a message has been read, and updates the local Realm database accordingly.
   ///
   /// ## Parameters
   /// - [messageId]: The unique identifier of the message that has been read.
