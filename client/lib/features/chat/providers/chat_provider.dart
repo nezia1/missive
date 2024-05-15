@@ -42,6 +42,9 @@ class ChatProvider with ChangeNotifier {
   bool _isConnecting = false;
   int _reconnectionAttempts = 0;
 
+  /// Whether the provider is currently connecting to the WebSocket server.
+  get isConnecting => _isConnecting;
+
   ChatProvider(
       {String? url, AuthProvider? authProvider, SignalProvider? signalProvider})
       : _url = url,
