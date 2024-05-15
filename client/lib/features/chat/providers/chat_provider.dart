@@ -17,6 +17,7 @@ import 'package:missive/common/http.dart';
 import 'package:uuid/uuid.dart' as uuid_generator;
 
 import 'package:missive/features/chat/models/conversation.dart';
+import 'package:missive/features/chat/models/pending_messages.dart';
 
 /// Provides chat-related functionalities, handling messaging operations, WebSocket connections,
 /// and encrypted local storage in a Realm database.
@@ -39,11 +40,12 @@ class ChatProvider with ChangeNotifier {
   final Logger _logger = Logger('ChatProvider');
 
   Timer? _reconnectionTimer;
+  bool _connected = false;
   bool _isConnecting = false;
   int _reconnectionAttempts = 0;
 
-  /// Whether the provider is currently connecting to the WebSocket server.
-  get isConnecting => _isConnecting;
+  /// Whether or not the provider is connected to the WebSocket server. Used to update the UI based on the connection status.
+  get connected => _connected;
 
   ChatProvider(
       {String? url, AuthProvider? authProvider, SignalProvider? signalProvider})
@@ -133,6 +135,17 @@ class ChatProvider with ChangeNotifier {
 
       _channel = IOWebSocketChannel(ws);
       _logger.log(Level.FINE, 'Connected to $_url');
+      _connected = true;
+      _sendPendingMessages();
+
+      // If reconnection attempts have been made, fetch pending messages as there could have been messages sent while disconnected, and reset the attempts
+      if (_reconnectionAttempts > 0) {
+        fetchPendingMessages();
+        fetchMessageStatuses();
+        _reconnectionAttempts = 0;
+        notifyListeners();
+      }
+
       _channel!.stream.listen(
         (message) async {
           await _handleMessage(message);
@@ -143,6 +156,7 @@ class ChatProvider with ChangeNotifier {
       );
     } catch (e) {
       _logger.log(Level.SEVERE, 'Failed to connect: $e');
+      _connected = false;
       _scheduleReconnection();
     } finally {
       _isConnecting = false;
@@ -276,8 +290,75 @@ class ChatProvider with ChangeNotifier {
       ));
     });
 
+    if (!_connected) {
+      _storePendingMessage(uuid, message, receiver);
+      return;
+    }
     // send message over WebSocket
     _channel?.sink.add(messageJson);
+  }
+
+  /// Stores a message in the user's Realm database as a pending message.
+  /// This method is used when the WebSocket connection is not established, and the message cannot be sent immediately.
+  /// The message is stored locally in the Realm database and will be sent when the connection is re-established.
+  /// ## Parameters
+  /// - [uuid]: The unique identifier of the message.
+  /// - [message]: The encrypted message to be sent.
+  /// - [receiver]: The name of the recipient of the message.
+  /// ## Usage
+  /// ```dart
+  /// _storePendingMessage('12345', message, 'alice');
+  /// ```
+  /// This method is used internally by the provider and should not be called directly.
+  void _storePendingMessage(
+      String uuid, CiphertextMessage message, String receiver) {
+    final realm = _userRealm;
+    if (realm == null) {
+      throw InitializationError('User Realm is not initialized');
+    }
+
+    realm.write(() {
+      final pendingMessages = realm.find<PendingMessages>('pending_messages');
+      if (pendingMessages == null) {
+        realm.add(PendingMessages('pending_messages', messages: [
+          PendingMessage(uuid, base64Encode(message.serialize()), receiver)
+        ]));
+        return;
+      }
+      pendingMessages.messages.add(
+          PendingMessage(uuid, base64Encode(message.serialize()), receiver));
+    });
+  }
+
+  /// Send all pending messages stored in the user's Realm database.
+  /// This method is used when the WebSocket connection is re-established, and all pending messages are sent to the server.
+  /// The messages are removed from the local Realm database after they are sent.
+  /// ## Usage
+  /// ```dart
+  /// await _sendPendingMessages();
+  /// ```
+  void _sendPendingMessages() {
+    final realm = _userRealm;
+    if (realm == null) {
+      throw InitializationError('User Realm is not initialized');
+    }
+
+    final pendingMessages = realm.find<PendingMessages>('pending_messages');
+    if (pendingMessages == null) return;
+
+    for (final message in pendingMessages.messages) {
+      final messageJson = jsonEncode({
+        'id': message.id,
+        'content': message.ciphertextMessage,
+        'receiver': message.receiver,
+      });
+      _channel?.sink.add(messageJson);
+      _logger.log(Level.FINE, 'Sent pending message: $messageJson');
+    }
+
+    realm.write(() {
+      realm.delete(pendingMessages);
+    });
   }
 
   /// Notifies the server that a message has been read, and updates the local Realm database accordingly.
@@ -373,14 +454,24 @@ class ChatProvider with ChangeNotifier {
     // get pending messages from server
     final name = (await _authProvider?.user)?.name;
     final accessToken = await _authProvider?.accessToken;
+
     if (name == null || accessToken == null) {
       throw Exception('User is not logged in');
     }
 
-    // get messages from server
-    final response = await dio.get('/users/$name/messages',
-        options: Options(
-            headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'}));
+    Response response;
+    try {
+      // get messages from server
+      response = await dio.get('/users/$name/messages',
+          options: Options(headers: {
+            HttpHeaders.authorizationHeader: 'Bearer $accessToken'
+          }));
+    } on DioException catch (e) {
+      _logger.log(Level.WARNING, 'Error fetching pending messages: $e');
+      _connected = false;
+      notifyListeners();
+      return;
+    }
 
     final messages = response.data['data']['messages'];
 
@@ -430,12 +521,20 @@ class ChatProvider with ChangeNotifier {
     if (name == null || accessToken == null) {
       throw Exception('User is not logged in');
     }
-
-    final response = await dio.get('/users/$name/messages/status',
-        options: Options(
-            headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'}));
-
-    final statuses = response.data['data']['statuses'];
+    Response response;
+    dynamic statuses;
+    try {
+      response = await dio.get('/users/$name/messages/status',
+          options: Options(headers: {
+            HttpHeaders.authorizationHeader: 'Bearer $accessToken'
+          }));
+      statuses = response.data['data']['statuses'];
+    } on DioException catch (e) {
+      _logger.log(Level.WARNING, 'Error fetching message statuses: $e');
+      _connected = false;
+      notifyListeners();
+      return;
+    }
 
     for (final status in statuses) {
       _logger.log(Level.FINE, 'Updating message status: $status');
@@ -476,7 +575,12 @@ class ChatProvider with ChangeNotifier {
     final directory = (await getApplicationSupportDirectory()).path;
 
     final realmConfig = Configuration.local(
-      [Conversation.schema, PlaintextMessage.schema],
+      [
+        Conversation.schema,
+        PlaintextMessage.schema,
+        PendingMessages.schema,
+        PendingMessage.schema
+      ],
       path: '$directory/${name}_realm.realm',
       encryptionKey: realmKey,
     );

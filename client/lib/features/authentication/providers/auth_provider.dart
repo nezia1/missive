@@ -70,8 +70,9 @@ class AuthProvider extends ChangeNotifier {
         token = newToken;
 
         await _secureStorage.write(key: 'accessToken', value: token);
-      } on DioException {
-        // TODO: handle error better (e.g. log out user, show error message, etc.)
+      } on DioException catch (e) {
+        _logger.log(Level.SEVERE, 'Error refreshing token: $e');
+        logout();
       }
     }
     return token;
@@ -307,7 +308,6 @@ class AuthProvider extends ChangeNotifier {
       User user = User.fromJson(response.data);
       _user = user;
     } catch (e) {
-      // TODO handle error
       _logger.log(Level.SEVERE, e.toString());
       _user = null;
     } finally {

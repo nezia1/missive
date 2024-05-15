@@ -55,11 +55,14 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
       await _signalProvider.initialize(installing: false, name: name!);
     }
 
-    await _chatProvider.connect();
     _chatProvider.setupUserRealm();
-
-    _chatProvider.fetchPendingMessages();
-    _chatProvider.fetchMessageStatuses();
+    try {
+      _chatProvider.fetchPendingMessages();
+      _chatProvider.fetchMessageStatuses();
+    } catch (e) {
+      _logger.log(Level.WARNING, 'Error fetching pending messages: $e');
+    }
+    await _chatProvider.connect();
   }
 
   Widget _buildBody() {
