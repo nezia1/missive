@@ -119,22 +119,51 @@ class ChatProvider with ChangeNotifier {
 
     _isConnecting = true;
 
-    final ws = await WebSocket.connect(
-      _url!,
-      headers: {
-        HttpHeaders.authorizationHeader:
-            'Bearer ${await _authProvider!.accessToken}'
-      },
-    );
+    try {
+      final ws = await WebSocket.connect(
+        _url!,
+        headers: {
+          HttpHeaders.authorizationHeader:
+              'Bearer ${await _authProvider!.accessToken}'
+        },
+      );
 
-    _channel = IOWebSocketChannel(ws);
-    _logger.log(Level.INFO, 'Connected to $_url');
-    _channel!.stream.listen((message) async {
-      await _handleMessage(message);
-    },
+      _channel = IOWebSocketChannel(ws);
+      _logger.log(Level.FINE, 'Connected to $_url');
+      _channel!.stream.listen(
+        (message) async {
+          await _handleMessage(message);
+        },
         onDone: _handleConnectionClosed,
         onError: (error) =>
-            {_logger.log(Level.SEVERE, 'WebSocket Error: $error')});
+            _logger.log(Level.SEVERE, 'WebSocket Error: $error'),
+      );
+    } catch (e) {
+      _logger.log(Level.SEVERE, 'Failed to connect: $e');
+      _scheduleReconnection();
+    } finally {
+      _isConnecting = false;
+    }
+  }
+
+  void _handleConnectionClosed() {
+    _logger.log(Level.WARNING,
+        'WebSocket connection closed. Attempting to reconnect...');
+    _channel = null;
+    _scheduleReconnection();
+  }
+
+  void _scheduleReconnection() {
+    if (_reconnectionTimer != null && _reconnectionTimer!.isActive) return;
+
+    _reconnectionAttempts++;
+    final delay = min(_reconnectionAttempts * 2,
+        30); // take more and more time to reconnect after each failed attempt (max 30s)
+    _reconnectionTimer = Timer(Duration(seconds: delay), () {
+      _logger.log(Level.INFO,
+          'Attempting to reconnect... (Attempt $_reconnectionAttempts)');
+      connect();
+    });
   }
 
   Future<void> _handleMessage(String message) async {
@@ -156,7 +185,7 @@ class ChatProvider with ChangeNotifier {
           messageStatus = Status.error;
           break;
       }
-      _logger.log(Level.INFO, 'Updating message status: $message');
+      _logger.log(Level.FINE, 'Updating message status: $message');
       _updateMessageStatus(messageJson['messageId'], messageStatus);
       return;
     }
@@ -184,24 +213,6 @@ class ChatProvider with ChangeNotifier {
 
       user.messages.add(PlaintextMessage(messageJson['id'], plainText, false,
           sentAt: DateTime.now()));
-    });
-  }
-
-  void _handleConnectionClosed() {
-    _logger.log(Level.WARNING,
-        'WebSocket connection closed. Attempting to reconnect...');
-    _channel = null;
-    _scheduleReconnection();
-  }
-
-  void _scheduleReconnection() {
-    if (_reconnectionTimer != null && _reconnectionTimer!.isActive) return;
-
-    _reconnectionAttempts++;
-    final delay = min(_reconnectionAttempts * 2,
-        30); // take more and more time to reconnect after each failed attempt (max 30s)
-    _reconnectionTimer = Timer(Duration(seconds: delay), () {
-      connect();
     });
   }
 
@@ -278,7 +289,7 @@ class ChatProvider with ChangeNotifier {
   /// ```
   void notifyRead(String messageId, String receiver) {
     _logger.log(
-        Level.INFO, 'Notifying server that message $messageId was read');
+        Level.FINE, 'Notifying server that message $messageId was read');
     _updateMessageStatus(messageId, Status.read);
     _channel?.sink.add(
         jsonEncode({'id': messageId, 'state': 'read', 'receiver': receiver}));
@@ -424,7 +435,7 @@ class ChatProvider with ChangeNotifier {
     final statuses = response.data['data']['statuses'];
 
     for (final status in statuses) {
-      _logger.log(Level.INFO, 'Updating message status: $status');
+      _logger.log(Level.FINE, 'Updating message status: $status');
       final message = _userRealm?.find<PlaintextMessage>(status['messageId']);
       if (message != null) {
         _updateMessageStatus(
@@ -497,7 +508,7 @@ class ChatProvider with ChangeNotifier {
   /// ```
   @override
   void dispose() {
-    _logger.log(Level.INFO, 'Disposing... (this should happen after log out)');
+    _logger.log(Level.FINE, 'Disposing... (this should happen after log out)');
     if (_channel != null) {
       _channel?.sink.close();
     }
