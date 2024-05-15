@@ -17,13 +17,14 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 
 			// TODO: handle JSON parsing error (if it's not a valid JSON string, it will crash the conneection)
 			const message = JSON.parse(msg.toString()) as {
-				id: string
+				id: string // generated from the client
 				content: string
-				receiver: string
-				state: Status | undefined
-				sender: string // name of the user who sent the message originally
+				receiver: string // when it's a status update, it's usually the sender (receiver as in who will receive the message or update)
+				state: Status | undefined // if it's defined, it's a status update
+				sender: string
 			}
 			message.state = message.state?.toUpperCase() as Status
+			message.sender = req.authenticatedUser.name
 
 			console.log(message)
 			// If message has no state, it's a new message (not a status update)
@@ -34,14 +35,11 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				// if message has state (status update), send it to the receiver
 
 				const receiver = connections.get(message.receiver)
-				message.sender = message.sender || req.authenticatedUser.name
 
 				// if a message has a state, it's a status update
 				// TODO: real-time status updates do not work (read is not working because it sends to the wrong person, fix the logic)
 				if (message.state) {
-					const sender = connections.get(message.sender)
-					console.log(message.sender)
-					sendStatusUpdate(message.state, message.id, sender as WebSocket)
+					sendStatusUpdate(message.state, message.id, receiver as WebSocket)
 					return
 				}
 
@@ -50,11 +48,10 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 			} else {
 				if (message.state) {
 					// if message has state (status update), store it in the database
-					// TODO: get the sender id from the message (impossible as of now, as it is not sent from the client)
 					const senderId = (
 						await fastify.prisma.user.findUnique({
 							where: {
-								name: message.sender,
+								name: message.receiver,
 							},
 							select: {
 								id: true,
