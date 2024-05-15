@@ -270,7 +270,7 @@ class ChatProvider with ChangeNotifier {
   ///
   /// ## Parameters
   /// - [messageId]: The unique identifier of the message that has been read.
-  /// - [sender]: The identifier of the sender of the message.
+  /// - [receiver]: The user we want to notify.
   ///
   /// ## Usage
   /// ```dart
