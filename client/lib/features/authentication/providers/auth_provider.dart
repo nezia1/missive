@@ -204,6 +204,9 @@ class AuthProvider extends ChangeNotifier {
 
       return AuthenticationSuccess();
     } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        return DuplicateUserError('User already exists');
+      }
       return AuthenticationError(e.message);
     }
   }
@@ -407,4 +410,9 @@ class TOTPRequiredError extends AuthenticationError {
 /// Represents an error during an authentication attempt due to an invalid TOTP.
 class TOTPInvalidError extends AuthenticationError {
   TOTPInvalidError();
+}
+
+/// Represents an error during a register attempt due to a duplicate username.
+class DuplicateUserError extends AuthenticationError {
+  DuplicateUserError([super.message]);
 }

@@ -36,13 +36,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
             .register(_name, _password);
 
     switch (registerResult) {
+      case AuthenticationSuccess():
+        break;
       case AuthenticationTimeoutError():
         setState(() => _errorMessage =
             'The request timed out (server could not be reached)');
-      case AuthenticationSuccess():
+      case DuplicateUserError():
+        setState(() => _errorMessage = 'User already exists');
+        break;
+      case AuthenticationError():
+        setState(() => _errorMessage = 'An unexpected error occurred');
         break;
       default:
-        setState(() => _errorMessage = 'An unexpected error occurred');
         break;
     }
 
@@ -51,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void displayErrorSnackBar(String message) {
     final errorSnackBar = SnackBar(
-        content: Text('Login failed: $message'),
+        content: Text('Registration failed: $message'),
         action: SnackBarAction(
             label: 'Dismiss',
             onPressed: ScaffoldMessenger.of(context).hideCurrentSnackBar));
