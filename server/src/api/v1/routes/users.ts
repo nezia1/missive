@@ -98,6 +98,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 					password: await argon2.hash(request.body.password),
 					registrationId: request.body.registrationId,
 					identityKey: request.body.identityKey,
+					notificationID: request.body.notificationID,
 				},
 			})
 			const accessToken = await new SignScopedJWT({
