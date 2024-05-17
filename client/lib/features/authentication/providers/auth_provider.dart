@@ -303,7 +303,7 @@ class AuthProvider extends ChangeNotifier {
   /// ```
   void logout() async {
     // TODO: handle offline login
-    _setNotificationID(_user!.id, null);
+    await _setNotificationID(_user!.id, null);
     _user = null;
     // TODO revoke the refresh token from the server, not only client-side
     await _secureStorage.delete(key: 'refreshToken');
