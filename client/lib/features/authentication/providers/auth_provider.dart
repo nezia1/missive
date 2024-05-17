@@ -301,6 +301,7 @@ class AuthProvider extends ChangeNotifier {
   /// provider.logout();
   /// ```
   void logout() async {
+    // TODO: handle offline login
     _setOneSignalID(_user!.id, null);
     _user = null;
     // TODO revoke the refresh token from the server, not only client-side
