@@ -169,6 +169,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 				data: {
 					totp_url:
 						request.body.enable_totp && totp ? totp.toString() : undefined,
+					notificationID: request.body.notificationID,
 				},
 			})
 
