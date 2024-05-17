@@ -166,7 +166,7 @@ class AuthProvider extends ChangeNotifier {
         'identityKey': base64Encode(
           identityKeyPair.getPublicKey().serialize(),
         ),
-        'oneSignalId': Platform.isAndroid || Platform.isIOS
+        'notificationID': Platform.isAndroid || Platform.isIOS
             ? await OneSignal.User.getOnesignalId()
             : null, // get the OneSignal ID that was generated for this device only if user is on mobile
       });
@@ -260,6 +260,13 @@ class AuthProvider extends ChangeNotifier {
       NamespacedSecureStorage storageManager = NamespacedSecureStorage(
           secureStorage: _secureStorage, namespace: name);
 
+      if (Platform.isAndroid || Platform.isIOS) {
+        final payload = jsonDecode(utf8.decode(
+            base64Decode(base64Url.normalize(accessToken.split('.')[1]))));
+        final oneSignalId = await OneSignal.User.getOnesignalId();
+        await _setOneSignalID(payload['sub'], oneSignalId);
+      }
+
       // If user didn't log in yet, we need to install the app
       final firstLogin =
           await storageManager.read(key: 'identityKeyPair') == null;
@@ -294,17 +301,38 @@ class AuthProvider extends ChangeNotifier {
   /// provider.logout();
   /// ```
   void logout() async {
+    _setOneSignalID(_user!.id, null);
+    _user = null;
     // TODO revoke the refresh token from the server, not only client-side
     await _secureStorage.delete(key: 'refreshToken');
     await _secureStorage.delete(key: 'accessToken');
     await _secureStorage.delete(key: 'user');
 
-    _user = null;
-
     await _secureStorage.write(key: 'isLoggedIn', value: 'false');
     _isLoggedIn = false;
-    // TODO: remove OneSignal ID from user, both from the server and from the device
     notifyListeners();
+  }
+
+  /// Sets the OneSignal ID for the currently logged in user, and uploads it to the server.
+  ///
+  /// This method sets the OneSignal ID for the currently logged in user, and uploads it to the server. This is used to send push notifications to the user.
+  ///
+  /// ## Parameters
+  /// - [oneSignalId]: The OneSignal ID to set for the user.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// await _setOneSignalId('onesignal-id');
+  /// ```
+  Future<void> _setOneSignalID(String userID, String? oneSignalID) async {
+    print(await accessToken);
+    await _httpClient.patch('/users/$userID',
+        data: {'notificationID': oneSignalID},
+        options: Options(headers: {
+          'Authorization': 'Bearer ${await accessToken}',
+        }));
+
+    _logger.log(Level.FINE, 'OneSignal ID set for user: $oneSignalID');
   }
 
   /// Loads the user's profile from the server and updates the locally cached user.
