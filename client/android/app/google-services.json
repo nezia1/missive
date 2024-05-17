@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "880440055356",
+    "project_id": "missive-a3896",
+    "storage_bucket": "missive-a3896.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:880440055356:android:b9b4757efbc5200441d539",
+        "android_client_info": {
+          "package_name": "io.nezia.missive"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsNk4fWbQFiAaHh9qu_iU08LT5xBZ63Tc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

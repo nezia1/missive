@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -155,6 +156,7 @@ class AuthProvider extends ChangeNotifier {
   /// AuthenticationResult result = await provider.register('username', 'password');
   /// ```
   Future<AuthenticationResult> register(String name, String password) async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
     try {
       final identityKeyPair = generateIdentityKeyPair();
       final registrationId = generateRegistrationId(false);
@@ -167,7 +169,7 @@ class AuthProvider extends ChangeNotifier {
           identityKeyPair.getPublicKey().serialize(),
         ),
         'notificationID': Platform.isAndroid || Platform.isIOS
-            ? await OneSignal.User.getOnesignalId()
+            ? await messaging.getToken()
             : null, // get the OneSignal ID that was generated for this device only if user is on mobile
       });
 
@@ -263,8 +265,8 @@ class AuthProvider extends ChangeNotifier {
       if (Platform.isAndroid || Platform.isIOS) {
         final payload = jsonDecode(utf8.decode(
             base64Decode(base64Url.normalize(accessToken.split('.')[1]))));
-        final oneSignalId = await OneSignal.User.getOnesignalId();
-        await _setOneSignalID(payload['sub'], oneSignalId);
+        FirebaseMessaging messaging = FirebaseMessaging.instance;
+        await _setNotificationID(payload['sub'], await messaging.getToken());
       }
 
       // If user didn't log in yet, we need to install the app
@@ -302,7 +304,7 @@ class AuthProvider extends ChangeNotifier {
   /// ```
   void logout() async {
     // TODO: handle offline login
-    _setOneSignalID(_user!.id, null);
+    _setNotificationID(_user!.id, null);
     _user = null;
     // TODO revoke the refresh token from the server, not only client-side
     await _secureStorage.delete(key: 'refreshToken');
@@ -325,7 +327,7 @@ class AuthProvider extends ChangeNotifier {
   /// ```dart
   /// await _setOneSignalId('onesignal-id');
   /// ```
-  Future<void> _setOneSignalID(String userID, String? oneSignalID) async {
+  Future<void> _setNotificationID(String userID, String? oneSignalID) async {
     print(await accessToken);
     await _httpClient.patch('/users/$userID',
         data: {'notificationID': oneSignalID},

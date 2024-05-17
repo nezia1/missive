@@ -6,8 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:logging/logging.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 // screens
 import 'package:missive/features/authentication/landing_screen.dart';
@@ -29,6 +31,7 @@ import 'package:missive/constants/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   const secureStorage = FlutterSecureStorage();
   final AuthProvider authProvider =
       AuthProvider(httpClient: dio, secureStorage: secureStorage);
@@ -42,15 +45,15 @@ void main() async {
     });
   }
   if (Platform.isAndroid || Platform.isIOS) {
-    if (kDebugMode) {
-      OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-    }
-
-    OneSignal.initialize(
-        const String.fromEnvironment('ONESIGNAL_APP_ID', defaultValue: ''));
-
-// The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
-    OneSignal.Notifications.requestPermission(true);
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      provisional: false,
+      sound: true,
+    );
   }
 
   runApp(Missive(
