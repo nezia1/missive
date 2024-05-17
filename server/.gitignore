@@ -182,3 +182,6 @@ venv
 
 # OpenSSL keys
 *.pem
+
+# Firebase
+service-account-file.json

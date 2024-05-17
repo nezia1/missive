@@ -10,6 +10,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    env_file:
+      - path: server/.env
+        required: true
 
   db:
     image: postgres:13

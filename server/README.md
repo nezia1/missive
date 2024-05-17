@@ -24,6 +24,10 @@ Après avoir cloné le dépôt en local et installé les prérequis, il faut cr�
 - `DATABASE_URL` : URL de la base de données (URI standard Postgres)
 - `COOKIE_SECRET` : Clé secrète pour les cookies
 
+#### Ajout du fichier de configuration pour Firebase Admin SDK
+
+Afin de pouvoir envoyer des notifications, il est nécessaire d'ajouter un fichier de configuration pour Firebase Admin SDK (Firebase Cloud Messaging est utilisé). Pour cela, il faut créer un compte de service sur Firebase et télécharger le fichier de configuration. Une fois cela fait, il faut ajouter le fichier `service-account-file.json` à la racine du dossier `server`.
+
 #### Génération des clés
 
 Il faudra également générer les clés pour signer les tokens JWT. Pour cela, vous pouvez utiliser les commandes suivantes :

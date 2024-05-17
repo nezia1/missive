@@ -1,10 +1,17 @@
-import { type Prisma, Status } from '@prisma/client'
+import { Status } from '@prisma/client'
 import type { FastifyPluginCallback } from 'fastify'
 
 import { authenticationHook } from '@/hooks'
 import { exclude, parseGenericError } from '@/utils'
+import { initializeApp } from 'firebase-admin/app'
+import {
+	type Message as FirebaseMessage,
+	getMessaging,
+} from 'firebase-admin/messaging'
 
 const connections = new Map<string, WebSocket>()
+initializeApp()
+
 const websocket: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.addHook('preParsing', authenticationHook)
 	fastify.get('/', { websocket: true }, (socket, req) => {
@@ -111,7 +118,16 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				})
 
 				sendStatusUpdate(Status.RECEIVED, message.id, socket)
+				if (!offlineReceiver.notificationID) return
+
 				// TODO send push notification to the receiver
+				const firebaseMessage: FirebaseMessage = {
+					token: offlineReceiver.notificationID,
+					notification: {
+						title: `New message from ${req.authenticatedUser.name}`,
+					},
+				}
+				await getMessaging().send(firebaseMessage)
 			}
 		})
 
