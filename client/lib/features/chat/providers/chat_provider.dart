@@ -38,6 +38,7 @@ class ChatProvider with ChangeNotifier {
   Realm? _userRealm;
   StreamSubscription? _messagesSubscription;
   final Logger _logger = Logger('ChatProvider');
+  bool _disposed = false;
 
   Timer? _reconnectionTimer;
   bool _connected = false;
@@ -164,13 +165,13 @@ class ChatProvider with ChangeNotifier {
   }
 
   void _handleConnectionClosed() {
-    _logger.log(Level.WARNING,
-        'WebSocket connection closed. Attempting to reconnect...');
+    _logger.log(Level.WARNING, 'WebSocket connection closed.');
     _channel = null;
     _scheduleReconnection();
   }
 
   void _scheduleReconnection() {
+    if (_disposed) return;
     if (_reconnectionTimer != null && _reconnectionTimer!.isActive) return;
 
     _reconnectionAttempts++;
@@ -412,7 +413,8 @@ class ChatProvider with ChangeNotifier {
   /// ```dart
   /// provider.setupUserRealm();
   /// ```
-  void setupUserRealm() async {
+  Future<void> setupUserRealm() async {
+    _logger.log(Level.FINE, 'Setting up user Realm...');
     _userRealm = await _getUserRealm();
     if (_userRealm == null) {
       throw InitializationError('User Realm is not initialized');
@@ -420,6 +422,7 @@ class ChatProvider with ChangeNotifier {
     // initialize messages
     final conversations = _userRealm!.all<Conversation>();
     _conversations = conversations.toList();
+    _logger.log(Level.FINE, 'User realm setup complete');
 
     notifyListeners(); // update UI with initial data load
 
@@ -615,6 +618,7 @@ class ChatProvider with ChangeNotifier {
   /// ```
   @override
   void dispose() {
+    _disposed = true;
     _logger.log(Level.FINE, 'Disposing... (this should happen after log out)');
     if (_channel != null) {
       _channel?.sink.close();

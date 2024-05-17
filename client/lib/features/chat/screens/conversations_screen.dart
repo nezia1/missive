@@ -40,27 +40,14 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
 
   /// Initializes stores, providers, and fetches pending data. It also installs the app (generates all required keys and upload them) in case it's the first time the user opens the appa.
   Future<void> initialize() async {
-    final prefs = await SharedPreferences.getInstance();
-    final name = (await _userProvider.user)?.name;
-
-    _logger.log(Level.INFO, 'installed state: ${prefs.getBool('installed')}');
-    if (prefs.getBool('installed') == false) {
-      await _signalProvider.initialize(
-        installing: true,
-        name: name!,
-        accessToken: await _userProvider.accessToken,
-      );
-      prefs.setBool('installed', true);
-    } else {
-      await _signalProvider.initialize(installing: false, name: name!);
-    }
-
-    _chatProvider.setupUserRealm();
+    await _initializeSignalAsNeeded();
+    await _chatProvider.setupUserRealm();
     try {
       _chatProvider.fetchPendingMessages();
       _chatProvider.fetchMessageStatuses();
     } catch (e) {
-      _logger.log(Level.WARNING, 'Error fetching pending messages: $e');
+      _logger.log(Level.WARNING,
+          'Error fetching pending messages: $e (error of type ${e.runtimeType})');
     }
     await _chatProvider.connect();
   }
@@ -188,6 +175,24 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
             ),
           );
         });
+  }
+
+  /// This function initializes the Signal protocol, and installs it if it's the first time the user opens the app.
+  Future<void> _initializeSignalAsNeeded() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = (await _userProvider.user)?.name;
+
+    _logger.log(Level.INFO, 'installed state: ${prefs.getBool('installed')}');
+    if (prefs.getBool('installed') == false) {
+      await _signalProvider.initialize(
+        installing: true,
+        name: name!,
+        accessToken: await _userProvider.accessToken,
+      );
+      prefs.setBool('installed', true);
+    } else {
+      await _signalProvider.initialize(installing: false, name: name!);
+    }
   }
 
   @override
