@@ -21,6 +21,7 @@ model User {
   identityKey     String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+  notificationID  String? // OneSignal player ID, generic name in case we want to switch to another provider. This should be an array whenever we want to implement multi-devices, or a separate Device model completely. Latter might be better.
   tokens          RefreshToken[]
   pendingMessages PendingMessage[] @relation("ReceivedMessages")
   // this is a virtual relation to comply with Prisma's limitation of not being able to have a relation with the same model twice if one of them is unidirectional
