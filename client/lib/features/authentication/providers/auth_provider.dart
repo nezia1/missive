@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:logging/logging.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:missive/common/http.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
