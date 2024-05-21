@@ -39,8 +39,12 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 
 Assurez vous de les générer à la racine du dossier `api`.
 
-Pour lancer le serveur en mode développement :
+#### Lancement du serveur en mode développement
+
+Le serveur de Missive utilise Docker, afin d'avoir un environnement de développement similaire à celui de production, et reproducible. Pour lancer le serveur en mode développement, voici les étapes à suivre :
 
 ```bash
-npm run dev
+cd .. # Pour revenir à la racine du projet
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d # Pour lancer le serveur en mode développement
+docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f # Pour voir les logs du serveur (possible de filtrer par service)
 ```
