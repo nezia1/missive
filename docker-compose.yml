@@ -1,7 +1,6 @@
 services:
   app:
-    build: 
-      context: server/.
+    image: nezia/missive-server:v1
     depends_on:
       - db
 
