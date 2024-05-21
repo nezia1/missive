@@ -12,3 +12,4 @@ services:
     volumes: 
       - ./server/private_key.pem:/app/private_key.pem
       - ./server/public_key.pem:/app/public_key.pem
+      - ./server/service-account-file.json:/app/service-account-file.json
