@@ -6,10 +6,6 @@ services:
 
   db:
     image: postgres:13
-    environment:
-      POSTGRES_USER: prisma
-      POSTGRES_PASSWORD: prisma
-      POSTGRES_DB: prisma
     volumes:
       - postgres_data:/var/lib/postgresql/data
   caddy:

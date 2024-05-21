@@ -154,21 +154,25 @@ export function exclude<T>(model: T, excludedFields: (keyof T)[]): Partial<T> {
  * @returns {Object} - An object containing the private and public keys as strings.
  */
 export function loadKeys() {
-	const __dirname = path.dirname(fileURLToPath(import.meta.url))
+	const isProduction = process.env.NODE_ENV === 'production'
+	const __dirname = isProduction
+		? '/run/secrets'
+		: path.dirname(fileURLToPath(import.meta.url))
 
-	const privateKeyPem = fs.readFileSync(
-		path.join(__dirname, '../private_key.pem'),
-		{
-			encoding: 'utf-8',
-		},
+	const privateKeyPath = path.join(
+		process.env.PRIVATE_KEY_PATH || '../private_key.pem',
+	)
+	const publicKeyPath = path.join(
+		process.env.PUBLIC_KEY_PATH || '../public_key.pem',
 	)
 
-	const publicKeyPem = fs.readFileSync(
-		path.join(__dirname, '../public_key.pem'),
-		{
-			encoding: 'utf-8',
-		},
-	)
+	const privateKeyPem = fs.readFileSync(privateKeyPath, {
+		encoding: 'utf-8',
+	})
+
+	const publicKeyPem = fs.readFileSync(publicKeyPath, {
+		encoding: 'utf-8',
+	})
 
 	return { privateKeyPem, publicKeyPem }
 }
