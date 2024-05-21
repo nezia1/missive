@@ -1,5 +1,4 @@
 FROM node:20-alpine as builder
-ARG DATABASE_URL
 WORKDIR /app
 
 COPY package*.json ./
@@ -9,9 +8,11 @@ RUN npm install
 
 COPY . .
 
-FROM node:20
-ARG DATABASE_URL
+FROM node:20-alpine
 WORKDIR /app
+
+# needed for wait-for-it.sh
+RUN apk add --no-cache bash 
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/ .
