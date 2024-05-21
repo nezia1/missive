@@ -2,17 +2,8 @@ services:
   app:
     build: 
       context: server/.
-    environment:
-      DATABASE_URL: postgresql://prisma:prisma@db:5432/missive?schema=public
-      API_KEY: secret
-      JWT_SECRET: secret
-      COOKIE_SECRET: secret
     depends_on:
-      db:
-        condition: service_healthy
-    env_file:
-      - path: server/.env
-        required: true
+      - db
 
   db:
     image: postgres:13
@@ -22,10 +13,6 @@ services:
       POSTGRES_DB: prisma
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U prisma"]
-      interval: 5s
-      retries: 5
   caddy:
     image: caddy:2
     environment:

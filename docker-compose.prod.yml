@@ -1,3 +1,4 @@
+
 services:
   caddy:
     volumes:
@@ -8,4 +9,40 @@ services:
       - db
     env_file:
       - pgadmin.env
+  app: 
+    secrets:
+      - db_user
+      - db_password
+      - private_key
+      - public_key
+      - google_application_credentials
+    build:
+      args:
+        NODE_ENV: production
+    environment:
+      NODE_ENV: production
 
+  db:
+    secrets:
+      - db_user
+      - db_password
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/db_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/db_user)"]
+      interval: 5s
+      retries: 5
+        
+secrets:
+  db_user:
+    external: true
+  db_password:
+    external: true
+  private_key:
+    external: true
+  public_key:
+    external: true
+  google_application_credentials:
+    external: true
+    
