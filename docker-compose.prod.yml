@@ -10,6 +10,7 @@ services:
     env_file:
       - pgadmin.env
   app: 
+    image: nezia/missive-server:v1
     secrets:
       - db_user
       - db_password

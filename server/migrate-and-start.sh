@@ -8,8 +8,6 @@ if [ "$NODE_ENV" = "production" ]; then
     npm start
 else 
     npx prisma migrate dev 
-    export PRIVATE_KEY_PATH=../private_key.pem
-    export PUBLIC_KEY_PATH=../public_key.pem
     npm run dev
 fi
 

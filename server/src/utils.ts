@@ -160,11 +160,12 @@ export function loadKeys() {
 		: path.dirname(fileURLToPath(import.meta.url))
 
 	const privateKeyPath = path.join(
-		process.env.PRIVATE_KEY_PATH || '../private_key.pem',
+		process.env.PRIVATE_KEY_PATH || path.join(__dirname, '../private_key.pem'),
 	)
 	const publicKeyPath = path.join(
-		process.env.PUBLIC_KEY_PATH || '../public_key.pem',
+		process.env.PUBLIC_KEY_PATH || path.join(__dirname, '../public_key.pem'),
 	)
+	console.log(publicKeyPath)
 
 	const privateKeyPem = fs.readFileSync(privateKeyPath, {
 		encoding: 'utf-8',
