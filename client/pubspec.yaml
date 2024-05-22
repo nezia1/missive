@@ -67,6 +67,20 @@ dev_dependencies:
   mockito: ^5.4.4
   build_runner: ^2.4.8
   test: ^1.24.9
+  flutter_launcher_icons: "^0.13.1"
+
+flutter_launcher_icons:
+  image_path: "assets/missive_app_logo.png" 
+  adaptive_icon_foreground: "assets/missive_logo.png"
+  adaptive_icon_background: "#625D92"
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/missive_logo.png"
+    background_color: "#625D92"
+    theme_color: "#625D92"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
