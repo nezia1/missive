@@ -48,6 +48,7 @@ void main() async {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
     FirebaseMessaging messaging = FirebaseMessaging.instance;
+    if (Platform.isIOS) await messaging.getAPNSToken();
     await messaging.requestPermission(
       alert: true,
       badge: true,

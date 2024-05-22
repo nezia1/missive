@@ -159,6 +159,15 @@ class AuthProvider extends ChangeNotifier {
     try {
       final identityKeyPair = generateIdentityKeyPair();
       final registrationId = generateRegistrationId(false);
+      final String? notificationId;
+
+      if (Platform.isAndroid) {
+        notificationId = await messaging.getToken();
+      } else if (Platform.isIOS) {
+        notificationId = await messaging.getAPNSToken();
+      } else {
+        notificationId = null;
+      }
 
       final requestBody = jsonEncode({
         'name': name,
@@ -167,9 +176,7 @@ class AuthProvider extends ChangeNotifier {
         'identityKey': base64Encode(
           identityKeyPair.getPublicKey().serialize(),
         ),
-        'notificationID': Platform.isAndroid || Platform.isIOS
-            ? await messaging.getToken()
-            : null, // get the OneSignal ID that was generated for this device only if user is on mobile
+        'notificationID': notificationId
       });
 
       final response = await _httpClient
@@ -379,7 +386,13 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> initializeLoginState() async {
-    final isLoggedIn = await _secureStorage.read(key: 'isLoggedIn');
+    final String? isLoggedIn;
+    try {
+      isLoggedIn = await _secureStorage.read(key: 'isLoggedIn');
+    } catch (e) {
+      _logger.log(Level.WARNING, e.toString());
+      return;
+    }
     _isLoggedIn = isLoggedIn == 'true';
     notifyListeners();
   }

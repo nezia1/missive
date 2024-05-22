@@ -2,13 +2,12 @@ services:
   caddy:
     volumes:
       - ./dev.Caddyfile:/etc/caddy/Caddyfile
-    networks: 
-      - missive-dev
   db:
     ports:
       - "5432:5432"
-    networks: 
-      - missive-dev
+    env_file:
+      - path: server/.dev.env
+        required: true
   app:
     build:
       context: ./server
@@ -18,8 +17,3 @@ services:
         required: true
     volumes: 
       - ./server:/app
-    networks: 
-      - missive-dev
-networks: 
-  missive-dev:
-    driver: bridge
