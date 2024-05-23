@@ -16,6 +16,7 @@ async function main() {
 	})
 
 	for (const user of sampleUsers) {
+		console.log('Creating user:', user)
 		const { name, password } = user
 
 		const hashedPassword = await argon2.hash(password)
@@ -26,9 +27,11 @@ async function main() {
 				totp_url: user.totp ? totp.toString() : null,
 			},
 		})
+		console.log('User created:', user)
 	}
 }
 
+console.log('Trying to run main()')
 await main()
 	.then(async () => {
 		await prisma.$disconnect()
