@@ -5,7 +5,7 @@
 	"scripts": {
 		"start": "tsx index.ts",
 		"dev": "tsx --watch index.ts",
-		"test": "test -f .env && tsx --env-file=.env --test src/**/*.test.ts || tsx --test src/**/*.test.ts"
+		"test": "test -f .env && tsx --env-file=.env --test-reporter node-test-junit-reporter --test-reporter-destination report.xml --test src/**/*.test.ts || tsx --test-reporter node-test-junit-reporter --test-reporter-destination report.xml --test src/**/*.test.ts"
 	},
 	"prisma": {
 		"seed": "tsx prisma/seed.ts"
@@ -15,6 +15,7 @@
 		"@types/node": "^20.10.3",
 		"@types/ws": "^8.5.10",
 		"bun-types": "latest",
+		"node-test-junit-reporter": "^1.1.5",
 		"prisma": "5.10.2",
 		"prisma-dbml-generator": "^0.12.0",
 		"tsx": "^4.7.1",

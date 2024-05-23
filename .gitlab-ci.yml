@@ -18,7 +18,6 @@ variables:
 server_unit_tests:
   image: node:latest
   stage: test
-  cache: []
   services:
     - name: postgres:13
       alias: db
@@ -37,6 +36,9 @@ server_unit_tests:
     - openssl rsa -pubout -in private_key.pem -out public_key.pem
   script:
     - npm test
+  artifacts:
+    reports:
+      junit: server/report.xml
     
 
 flutter_unit_tests:
