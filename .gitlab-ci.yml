@@ -39,6 +39,10 @@ server_unit_tests:
   artifacts:
     reports:
       junit: server/report.xml
+  rules:
+    - changes:
+      - server/**/*
+
     
 
 flutter_unit_tests:
