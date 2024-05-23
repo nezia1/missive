@@ -7,8 +7,6 @@ stages:
 
 variables:
   PIP_CACHE_DIR: '$CI_PROJECT_DIR/.cache/pip'
-  GIT_SUBMODULE_STRATEGY: recursive
-  GIT_SUBMODULE_FORCE_HTTPS: 'true'
 
 .prepare_python_docs: &prepare_python_docs
   - cd documentation
@@ -18,21 +16,25 @@ variables:
   - pip install -r requirements.txt
 
 server_unit_tests:
-  image: node:21
+  image: node:latest
   stage: test
+  cache: []
   services:
     - name: postgres:13
       alias: db
   variables: 
-    POSTGRES_DB: test
     POSTGRES_USER: test
     POSTGRES_PASSWORD: test
     DATABASE_URL: postgres://test:test@db:5432/test
+    COOKIE_SECRET: test
   before_script:
     - cd server
     - npm install
     - npx prisma generate
-    - npx prisma migrate dev
+    - npx prisma migrate deploy
+    - npx prisma db seed
+    - openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+    - openssl rsa -pubout -in private_key.pem -out public_key.pem
   script:
     - npm test
     
@@ -79,6 +81,8 @@ build_mkdocs:
       - '.cache/pip'
   variables:
     ENABLE_PDF_EXPORT: 1
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SUBMODULE_FORCE_HTTPS: 'true'
   script:
     - *prepare_python_docs
     - 'mkdocs build --verbose --site-dir public'
