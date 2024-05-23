@@ -1,6 +1,6 @@
 [submodule "documentation"]
 	path = documentation
-	url = ../missive-documentation.git
+	url = git@gitlab.ictge.ch:anthony-rdrgz/missive-documentation.git
 [submodule "poc"]
 	path = poc
-	url = ../missive-poc.git
+	url = git@gitlab.ictge.ch:anthony-rdrgz/missive-poc.git
