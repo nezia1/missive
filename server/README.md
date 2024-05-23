@@ -39,6 +39,10 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 
 Assurez vous de les générer à la racine du dossier `api`.
 
+#### Ajout du compte de service pour Firebase
+
+Missive utilise FCM, qui lui permet d'envoyer des notifications push. Pour cela, il est nécessaire de créer un compte de service sur Firebase, et de télécharger le fichier de configuration. Une fois cela fait, il faut ajouter le fichier `service-account-file.json` à la racine du dossier `server`. Vous trouverez plus d'informations sur la [documentation officielle de Firebase](https://firebase.google.com/docs/admin/setup#initialize-sdk).
+
 #### Lancement du serveur en mode développement
 
 Le serveur de Missive utilise Docker, afin d'avoir un environnement de développement similaire à celui de production, et reproducible. Pour lancer le serveur en mode développement, voici les étapes à suivre :
