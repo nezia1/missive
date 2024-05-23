@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:missive/features/authentication/models/user.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
@@ -27,7 +29,10 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   late SecureStorageIdentityKeyStore identityKeyStore;
   late ChatProvider _chatProvider;
   late Future _initialization;
+  late User? _user;
   final Logger _logger = Logger('ConversationsScreen');
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<
+      ScaffoldState>(); // needed to show the snackbar above the drawer
 
   @override
   void initState() {
@@ -50,10 +55,13 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
           'Error fetching pending messages: $e (error of type ${e.runtimeType})');
     }
     await _chatProvider.connect();
+    if (!mounted) return;
+    _user = await Provider.of<AuthProvider>(context, listen: false).user;
   }
 
   Widget _buildBody() {
     return Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -78,33 +86,45 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
             )),
         drawer: Drawer(
           backgroundColor: Theme.of(context).canvasColor,
-          child: ListView(
+          child: Column(
             children: [
               SizedBox(
-                height: 70,
-                child: DrawerHeader(
-                    child: TextButton.icon(
-                        label: const Text('Logout'),
-                        icon: const Icon(Icons.logout),
-                        onPressed: () {
-                          _userProvider.logout();
-                        })),
-              ),
-              if (kDebugMode)
-                SizedBox(
-                  height: 70,
-                  child: DrawerHeader(
-                      child: TextButton.icon(
-                          label: const Text('Delete all data and logout'),
-                          icon: const Icon(Icons.logout),
-                          onPressed: () {
-                            FlutterSecureStorage storage =
-                                const FlutterSecureStorage();
-                            storage.deleteAll().then(
-                                  (value) => _userProvider.logout(),
-                                );
-                          })),
+                  height: 60,
+                  child: Center(
+                    child: SelectableText(_user!.name,
+                        style: Theme.of(context).textTheme.headlineMedium),
+                  )),
+              Expanded(
+                child: ListView(
+                  children: [
+                    SizedBox(
+                      height: 70,
+                      child: DrawerHeader(
+                          child: TextButton.icon(
+                              label: const Text('Logout'),
+                              icon: const Icon(Icons.logout),
+                              onPressed: () {
+                                _userProvider.logout();
+                              })),
+                    ),
+                    if (kDebugMode)
+                      SizedBox(
+                        height: 70,
+                        child: DrawerHeader(
+                            child: TextButton.icon(
+                                label: const Text('Delete all data and logout'),
+                                icon: const Icon(Icons.logout),
+                                onPressed: () {
+                                  FlutterSecureStorage storage =
+                                      const FlutterSecureStorage();
+                                  storage.deleteAll().then(
+                                        (value) => _userProvider.logout(),
+                                      );
+                                })),
+                      ),
+                  ],
                 ),
+              ),
             ],
           ),
         ),
