@@ -17,6 +17,26 @@ variables:
   - pip install --upgrade pip
   - pip install -r requirements.txt
 
+server_unit_tests:
+  image: node:21
+  stage: test
+  services:
+    - name: postgres:13
+      alias: db
+  variables: 
+    POSTGRES_DB: test
+    POSTGRES_USER: test
+    POSTGRES_PASSWORD: test
+    DATABASE_URL: postgres://test:test@db:5432/test
+  before_script:
+    - cd server
+    - npm install
+    - npx prisma generate
+    - npx prisma migrate dev
+  script:
+    - npm test
+    
+
 flutter_unit_tests:
   image: ghcr.io/cirruslabs/flutter:3.19.6
   stage: test
