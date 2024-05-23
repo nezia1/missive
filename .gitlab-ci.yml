@@ -15,7 +15,7 @@ variables:
   - pip install --upgrade pip
   - pip install -r requirements.txt
 
-server_unit_tests:
+server-unit-tests:
   image: node:latest
   stage: test
   services:
@@ -45,7 +45,7 @@ server_unit_tests:
 
     
 
-flutter_unit_tests:
+client-unit-tests:
   image: ghcr.io/cirruslabs/flutter:3.19.6
   stage: test
   script:
@@ -65,7 +65,7 @@ flutter_unit_tests:
     - changes:
       - client/**/*
 
-build_flutter_docs:
+build-client-docs:
   image: ghcr.io/cirruslabs/flutter:3.19.6
   stage: build
   cache:
@@ -79,7 +79,7 @@ build_flutter_docs:
     paths:
       - client/public
 
-build_mkdocs:
+build-server-docs:
   stage: build
   cache:
     key: '${CI_COMMIT_REF_SLUG}-mkdocs'
