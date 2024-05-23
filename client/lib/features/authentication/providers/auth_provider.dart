@@ -155,15 +155,16 @@ class AuthProvider extends ChangeNotifier {
   /// AuthenticationResult result = await provider.register('username', 'password');
   /// ```
   Future<AuthenticationResult> register(String name, String password) async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
     try {
       final identityKeyPair = generateIdentityKeyPair();
       final registrationId = generateRegistrationId(false);
       final String? notificationId;
 
       if (Platform.isAndroid) {
+        FirebaseMessaging messaging = FirebaseMessaging.instance;
         notificationId = await messaging.getToken();
       } else if (Platform.isIOS) {
+        FirebaseMessaging messaging = FirebaseMessaging.instance;
         notificationId = await messaging.getAPNSToken();
       } else {
         notificationId = null;
