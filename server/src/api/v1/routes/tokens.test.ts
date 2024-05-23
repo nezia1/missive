@@ -36,8 +36,8 @@ describe('POST /v1/tokens', async () => {
 		},
 	})
 
-	it('should have a 201 CREATED status code on successful login', () => {
-		assert.strictEqual(successfulResponseWithoutTOTP.statusCode, 201)
+	it('should have a 200 SUCCESS status code on successful login', () => {
+		assert.strictEqual(successfulResponseWithoutTOTP.statusCode, 200)
 	})
 
 	it('should respond with status: totp_required field when using TOTP', () => {
