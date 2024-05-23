@@ -5,8 +5,8 @@ import { sampleUsers } from '@/constants'
 import { loadKeys } from '@/utils'
 import { importSPKI, jwtVerify } from 'jose'
 
-const userWithTOTP = sampleUsers[0]
-const userWithoutTOTP = sampleUsers[1]
+const userWithTOTP = sampleUsers[1]
+const userWithoutTOTP = sampleUsers[0]
 
 const successfulResponseWithoutTOTP = await app.inject({
 	method: 'POST',
@@ -36,8 +36,8 @@ describe('POST /v1/tokens', async () => {
 		},
 	})
 
-	it('should have a 200 SUCCESS status code on successful login', () => {
-		assert.strictEqual(successfulResponseWithoutTOTP.statusCode, 200)
+	it('should have a 201 CREATED status code on successful login', () => {
+		assert.strictEqual(successfulResponseWithoutTOTP.statusCode, 201)
 	})
 
 	it('should respond with status: totp_required field when using TOTP', () => {
