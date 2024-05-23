@@ -96,7 +96,7 @@ build-server-docs:
     paths:
       - documentation/public
   dependencies:
-    - build_flutter_docs
+    - build-client-docs
 
 pages:
   stage: deploy
