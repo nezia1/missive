@@ -129,7 +129,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				token: receiver.notificationID,
 				notification: {
 					title: `${req.authenticatedUser.name}`,
-					body: message.content,
+					body: 'New message',
 				},
 			}
 			await getMessaging().send(firebaseMessage)
