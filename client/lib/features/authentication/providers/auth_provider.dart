@@ -163,12 +163,9 @@ class AuthProvider extends ChangeNotifier {
       final registrationId = generateRegistrationId(false);
       final String? notificationId;
 
-      if (Platform.isAndroid) {
+      if (Platform.isAndroid || Platform.isIOS) {
         FirebaseMessaging messaging = FirebaseMessaging.instance;
         notificationId = await messaging.getToken();
-      } else if (Platform.isIOS) {
-        FirebaseMessaging messaging = FirebaseMessaging.instance;
-        notificationId = await messaging.getAPNSToken();
       } else {
         notificationId = null;
       }
@@ -276,12 +273,7 @@ class AuthProvider extends ChangeNotifier {
         final payload = jsonDecode(utf8.decode(
             base64Decode(base64Url.normalize(accessToken.split('.')[1]))));
         FirebaseMessaging messaging = FirebaseMessaging.instance;
-        if (Platform.isAndroid) {
-          await _setNotificationID(payload['sub'], await messaging.getToken());
-        } else if (Platform.isIOS) {
-          await _setNotificationID(
-              payload['sub'], await messaging.getAPNSToken());
-        }
+        await _setNotificationID(payload['sub'], await messaging.getToken());
       }
 
       // If user didn't log in yet, we need to install the app
