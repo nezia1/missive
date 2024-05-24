@@ -59,11 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAmWFKj8yOskzpBBqQgVzRKsqIvT_Z-MME',
-    appId: '1:880440055356:ios:8c5eda28c6a7e88141d539',
+    appId: '1:880440055356:ios:21116ae9c6e3238641d539',
     messagingSenderId: '880440055356',
     projectId: 'missive-a3896',
     storageBucket: 'missive-a3896.appspot.com',
-    iosBundleId: 'com.example.client',
+    iosBundleId: 'io.nezia.missive',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
