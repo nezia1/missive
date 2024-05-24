@@ -33,24 +33,40 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 			message.state = message.state?.toUpperCase() as Status
 			message.sender = req.authenticatedUser.name
 
-			console.log(message)
 			// If message has no state, it's a new message (not a status update)
 			if (!message.state) sendStatusUpdate(Status.SENT, message.id, socket)
+
+			// Check if receiver exists
+			const receiver = await fastify.prisma.user.findUnique({
+				where: {
+					name: message.receiver,
+				},
+			})
+			if (!receiver)
+				return socket.send(
+					JSON.stringify({
+						error: 'Receiver not found',
+					}),
+				)
 
 			// Receiver is online
 			if (connections.has(message.receiver)) {
 				// if message has state (status update), send it to the receiver
 
-				const receiver = connections.get(message.receiver)
+				const receiverChannel = connections.get(message.receiver)
 
 				// if a message has a state, it's a status update
 				// TODO: real-time status updates do not work (read is not working because it sends to the wrong person, fix the logic)
 				if (message.state) {
-					sendStatusUpdate(message.state, message.id, receiver as WebSocket)
+					sendStatusUpdate(
+						message.state,
+						message.id,
+						receiverChannel as WebSocket,
+					)
 					return
 				}
 
-				receiver?.send(JSON.stringify(exclude(message, ['receiver'])))
+				receiverChannel?.send(JSON.stringify(exclude(message, ['receiver'])))
 				sendStatusUpdate(Status.RECEIVED, message.id, socket)
 			} else {
 				if (message.state) {
@@ -77,20 +93,6 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 
 					return
 				}
-				// Check if receiver exists
-				const offlineReceiver = await fastify.prisma.user.findUnique({
-					where: {
-						name: message.receiver,
-					},
-				})
-
-				if (!offlineReceiver)
-					return socket.send(
-						JSON.stringify({
-							error: 'Receiver not found',
-						}),
-					)
-
 				const pendingMessage = await fastify.prisma.pendingMessage.create({
 					// add receiver id to the pending message
 					data: {
@@ -118,17 +120,16 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				})
 
 				sendStatusUpdate(Status.RECEIVED, message.id, socket)
-				if (!offlineReceiver.notificationID) return
-
-				// TODO send push notification to the receiver
-				const firebaseMessage: FirebaseMessage = {
-					token: offlineReceiver.notificationID,
-					notification: {
-						title: `New message from ${req.authenticatedUser.name}`,
-					},
-				}
-				await getMessaging().send(firebaseMessage)
 			}
+			if (!receiver.notificationID) return
+			const firebaseMessage: FirebaseMessage = {
+				token: receiver.notificationID,
+				notification: {
+					title: `${req.authenticatedUser.name}`,
+					body: message.content,
+				},
+			}
+			await getMessaging().send(firebaseMessage)
 		})
 
 		socket.on('close', () => {
