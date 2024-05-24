@@ -122,6 +122,9 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				sendStatusUpdate(Status.RECEIVED, message.id, socket)
 			}
 			if (!receiver.notificationID) return
+			console.log(
+				`Sending notification to ${receiver.notificationID} (${receiver.name})`,
+			)
 			const firebaseMessage: FirebaseMessage = {
 				token: receiver.notificationID,
 				notification: {
@@ -130,6 +133,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				},
 			}
 			await getMessaging().send(firebaseMessage)
+			console.log('Notification sent')
 		})
 
 		socket.on('close', () => {
