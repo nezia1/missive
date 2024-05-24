@@ -29,16 +29,18 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
 
   @override
   Future<IdentityKey?> getIdentity(SignalProtocolAddress address) async {
-    final identityKeyString =
-        await _secureStorage.read(key: address.toString());
+    final identityKeyString = await _secureStorage
+        .read(key: address.toString())
+        .catchError((_) => null);
     if (identityKeyString == null) return null;
     return IdentityKey.fromBytes(base64Decode(identityKeyString), 0);
   }
 
   @override
   Future<IdentityKeyPair> getIdentityKeyPair() async {
-    final identityKeyPairString =
-        await _secureStorage.read(key: 'identityKeyPair');
+    final identityKeyPairString = await _secureStorage
+        .read(key: 'identityKeyPair')
+        .catchError((_) => null);
 
     if (identityKeyPairString == null) {
       throw Exception('Identity key pair not found');
@@ -49,7 +51,9 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
 
   @override
   Future<int> getLocalRegistrationId() async {
-    final registrationId = await _secureStorage.read(key: 'registrationId');
+    final registrationId = await _secureStorage
+        .read(key: 'registrationId')
+        .catchError((_) => null);
 
     if (registrationId == null) throw Exception('Registration ID not found');
 

@@ -51,7 +51,8 @@ class AuthProvider extends ChangeNotifier {
   /// String? token = await provider.accessToken;
   /// ```
   Future<String?> get accessToken async {
-    var token = await _secureStorage.read(key: 'accessToken');
+    var token =
+        await _secureStorage.read(key: 'accessToken').catchError((_) => null);
 
     if (token == null) return null;
 
@@ -111,7 +112,9 @@ class AuthProvider extends ChangeNotifier {
   /// String? token = await provider.refreshToken;
   /// ```
   Future<String?> get refreshToken async {
-    return await _secureStorage.read(key: 'refreshToken');
+    return await _secureStorage
+        .read(key: 'refreshToken')
+        .catchError((_) => null);
   }
 
   /// Returns the currently authenticated [User], or null if it's not available.
@@ -273,12 +276,19 @@ class AuthProvider extends ChangeNotifier {
         final payload = jsonDecode(utf8.decode(
             base64Decode(base64Url.normalize(accessToken.split('.')[1]))));
         FirebaseMessaging messaging = FirebaseMessaging.instance;
-        await _setNotificationID(payload['sub'], await messaging.getToken());
+        if (Platform.isAndroid) {
+          await _setNotificationID(payload['sub'], await messaging.getToken());
+        } else if (Platform.isIOS) {
+          await _setNotificationID(
+              payload['sub'], await messaging.getAPNSToken());
+        }
       }
 
       // If user didn't log in yet, we need to install the app
-      final firstLogin =
-          await storageManager.read(key: 'identityKeyPair') == null;
+      final firstLogin = await storageManager
+              .read(key: 'identityKeyPair')
+              .catchError((_) => null) ==
+          null;
       _logger.log(Level.INFO, 'first time logged in: $firstLogin');
       if (firstLogin) {
         (await SharedPreferences.getInstance()).setBool('installed', false);
@@ -311,12 +321,18 @@ class AuthProvider extends ChangeNotifier {
   /// ```
   void logout() async {
     // TODO: handle offline login
-    await _setNotificationID(_user!.id, null);
+    // await _setNotificationID(_user!.id, null);
     _user = null;
     // TODO revoke the refresh token from the server, not only client-side
-    await _secureStorage.delete(key: 'refreshToken');
-    await _secureStorage.delete(key: 'accessToken');
-    await _secureStorage.delete(key: 'user');
+    await _secureStorage.delete(key: 'refreshToken').catchError((e) {
+      _logger.log(Level.WARNING, e.toString());
+    });
+    await _secureStorage.delete(key: 'accessToken').catchError((e) {
+      _logger.log(Level.WARNING, e.toString());
+    });
+    await _secureStorage.delete(key: 'user').catchError((e) {
+      _logger.log(Level.WARNING, e.toString());
+    });
 
     await _secureStorage.write(key: 'isLoggedIn', value: 'false');
     _isLoggedIn = false;
@@ -360,7 +376,9 @@ class AuthProvider extends ChangeNotifier {
       return;
     }
 
-    final storedUser = await _secureStorage.read(key: 'user');
+    final storedUser =
+        await _secureStorage.read(key: 'user').catchError((_) => null);
+
     if (storedUser != null) {
       _user = User.fromJson(jsonDecode(storedUser));
       _logger.log(Level.FINE, 'User loaded from storage: $_user');
@@ -389,7 +407,8 @@ class AuthProvider extends ChangeNotifier {
   Future<void> initializeLoginState() async {
     final String? isLoggedIn;
     try {
-      isLoggedIn = await _secureStorage.read(key: 'isLoggedIn');
+      isLoggedIn =
+          await _secureStorage.read(key: 'isLoggedIn').catchError((_) => null);
     } catch (e) {
       _logger.log(Level.WARNING, e.toString());
       return;

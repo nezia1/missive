@@ -54,9 +54,11 @@
 			"program": "lib/main.dart",
 			"args": [
 				"--dart-define",
-				"API_URL=http://localhost/api/v1",
+				"API_URL=https://missive.nezia.dev/api/v1",
 				"--dart-define",
-				"WEBSOCKET_URL=ws://localhost"
+				"WEBSOCKET_URL=wss://missive.nezia.dev",
+				"--dart-define",
+				"ONESIGNAL_APP_ID=4b170031-70ac-4bce-97c4-9f639f182598"
 			],
 			"deviceId": "00008110-000934A922F3801E"
 		}

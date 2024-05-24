@@ -29,7 +29,6 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   late SecureStorageIdentityKeyStore identityKeyStore;
   late ChatProvider _chatProvider;
   late Future _initialization;
-  late User? _user;
   final Logger _logger = Logger('ConversationsScreen');
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<
       ScaffoldState>(); // needed to show the snackbar above the drawer
@@ -54,9 +53,8 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
       _logger.log(Level.WARNING,
           'Error fetching pending messages: $e (error of type ${e.runtimeType})');
     }
-    await _chatProvider.connect();
     if (!mounted) return;
-    _user = await Provider.of<AuthProvider>(context, listen: false).user;
+    await _chatProvider.connect();
   }
 
   Widget _buildBody() {
@@ -86,47 +84,55 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
             )),
         drawer: Drawer(
           backgroundColor: Theme.of(context).canvasColor,
-          child: Column(
-            children: [
-              SizedBox(
-                  height: 60,
-                  child: Center(
-                    child: SelectableText(_user!.name,
-                        style: Theme.of(context).textTheme.headlineMedium),
-                  )),
-              Expanded(
-                child: ListView(
-                  children: [
+          child: Column(children: [
+            SizedBox(
+              height: 60,
+              child: Center(
+                child: Consumer<AuthProvider>(builder: (context, provider, _) {
+                  return FutureBuilder(
+                      future: provider.user,
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const CircularProgressIndicator();
+                        }
+                        return SelectableText(snapshot.data!.name,
+                            style: Theme.of(context).textTheme.headlineMedium);
+                      });
+                }),
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                children: [
+                  SizedBox(
+                    height: 70,
+                    child: DrawerHeader(
+                        child: TextButton.icon(
+                            label: const Text('Logout'),
+                            icon: const Icon(Icons.logout),
+                            onPressed: () {
+                              _userProvider.logout();
+                            })),
+                  ),
+                  if (kDebugMode)
                     SizedBox(
                       height: 70,
                       child: DrawerHeader(
                           child: TextButton.icon(
-                              label: const Text('Logout'),
+                              label: const Text('Delete all data and logout'),
                               icon: const Icon(Icons.logout),
                               onPressed: () {
-                                _userProvider.logout();
+                                FlutterSecureStorage storage =
+                                    const FlutterSecureStorage();
+                                storage.deleteAll().then(
+                                      (value) => _userProvider.logout(),
+                                    );
                               })),
                     ),
-                    if (kDebugMode)
-                      SizedBox(
-                        height: 70,
-                        child: DrawerHeader(
-                            child: TextButton.icon(
-                                label: const Text('Delete all data and logout'),
-                                icon: const Icon(Icons.logout),
-                                onPressed: () {
-                                  FlutterSecureStorage storage =
-                                      const FlutterSecureStorage();
-                                  storage.deleteAll().then(
-                                        (value) => _userProvider.logout(),
-                                      );
-                                })),
-                      ),
-                  ],
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ]),
         ),
         body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Padding(

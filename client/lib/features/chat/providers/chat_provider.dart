@@ -562,8 +562,12 @@ class ChatProvider with ChangeNotifier {
     final name = (await _authProvider!.user)!.name;
 
     // Generate a random encryption key if it doesn't exist, otherwise use the stored one
-    var realmEncryptionKeyString =
-        await secureStorage.read(key: '${name}_realmEncryptionKey');
+    var realmEncryptionKeyString = await secureStorage
+        .read(key: '${name}_realmEncryptionKey')
+        .catchError((e) {
+      _logger.log(Level.WARNING, 'Realm error: $e');
+      return null;
+    });
     if (realmEncryptionKeyString == null) {
       final rng = Random.secure();
       final keyString = base64Encode(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:missive/features/encryption/namespaced_secure_storage.dart';
 
@@ -57,7 +58,8 @@ class SecureStorageSessionStore implements SessionStore {
   }
 
   Future<Map<String, dynamic>?> _getSessions() async {
-    final serializedSessions = await _secureStorage.read(key: 'sessions');
+    final serializedSessions =
+        await _secureStorage.read(key: 'sessions').catchError((_) => null);
 
     if (serializedSessions == null) return null;
 

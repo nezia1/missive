@@ -63,7 +63,8 @@ class SecureStoragePreKeyStore implements PreKeyStore {
   /// Loads all pre keys from the secure storage
   /// Returns a [Map] of [PreKeyRecord]s
   Future<Map<String, dynamic>?> _loadKeys() async {
-    final preKeysJson = await _secureStorage.read(key: 'preKeys');
+    final preKeysJson =
+        await _secureStorage.read(key: 'preKeys').catchError((_) => null);
     if (preKeysJson == null) return null;
     final preKeys = jsonDecode(preKeysJson);
 

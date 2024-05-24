@@ -67,7 +67,8 @@ class SecureStorageSignedPreKeyStore implements SignedPreKeyStore {
 
   /// Load signed pre-keys from secure storage as base 64 encoded [SignedPreKeyRecord]s.
   Future<Map<String, dynamic>?> _loadKeys() async {
-    final preKeysString = await _secureStorage.read(key: 'signedPreKeys');
+    final preKeysString =
+        await _secureStorage.read(key: 'signedPreKeys').catchError((_) => null);
     if (preKeysString == null) return null;
 
     return jsonDecode(preKeysString);
