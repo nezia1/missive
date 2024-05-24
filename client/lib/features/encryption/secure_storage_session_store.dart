@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:missive/features/encryption/namespaced_secure_storage.dart';
 
