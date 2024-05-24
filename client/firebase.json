@@ -1,1 +1,23 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"missive-a3896","appId":"1:880440055356:android:b9b4757efbc5200441d539","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"missive-a3896","configurations":{"android":"1:880440055356:android:b9b4757efbc5200441d539","ios":"1:880440055356:ios:21116ae9c6e3238641d539","web":"1:880440055356:web:2f3d4bde18dff30a41d539"}}}}}}
+{
+	"flutter": {
+		"platforms": {
+			"android": {
+				"default": {
+					"projectId": "missive-a3896",
+					"appId": "1:880440055356:android:b9b4757efbc5200441d539",
+					"fileOutput": "android/app/google-services.json"
+				}
+			},
+			"dart": {
+				"lib/firebase_options.dart": {
+					"projectId": "missive-a3896",
+					"configurations": {
+						"android": "1:880440055356:android:b9b4757efbc5200441d539",
+						"ios": "1:880440055356:ios:21116ae9c6e3238641d539",
+						"web": "1:880440055356:web:2f3d4bde18dff30a41d539"
+					}
+				}
+			}
+		}
+	}
+}
