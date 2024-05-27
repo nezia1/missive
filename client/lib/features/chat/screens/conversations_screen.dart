@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:missive/features/chat/models/conversation.dart';
 import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
@@ -175,6 +176,10 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                 itemCount: provider.conversations.length,
                 itemBuilder: (context, index) {
                   final conversation = provider.conversations[index];
+                  final numberOfUnreadMessages = conversation.messages
+                      .where((message) =>
+                          !message.own && message.status != Status.read)
+                      .length;
                   return ListTile(
                     contentPadding:
                         const EdgeInsetsDirectional.symmetric(horizontal: 20),
@@ -186,12 +191,25 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                         _getTimestampText(conversation.messages.last.sentAt),
                       ],
                     ),
-                    subtitle: Text(
-                        conversation.messages.isNotEmpty
-                            ? conversation.messages.last.content
-                            : '',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                            conversation.messages.isNotEmpty
+                                ? conversation.messages.last.content
+                                : '',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis),
+                        if (numberOfUnreadMessages > 0)
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                                color: Colors.red, shape: BoxShape.circle),
+                            child: Text('$numberOfUnreadMessages',
+                                style: Theme.of(context).textTheme.bodySmall),
+                          )
+                      ],
+                    ),
                     onTap: () =>
                         context.push('/conversations/${conversation.username}'),
                   );
