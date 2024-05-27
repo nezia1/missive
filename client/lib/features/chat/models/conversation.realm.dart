@@ -88,9 +88,9 @@ class PlaintextMessage extends _PlaintextMessage
   PlaintextMessage(
     String id,
     String content,
-    bool own, {
+    bool own,
+    DateTime sentAt, {
     String? receiver,
-    DateTime? sentAt,
     String? statusString,
   }) {
     RealmObjectBase.set(this, 'id', id);
@@ -125,10 +125,10 @@ class PlaintextMessage extends _PlaintextMessage
   set receiver(String? value) => RealmObjectBase.set(this, 'receiver', value);
 
   @override
-  DateTime? get sentAt =>
-      RealmObjectBase.get<DateTime>(this, 'sentAt') as DateTime?;
+  DateTime get sentAt =>
+      RealmObjectBase.get<DateTime>(this, 'sentAt') as DateTime;
   @override
-  set sentAt(DateTime? value) => RealmObjectBase.set(this, 'sentAt', value);
+  set sentAt(DateTime value) => RealmObjectBase.set(this, 'sentAt', value);
 
   @override
   String? get statusString =>
@@ -176,8 +176,8 @@ class PlaintextMessage extends _PlaintextMessage
           fromEJson(id),
           fromEJson(content),
           fromEJson(own),
+          fromEJson(sentAt),
           receiver: fromEJson(receiver),
-          sentAt: fromEJson(sentAt),
           statusString: fromEJson(statusString),
         ),
       _ => raiseInvalidEJson(ejson),
@@ -193,7 +193,7 @@ class PlaintextMessage extends _PlaintextMessage
       SchemaProperty('content', RealmPropertyType.string),
       SchemaProperty('own', RealmPropertyType.bool),
       SchemaProperty('receiver', RealmPropertyType.string, optional: true),
-      SchemaProperty('sentAt', RealmPropertyType.timestamp, optional: true),
+      SchemaProperty('sentAt', RealmPropertyType.timestamp),
       SchemaProperty('statusString', RealmPropertyType.string, optional: true),
     ]);
   }();

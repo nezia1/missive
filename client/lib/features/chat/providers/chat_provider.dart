@@ -229,8 +229,8 @@ class ChatProvider with ChangeNotifier {
 
       user ??= realm.add(Conversation(messageJson['sender']));
 
-      user.messages.add(PlaintextMessage(messageJson['id'], plainText, false,
-          sentAt: DateTime.now()));
+      user.messages.add(PlaintextMessage(
+          messageJson['id'], plainText, false, DateTime.now()));
     });
   }
 
@@ -286,7 +286,7 @@ class ChatProvider with ChangeNotifier {
         uuid,
         plainText,
         true,
-        sentAt: DateTime.now(),
+        DateTime.now(),
         statusString: Status.pending.toShortString(),
       ));
     });
@@ -422,7 +422,8 @@ class ChatProvider with ChangeNotifier {
     // initialize messages
     final conversations = _userRealm!.all<Conversation>();
     _conversations = conversations.toList();
-    _logger.log(Level.FINE, 'User realm setup complete');
+    _conversations.sort(
+        (b, a) => a.messages.last.sentAt.compareTo(b.messages.last.sentAt));
 
     notifyListeners(); // update UI with initial data load
 
@@ -430,6 +431,8 @@ class ChatProvider with ChangeNotifier {
     var messages = _userRealm!.all<PlaintextMessage>();
     _messagesSubscription = messages.changes.listen((_) {
       _conversations = conversations.toList();
+      _conversations.sort(
+          (b, a) => a.messages.last.sentAt.compareTo(b.messages.last.sentAt));
       notifyListeners(); // update UI on new messages
     });
   }
@@ -501,7 +504,7 @@ class ChatProvider with ChangeNotifier {
           message['id'],
           plainText,
           false,
-          sentAt: DateTime.parse(message['sentAt']),
+          DateTime.parse(message['sentAt']),
         ));
       });
     }
@@ -581,16 +584,15 @@ class ChatProvider with ChangeNotifier {
 
     final directory = (await getApplicationSupportDirectory()).path;
 
-    final realmConfig = Configuration.local(
-      [
-        Conversation.schema,
-        PlaintextMessage.schema,
-        PendingMessages.schema,
-        PendingMessage.schema
-      ],
-      path: '$directory/${name}_realm.realm',
-      encryptionKey: realmKey,
-    );
+    final realmConfig = Configuration.local([
+      Conversation.schema,
+      PlaintextMessage.schema,
+      PendingMessages.schema,
+      PendingMessage.schema
+    ],
+        path: '$directory/${name}_realm.realm',
+        encryptionKey: realmKey,
+        schemaVersion: 2);
     return await Realm.open(realmConfig);
   }
 

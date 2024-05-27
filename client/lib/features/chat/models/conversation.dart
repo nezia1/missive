@@ -30,7 +30,7 @@ class _PlaintextMessage {
   late String content;
   late bool own;
   late String? receiver;
-  late DateTime? sentAt;
+  late DateTime sentAt;
   late String?
       statusString; // if null, message is from someone else (we only want to store status for sent messages)
 
