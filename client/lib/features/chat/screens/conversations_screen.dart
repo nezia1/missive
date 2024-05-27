@@ -36,6 +36,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<
       ScaffoldState>(); // needed to show the snackbar above the drawer
   String _version = '';
+  FToast _fToast = FToast();
 
   @override
   void initState() {
@@ -43,6 +44,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     _userProvider = Provider.of<AuthProvider>(context, listen: false);
     _signalProvider = Provider.of<SignalProvider>(context, listen: false);
     _chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    _fToast.init(context);
     _initialization = initialize();
   }
 
@@ -111,11 +113,18 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                                 onLongPress: () {
                                   Clipboard.setData(
                                       ClipboardData(text: snapshot.data!.name));
-                                  Fluttertoast.showToast(
-                                    msg: 'Username copied to clipboard',
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.primary,
+                                  Widget toast = Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24.0, vertical: 12.0),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(25.0),
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                    child: const Text(
+                                        'Username copied to clipboard'),
                                   );
+                                  _fToast.showToast(child: toast);
                                 },
                                 child: Text(
                                   snapshot.data!.name,
