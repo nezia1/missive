@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
@@ -7,6 +8,7 @@ import 'package:missive/features/chat/providers/chat_provider.dart';
 import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
@@ -82,55 +84,71 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
             )),
         drawer: Drawer(
           backgroundColor: Theme.of(context).canvasColor,
-          child: Column(children: [
-            SizedBox(
-              height: 60,
-              child: Center(
-                child: Consumer<AuthProvider>(builder: (context, provider, _) {
-                  return FutureBuilder(
-                      future: provider.user,
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return const CircularProgressIndicator();
-                        }
-                        return SelectableText(snapshot.data!.name,
-                            style: Theme.of(context).textTheme.headlineMedium);
-                      });
-                }),
+          child: SafeArea(
+            child: Column(children: [
+              SizedBox(
+                height: 60,
+                child: Center(
+                  child:
+                      Consumer<AuthProvider>(builder: (context, provider, _) {
+                    return FutureBuilder(
+                        future: provider.user,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const CircularProgressIndicator();
+                          }
+                          return GestureDetector(
+                              onLongPress: () {
+                                Clipboard.setData(
+                                    ClipboardData(text: snapshot.data!.name));
+                                Fluttertoast.showToast(
+                                  msg: 'Username copied to clipboard',
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                );
+                              },
+                              child: Text(
+                                snapshot.data!.name,
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium,
+                              ));
+                        });
+                  }),
+                ),
               ),
-            ),
-            Expanded(
-              child: ListView(
-                children: [
-                  SizedBox(
-                    height: 70,
-                    child: DrawerHeader(
-                        child: TextButton.icon(
-                            label: const Text('Logout'),
-                            icon: const Icon(Icons.logout),
-                            onPressed: () {
-                              _userProvider.logout();
-                            })),
-                  ),
-                  if (kDebugMode)
+              Expanded(
+                child: ListView(
+                  children: [
                     SizedBox(
                       height: 70,
                       child: DrawerHeader(
                           child: TextButton.icon(
-                              label: const Text('Delete all data and logout'),
+                              label: const Text('Logout'),
                               icon: const Icon(Icons.logout),
                               onPressed: () {
-                                FlutterSecureStorage storage =
-                                    const FlutterSecureStorage();
-                                storage.deleteAll().then(
-                                      (value) => _userProvider.logout(),
-                                    );
+                                _userProvider.logout();
                               })),
                     ),
-                ],
+                    if (kDebugMode)
+                      SizedBox(
+                        height: 70,
+                        child: DrawerHeader(
+                            child: TextButton.icon(
+                                label: const Text('Delete all data and logout'),
+                                icon: const Icon(Icons.logout),
+                                onPressed: () {
+                                  FlutterSecureStorage storage =
+                                      const FlutterSecureStorage();
+                                  storage.deleteAll().then(
+                                        (value) => _userProvider.logout(),
+                                      );
+                                })),
+                      ),
+                  ],
+                ),
               ),
-            ),
-          ]),
+            ]),
+          ),
         ),
         body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Padding(
@@ -138,9 +156,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
             child: Text('Conversations',
                 style: Theme.of(context).textTheme.headlineMedium),
           ),
-          Expanded(
-              //TODO: this probably needs its own widget, it's getting too big
-              child: Consumer<ChatProvider>(
+          Expanded(child: Consumer<ChatProvider>(
             builder: (context, provider, child) {
               return ListView.separated(
                 itemCount: provider.conversations.length,
