@@ -136,6 +136,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                 : conversation.messages[index - 1].sentAt;
                             final timestamp =
                                 conversation.messages[index].sentAt;
+                            final localTimestamp = timestamp?.toLocal();
+
                             final showTimestamp = previousTimestamp == null ||
                                 (timestamp != null &&
                                     timestamp
@@ -153,11 +155,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                 );
                             return Column(
                               children: [
-                                if (timestamp != null && showDate)
+                                if (localTimestamp != null && showDate)
                                   Text(DateFormat('dd MMM yyyy HH:mm')
-                                      .format(timestamp))
-                                else if (timestamp != null && showTimestamp)
-                                  Text(DateFormat('HH:mm').format(timestamp)),
+                                      .format(localTimestamp))
+                                else if (localTimestamp != null &&
+                                    showTimestamp)
+                                  Text(DateFormat('HH:mm')
+                                      .format(localTimestamp)),
                                 VisibilityDetector(
                                     key: Key(conversation.messages[index].id),
                                     child: MessageBubble(
