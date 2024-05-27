@@ -56,14 +56,6 @@ void main() async {
       sound: true,
     );
   }
-  FirebaseMessaging.onMessage.listen((event) => print(event));
-  FirebaseMessaging.onBackgroundMessage((message) {
-    // ignore: avoid_print
-    print('Got a message whilst in the background!');
-    // ignore: avoid_print
-    print('Message data: ${message.data}');
-    return Future<void>.value();
-  });
   runApp(Missive(
     authProvider: authProvider,
   ));
