@@ -15,7 +15,7 @@
 			"deviceId": "linux"
 		},
 		{
-			"name": "Launch Client (Android dev)",
+			"name": "Launch Client (Android emulator)",
 			"cwd": "${workspaceFolder}/client",
 			"request": "launch",
 			"type": "dart",
@@ -31,7 +31,7 @@
 			"deviceId": "emulator"
 		},
 		{
-			"name": "Launch Client (physical)",
+			"name": "Launch Client (Android physical)",
 			"cwd": "${workspaceFolder}/client",
 			"request": "launch",
 			"type": "dart",
@@ -44,7 +44,7 @@
 				"--dart-define",
 				"ONESIGNAL_APP_ID=4b170031-70ac-4bce-97c4-9f639f182598"
 			],
-			"deviceId": "803KPPB1643144"
+			"deviceId": "803KPSL1642814"
 		},
 		{
 			"name": "Launch (iOS Simulator)",
