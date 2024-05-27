@@ -9,6 +9,7 @@ import 'package:missive/features/encryption/providers/signal_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
@@ -32,6 +33,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   final Logger _logger = Logger('ConversationsScreen');
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<
       ScaffoldState>(); // needed to show the snackbar above the drawer
+  String _version = '';
 
   @override
   void initState() {
@@ -55,6 +57,10 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     }
     if (!mounted) return;
     await _chatProvider.connect();
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      _version = info.version;
+    });
   }
 
   Widget _buildBody() {
@@ -85,69 +91,75 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
         drawer: Drawer(
           backgroundColor: Theme.of(context).canvasColor,
           child: SafeArea(
-            child: Column(children: [
-              SizedBox(
-                height: 60,
-                child: Center(
-                  child:
-                      Consumer<AuthProvider>(builder: (context, provider, _) {
-                    return FutureBuilder(
-                        future: provider.user,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const CircularProgressIndicator();
-                          }
-                          return GestureDetector(
-                              onLongPress: () {
-                                Clipboard.setData(
-                                    ClipboardData(text: snapshot.data!.name));
-                                Fluttertoast.showToast(
-                                  msg: 'Username copied to clipboard',
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                );
-                              },
-                              child: Text(
-                                snapshot.data!.name,
-                                style:
-                                    Theme.of(context).textTheme.headlineMedium,
-                              ));
-                        });
-                  }),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(children: [
+                SizedBox(
+                  height: 60,
+                  child: Center(
+                    child:
+                        Consumer<AuthProvider>(builder: (context, provider, _) {
+                      return FutureBuilder(
+                          future: provider.user,
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const CircularProgressIndicator();
+                            }
+                            return GestureDetector(
+                                onLongPress: () {
+                                  Clipboard.setData(
+                                      ClipboardData(text: snapshot.data!.name));
+                                  Fluttertoast.showToast(
+                                    msg: 'Username copied to clipboard',
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                  );
+                                },
+                                child: Text(
+                                  snapshot.data!.name,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium,
+                                ));
+                          });
+                    }),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: ListView(
-                  children: [
-                    SizedBox(
-                      height: 70,
-                      child: DrawerHeader(
-                          child: TextButton.icon(
-                              label: const Text('Logout'),
-                              icon: const Icon(Icons.logout),
-                              onPressed: () {
-                                _userProvider.logout();
-                              })),
-                    ),
-                    if (kDebugMode)
+                Expanded(
+                  child: ListView(
+                    children: [
                       SizedBox(
                         height: 70,
                         child: DrawerHeader(
                             child: TextButton.icon(
-                                label: const Text('Delete all data and logout'),
+                                label: const Text('Logout'),
                                 icon: const Icon(Icons.logout),
                                 onPressed: () {
-                                  FlutterSecureStorage storage =
-                                      const FlutterSecureStorage();
-                                  storage.deleteAll().then(
-                                        (value) => _userProvider.logout(),
-                                      );
+                                  _userProvider.logout();
                                 })),
                       ),
-                  ],
+                      if (kDebugMode)
+                        SizedBox(
+                          height: 70,
+                          child: DrawerHeader(
+                              child: TextButton.icon(
+                                  label:
+                                      const Text('Delete all data and logout'),
+                                  icon: const Icon(Icons.logout),
+                                  onPressed: () {
+                                    FlutterSecureStorage storage =
+                                        const FlutterSecureStorage();
+                                    storage.deleteAll().then(
+                                          (value) => _userProvider.logout(),
+                                        );
+                                  })),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ]),
+                Text('Version: $_version')
+              ]),
+            ),
           ),
         ),
         body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
