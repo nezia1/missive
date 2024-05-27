@@ -136,30 +136,27 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                 : conversation.messages[index - 1].sentAt;
                             final timestamp =
                                 conversation.messages[index].sentAt;
-                            final localTimestamp = timestamp?.toLocal();
+                            final localTimestamp = timestamp.toLocal();
 
                             final showTimestamp = previousTimestamp == null ||
-                                (timestamp != null &&
-                                    timestamp
-                                            .difference(previousTimestamp)
-                                            .inMinutes >
-                                        5 // show timestamp if it's the first message or if the previous message was sent more than 5 minutes ago
+                                (timestamp
+                                        .difference(previousTimestamp)
+                                        .inMinutes >
+                                    5 // show timestamp if it's the first message or if the previous message was sent more than 5 minutes ago
                                 );
 
                             final showDate = previousTimestamp == null ||
-                                (timestamp != null &&
-                                    timestamp
-                                            .difference(previousTimestamp)
-                                            .inDays >
-                                        0 // show date if it's the first message or if the previous message was sent more than 1 day ago
+                                (timestamp
+                                        .difference(previousTimestamp)
+                                        .inDays >
+                                    0 // show date if it's the first message or if the previous message was sent more than 1 day ago
                                 );
                             return Column(
                               children: [
-                                if (localTimestamp != null && showDate)
+                                if (showDate)
                                   Text(DateFormat('dd MMM yyyy HH:mm')
                                       .format(localTimestamp))
-                                else if (localTimestamp != null &&
-                                    showTimestamp)
+                                else if (showTimestamp)
                                   Text(DateFormat('HH:mm')
                                       .format(localTimestamp)),
                                 VisibilityDetector(
