@@ -89,6 +89,8 @@ build-server-docs:
     ENABLE_PDF_EXPORT: 1
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SUBMODULE_FORCE_HTTPS: 'true'
+  before_script:
+    - git config --global url."https://".insteadOf git://
   script:
     - *prepare_python_docs
     - 'mkdocs build --verbose --site-dir public'
