@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:intl/intl.dart';
 
 import 'package:missive/features/authentication/providers/auth_provider.dart';
 import 'package:missive/features/encryption/secure_storage_identity_key_store.dart';
@@ -177,8 +178,14 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                   return ListTile(
                     contentPadding:
                         const EdgeInsetsDirectional.symmetric(horizontal: 20),
-                    title: Text(conversation.username,
-                        style: Theme.of(context).textTheme.headlineSmall),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(conversation.username,
+                            style: Theme.of(context).textTheme.headlineSmall),
+                        _getTimestampText(conversation.messages.last.sentAt),
+                      ],
+                    ),
                     subtitle: Text(
                         conversation.messages.isNotEmpty
                             ? conversation.messages.last.content
@@ -227,6 +234,39 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
             ),
           );
         });
+  }
+
+  /// Get the right timestamp text widget based on the date difference between the current date and the message's date. This is used to display the timestamp in the conversation list.
+  ///
+  /// - if the message was sent today, show the time'
+  /// - if the message was sent yesterday, show 'Yesterday'
+  /// - if the message was sent this week, show the day of the week
+  /// - if the message was sent before this week, show the date
+  Text _getTimestampText(DateTime sentAt) {
+    final Text timestampText;
+    final textStyle = Theme.of(context)
+        .textTheme
+        .bodyMedium
+        ?.copyWith(color: Theme.of(context).colorScheme.onBackground);
+    final differenceInDays = sentAt.difference(DateTime.now()).inDays;
+
+    if (differenceInDays == 0) {
+      timestampText = Text(
+          DateFormat('HH:mm').format(sentAt.toLocal()).toString(),
+          style: textStyle);
+    } else if (differenceInDays == 1) {
+      timestampText = Text('Yesterday', style: textStyle);
+    } else if (differenceInDays <= 7) {
+      timestampText = Text(
+          DateFormat('EEEE').format(sentAt.toLocal()).toString(),
+          style: textStyle);
+    } else {
+      timestampText = Text(
+          DateFormat('dd/MM/yyyy').format(sentAt.toLocal()).toString(),
+          style: textStyle);
+    }
+
+    return timestampText;
   }
 
   /// This function initializes the Signal protocol, and installs it if it's the first time the user opens the app.
