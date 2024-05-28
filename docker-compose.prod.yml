@@ -8,7 +8,7 @@ services:
     depends_on:
       - db
     env_file:
-      - pgadmin.env
+      - stack.env
   app: 
     image: nezia/missive-server:v1
     secrets:
