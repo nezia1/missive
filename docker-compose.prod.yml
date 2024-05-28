@@ -8,8 +8,8 @@ services:
     depends_on:
       - db
     environment:
-      - PGADMIN_DEFAULT_EMAIL=anthony@nezia.dev
-      - PGADMIN_DEFAULT_PASSWORD_FILE=/run/secrets/pgadmin_password
+      PGADMIN_DEFAULT_EMAIL: anthony@nezia.dev
+      PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
   app: 
     image: nezia/missive-server:v1
     secrets:
