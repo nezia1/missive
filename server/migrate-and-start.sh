@@ -9,6 +9,7 @@ if [ "$NODE_ENV" = "production" ]; then
     export GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/google_application_credentials
     npm start
 else 
+    echo "Running in development, migrating..."
     npx prisma migrate dev 
     npm run dev
 fi
