@@ -50,3 +50,5 @@ secrets:
     external: true
   cookie_secret:
     external: true
+  pgadmin_password:
+    external: true
