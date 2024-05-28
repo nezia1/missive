@@ -53,3 +53,6 @@ secrets:
     external: true
   pgadmin_password:
     external: true
+configs:
+  caddy_config:
+    external: true
