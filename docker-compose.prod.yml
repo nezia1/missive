@@ -25,7 +25,12 @@ services:
         NODE_ENV: production
     environment:
       NODE_ENV: production
-
+    entrypoint: >
+      bash -c "
+      export DB_USER=\$(cat /run/secrets/db_user) &&
+      export DB_PASSWORD=\$(cat /run/secrets/db_password) &&
+      export DATABASE_URL=postgres://\$DB_USER:\$DB_PASSWORD@db:5432/missive &&
+      ./wait-for-it.sh db:5432 -- ./migrate-and-start.sh"
   db:
     secrets:
       - db_user
