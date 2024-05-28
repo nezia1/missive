@@ -8,6 +8,8 @@ services:
     image: dpage/pgadmin4
     depends_on:
       - db
+    secrets:
+      - pgadmin_password
     environment:
       PGADMIN_DEFAULT_EMAIL: anthony@nezia.dev
       PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password

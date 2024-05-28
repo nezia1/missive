@@ -3,9 +3,10 @@ missive.nezia.dev {
         path /pgadmin*
     }
     handle @pgadmin {
-        header_up X-Script-Name /pgadmin
-        header_up X-Scheme {scheme}
-        reverse_proxy pgadmin:80
+        reverse_proxy pgadmin:80 {
+            header_up X-Script-Name /pgadmin
+            header_up X-Scheme {scheme}
+        }
     }
     reverse_proxy app:8080
 }
