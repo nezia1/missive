@@ -4,6 +4,8 @@ services:
     configs:
       - source: caddy_config
         target: /etc/caddy/Caddyfile
+    deploy:
+      replicas: 1
   pgadmin:
     image: dpage/pgadmin4
     depends_on:
@@ -13,6 +15,8 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: anthony@nezia.dev
       PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_password
+    deploy:
+      replicas: 1
   app: 
     image: nezia/missive-server:v1
     secrets:
@@ -28,6 +32,8 @@ services:
     environment:
       NODE_ENV: production
     entrypoint: ["bash", "-c", "./wait-for-it.sh db:5432 -- ./migrate-and-start.sh"]
+    deploy:
+      replicas: 2
   db:
     secrets:
       - db_user
@@ -39,7 +45,9 @@ services:
       test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/db_user)"]
       interval: 5s
       retries: 5
-        
+    deploy:
+      replicas: 1
+
 secrets:
   db_user:
     external: true
