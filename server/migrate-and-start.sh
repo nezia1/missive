@@ -1,4 +1,5 @@
 #!/bin/sh 
+set -x
 if [ "$NODE_ENV" = "production" ]; then
     export DATABASE_URL="postgresql://$(cat /run/secrets/db_user):$(cat /run/secrets/db_password)@db:5432/missive"
     echo "$DATABASE_URL"
