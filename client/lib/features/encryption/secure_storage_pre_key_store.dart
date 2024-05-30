@@ -1,8 +1,19 @@
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'dart:convert';
-
 import 'package:missive/features/encryption/namespaced_secure_storage.dart';
 
+/// A class that implements [PreKeyStore] to store, retrieve, and manage pre keys using [SecureStorage].
+///
+/// This class interacts with the device's secure storage to handle pre keys,
+/// which are essential for the Signal Protocol. It provides methods to check the existence,
+/// load, store, and remove pre keys, as well as a private method to load all keys.
+///
+/// ## Usage
+/// ```dart
+/// final secureStoragePreKeyStore = SecureStoragePreKeyStore(secureStorage);
+/// await secureStoragePreKeyStore.storePreKey(preKeyId, preKeyRecord);
+/// ```
+///
 class SecureStoragePreKeyStore implements PreKeyStore {
   final SecureStorage _secureStorage;
 
@@ -10,6 +21,11 @@ class SecureStoragePreKeyStore implements PreKeyStore {
       : _secureStorage = secureStorage;
 
   @override
+
+  /// Checks if a pre key with the given [preKeyId] exists in the secure storage.
+  ///
+  /// ## Returns
+  /// - `true` if the pre key exists, `false` otherwise.
   Future<bool> containsPreKey(int preKeyId) async {
     final preKeys = await _loadKeys();
     if (preKeys == null) return false;
@@ -19,7 +35,15 @@ class SecureStoragePreKeyStore implements PreKeyStore {
   @override
 
   /// Loads a serialized [PreKeyRecord] from [SecureStorage] and returns it as a [PreKeyRecord].
-  /// Throws a n [InvalidKeyIdException] if the pre key is not found.
+  ///
+  /// ## Parameters
+  /// - `preKeyId`: The ID of the pre key to load.
+  ///
+  /// ## Returns
+  /// - A [PreKeyRecord] if found.
+  ///
+  /// ## Throws
+  /// - `InvalidKeyIdException` if the pre key is not found or if no pre keys are stored.
   Future<PreKeyRecord> loadPreKey(int preKeyId) async {
     final preKeys = await _loadKeys();
 
@@ -37,6 +61,11 @@ class SecureStoragePreKeyStore implements PreKeyStore {
   }
 
   @override
+
+  /// Removes a pre key with the given [preKeyId] from the secure storage.
+  ///
+  /// ## Parameters
+  /// - `preKeyId`: The ID of the pre key to remove.
   Future<void> removePreKey(int preKeyId) async {
     final preKeys = await _loadKeys();
     if (preKeys == null) return;
@@ -46,8 +75,13 @@ class SecureStoragePreKeyStore implements PreKeyStore {
 
   @override
 
-  /// Store a [PreKeyRecord] in the device's secure storage
-  /// The pre key is stored as a base64 encoded [String]
+  /// Stores a [PreKeyRecord] in the device's secure storage.
+  ///
+  /// The pre key is stored as a base64 encoded [String].
+  ///
+  /// ## Parameters
+  /// - `preKeyId`: The ID of the pre key to store.
+  /// - `record`: The [PreKeyRecord] to store.
   Future<void> storePreKey(int preKeyId, PreKeyRecord record) async {
     var preKeys = await _loadKeys();
 
@@ -60,8 +94,10 @@ class SecureStoragePreKeyStore implements PreKeyStore {
     await _secureStorage.write(key: 'preKeys', value: jsonEncode(preKeys));
   }
 
-  /// Loads all pre keys from the secure storage
-  /// Returns a [Map] of [PreKeyRecord]s
+  /// Loads all pre keys from the secure storage.
+  ///
+  /// ## Returns
+  /// - A [Map] of [PreKeyRecord]s if found, `null` otherwise.
   Future<Map<String, dynamic>?> _loadKeys() async {
     final preKeysJson =
         await _secureStorage.read(key: 'preKeys').catchError((_) => null);

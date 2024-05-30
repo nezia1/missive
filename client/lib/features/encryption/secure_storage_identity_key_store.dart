@@ -4,19 +4,36 @@ import 'dart:convert';
 
 import 'package:missive/features/encryption/namespaced_secure_storage.dart';
 
+/// A secure storage-based implementation of the IdentityKeyStore interface from the Signal protocol.
+///
+/// This class is responsible for:
+/// - Storing identity keys and registration IDs securely using [SecureStorage].
+/// - Providing methods to retrieve and verify the identity keys.
+/// - Ensuring secure storage and management of identity-related information.
 class SecureStorageIdentityKeyStore implements IdentityKeyStore {
   final SecureStorage _secureStorage;
 
+  /// Constructs an instance of [SecureStorageIdentityKeyStore] with a secure storage manager.
+  ///
+  /// ## Parameters
+  /// - [secureStorage]: An instance of [SecureStorage] for managing secure storage operations.
   SecureStorageIdentityKeyStore(SecureStorage secureStorage)
       : _secureStorage = secureStorage;
 
-  /// Instanciate a new [SecureStorageIdentityKeyStore], and store the [IdentityKeyPair] and registrationId using [SecureStorage]. This is meant to be used when the user first creates their account.
+  /// Constructs an instance of [SecureStorageIdentityKeyStore] and stores the [IdentityKeyPair] and registrationId.
+  ///
+  /// This constructor is meant to be used when the user first creates their account.
+  ///
+  /// ## Parameters
+  /// - [storageManager]: An instance of [SecureStorage] for managing secure storage operations.
+  /// - [identityKeyPair]: The user's [IdentityKeyPair] that will be securely stored.
+  /// - [registrationId]: The user's registration ID that will be securely stored.
   SecureStorageIdentityKeyStore.fromIdentityKeyPair(
       SecureStorage storageManager,
       IdentityKeyPair identityKeyPair,
       int registrationId)
       : _secureStorage = storageManager {
-    // we cannot use async here, so we need to use Future.wait since fromIdentityKeyPair a constructor
+    // We cannot use async here, so we need to use Future.wait since fromIdentityKeyPair is a constructor
     List<Future> futures = [
       _secureStorage.write(
           key: 'identityKeyPair',
@@ -27,6 +44,18 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
     Future.wait(futures);
   }
 
+  /// Retrieves the stored identity key for a given address.
+  ///
+  /// ## Parameters
+  /// - [address]: The [SignalProtocolAddress] for which the identity key is to be retrieved.
+  ///
+  /// ## Returns
+  /// - A [Future] containing the [IdentityKey] if found, else null.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// IdentityKey? key = await keyStore.getIdentity(address);
+  /// ```
   @override
   Future<IdentityKey?> getIdentity(SignalProtocolAddress address) async {
     final identityKeyString = await _secureStorage
@@ -36,6 +65,18 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
     return IdentityKey.fromBytes(base64Decode(identityKeyString), 0);
   }
 
+  /// Retrieves the user's identity key pair from secure storage.
+  ///
+  /// ## Returns
+  /// - A [Future] containing the [IdentityKeyPair].
+  ///
+  /// ## Throws
+  /// - `Exception` if the identity key pair is not found.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// IdentityKeyPair keyPair = await keyStore.getIdentityKeyPair();
+  /// ```
   @override
   Future<IdentityKeyPair> getIdentityKeyPair() async {
     final identityKeyPairString = await _secureStorage
@@ -49,6 +90,18 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
     return IdentityKeyPair.fromSerialized(base64Decode(identityKeyPairString));
   }
 
+  /// Retrieves the local registration ID from secure storage.
+  ///
+  /// ## Returns
+  /// - A [Future] containing the registration ID.
+  ///
+  /// ## Throws
+  /// - `Exception` if the registration ID is not found.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// int registrationId = await keyStore.getLocalRegistrationId();
+  /// ```
   @override
   Future<int> getLocalRegistrationId() async {
     final registrationId = await _secureStorage
@@ -60,6 +113,20 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
     return int.parse(registrationId);
   }
 
+  /// Checks if the identity key is trusted by comparing it with stored data.
+  ///
+  /// ## Parameters
+  /// - [address]: The [SignalProtocolAddress] to check.
+  /// - [identityKey]: The [IdentityKey] to verify.
+  /// - [direction]: The [Direction] of the communication, indicating the direction of message (sending or receiving).
+  ///
+  /// ## Returns
+  /// - A [Future] containing a boolean value indicating whether the identity is trusted.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// bool isTrusted = await keyStore.isTrustedIdentity(address, identityKey, Direction.SENDING);
+  /// ```
   @override
   Future<bool> isTrustedIdentity(SignalProtocolAddress address,
       IdentityKey? identityKey, Direction direction) async {
@@ -72,6 +139,19 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
             .equals(trusted.serialize(), identityKey.serialize());
   }
 
+  /// Saves the identity key for a given address in secure storage.
+  ///
+  /// ## Parameters
+  /// - [address]: The [SignalProtocolAddress] associated with the identity key.
+  /// - [identityKey]: The [IdentityKey] to be saved.
+  ///
+  /// ## Returns
+  /// - A [Future] containing a boolean value indicating whether the save operation was successful.
+  ///
+  /// ## Usage
+  /// ```dart
+  /// bool success = await keyStore.saveIdentity(address, identityKey);
+  /// ```
   @override
   Future<bool> saveIdentity(
       SignalProtocolAddress address, IdentityKey? identityKey) async {
@@ -84,3 +164,4 @@ class SecureStorageIdentityKeyStore implements IdentityKeyStore {
     return true;
   }
 }
+  ///
