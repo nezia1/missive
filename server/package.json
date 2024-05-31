@@ -5,7 +5,7 @@
 	"scripts": {
 		"start": "tsx index.ts",
 		"dev": "tsx --watch index.ts",
-		"test": "npx vitest --root=src --reporter=junit --outputFile=results.xml"
+		"test": "npx vitest --root=src --reporter=junit --outputFile=report.xml"
 	},
 	"prisma": {
 		"seed": "tsx prisma/seed.ts"
