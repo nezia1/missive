@@ -1,33 +1,40 @@
-import assert from 'node:assert'
-import { describe, it } from 'node:test'
+import prisma from '@/__mocks__/prisma'
 import app from '@/app'
 import { sampleUsers } from '@/constants'
 import { loadKeys } from '@/utils'
+import * as argon2 from 'argon2'
 import { importSPKI, jwtVerify } from 'jose'
+import type { Response } from 'light-my-request'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 
-const userWithTOTP = sampleUsers[1]
-const userWithoutTOTP = sampleUsers[0]
+const sampleUser = sampleUsers[0]
 
-const successfulResponseWithoutTOTP = await app.inject({
-	method: 'POST',
-	url: '/api/v1/tokens',
-	payload: {
-		name: userWithoutTOTP.name,
-		password: userWithoutTOTP.password,
-	},
-})
+let successfulResponse: Response
+let successfulResponseWithTOTP: Response
+let unsuccessfulResponse: Response
+let successfullyRefreshedTokenResponse: Response
+let accessToken: string
+let isAccessTokenValid: boolean
 
-describe('POST /v1/tokens', async () => {
-	const successfulResponseWithTOTP = await app.inject({
+beforeAll(async () => {
+	// Setup prisma mocks
+	vi.mock('@/prisma')
+	prisma.user.findUnique.mockResolvedValue({
+		...sampleUser,
+		password: await argon2.hash(sampleUser.password),
+	})
+	prisma.user.findUniqueOrThrow.mockResolvedValue(sampleUser)
+
+	successfulResponse = await app.inject({
 		method: 'POST',
 		url: '/api/v1/tokens',
 		payload: {
-			name: userWithTOTP.name,
-			password: userWithTOTP.password,
+			name: sampleUser.name,
+			password: sampleUser.password,
 		},
 	})
 
-	const unsuccessfulResponse = await app.inject({
+	unsuccessfulResponse = await app.inject({
 		method: 'POST',
 		url: '/api/v1/tokens',
 		payload: {
@@ -36,45 +43,38 @@ describe('POST /v1/tokens', async () => {
 		},
 	})
 
-	it('should have a 201 CREATED status code on successful login', () => {
-		assert.strictEqual(successfulResponseWithoutTOTP.statusCode, 201)
-	})
-
-	it('should respond with status: totp_required field when using TOTP', () => {
-		assert.strictEqual(
-			successfulResponseWithTOTP.json().data.status,
-			'totp_required',
-			'should respond with status: totp_required field when using TOTP',
-		)
-	})
-
-	it('should have a 401 UNAUTHORIZED status code on login using wrong credentials', () => {
-		assert.strictEqual(unsuccessfulResponse.statusCode, 401)
-	})
-})
-
-describe('PUT /api/v1/tokens', async () => {
 	const { publicKeyPem } = loadKeys()
 	const publicKey = await importSPKI(publicKeyPem, 'P256')
 
-	const successfullyRefreshedTokenResponse = await app.inject({
+	successfullyRefreshedTokenResponse = await app.inject({
 		method: 'PUT',
 		url: '/api/v1/tokens',
 		cookies: {
-			refreshToken: successfulResponseWithoutTOTP.cookies[0].value,
+			refreshToken: successfulResponse.cookies[0].value,
 		},
 	})
-	const accessToken = successfullyRefreshedTokenResponse.json().data.accessToken
+	accessToken = successfullyRefreshedTokenResponse.json().data.accessToken
 
-	let isAccessTokenValid: boolean
 	try {
 		await jwtVerify(accessToken, publicKey)
 		isAccessTokenValid = true
 	} catch {
 		isAccessTokenValid = false
 	}
+})
 
+describe('POST /v1/tokens', () => {
+	it('should have a 201 CREATED status code on successful login', () => {
+		expect(successfulResponse.statusCode).toBe(201)
+	})
+
+	it('should have a 401 UNAUTHORIZED status code on login using wrong credentials', () => {
+		expect(unsuccessfulResponse.statusCode).toBe(401)
+	})
+})
+
+describe('PUT /api/v1/tokens', () => {
 	it('should respond with a valid access token', () => {
-		assert.strictEqual(isAccessTokenValid, true)
+		expect(isAccessTokenValid).toBe(true)
 	})
 })

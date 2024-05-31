@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="4" failures="1" errors="0" time="6.504">
+    <testsuite name="api/v1/routes/tokens.test.ts" timestamp="2024-05-31T14:15:36.315Z" hostname="fedora" tests="3" failures="0" errors="0" skipped="0" time="0.208">
+        <testcase classname="api/v1/routes/tokens.test.ts" name="POST /v1/tokens &gt; should have a 201 CREATED status code on successful login" time="0.002">
+        </testcase>
+        <testcase classname="api/v1/routes/tokens.test.ts" name="POST /v1/tokens &gt; should have a 401 UNAUTHORIZED status code on login using wrong credentials" time="0">
+        </testcase>
+        <testcase classname="api/v1/routes/tokens.test.ts" name="PUT /api/v1/tokens &gt; should respond with a valid access token" time="0">
+        </testcase>
+    </testsuite>
+    <testsuite name="api/v1/routes/users.test.ts" timestamp="2024-05-31T14:15:36.319Z" hostname="fedora" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="api/v1/routes/users.test.ts" name="api/v1/routes/users.test.ts" time="0">
+            <failure message="No test suite found in file /home/nezia/dev/missive/server/src/api/v1/routes/users.test.ts" type="Error">
+Error: No test suite found in file /home/nezia/dev/missive/server/src/api/v1/routes/users.test.ts
+            </failure>
+        </testcase>
+    </testsuite>
+</testsuites>
