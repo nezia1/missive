@@ -1,3 +1,8 @@
+/**
+ * @file Contains the API routes for pending messages management.
+ * @author Anthony Rodriguez <anthony@nezia.dev>
+ */
+
 import type { FastifyPluginCallback } from 'fastify'
 
 import { AuthorizationError } from '@/errors'
@@ -7,6 +12,9 @@ import { exclude, parseGenericError } from '@/utils'
 
 import type { APIReply, MessageParams } from '@/globals'
 
+/**
+ * Contains the API routes for pending messages management.
+ */
 const messages: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.route<{ Reply: APIReply; Params: MessageParams }>({
 		method: 'GET',

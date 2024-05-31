@@ -1,3 +1,8 @@
+/**
+ * @file Contains the API routes for JWT management (authentication and authorization).
+ * @author Anthony Rodriguez <anthony@nezia.dev>
+ */
+
 import type { Prisma } from '@prisma/client'
 import * as argon2 from 'argon2'
 import type { FastifyPluginCallback } from 'fastify'
@@ -31,6 +36,9 @@ const userPermissions = [
 	Permissions.MESSAGES_READ,
 ]
 
+/**
+ * Contains the API routes for JWT management (authentication and authorization).
+ */
 const tokens: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.post<{ Body: UserLoginInput; Reply: APIReply }>(
 		'/',

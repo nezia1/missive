@@ -1,9 +1,17 @@
-import type { APIReply, UserParams } from '@/globals'
+/**
+ * @file Contains the API routes for public key management.
+ * @author Anthony Rodriguez <anthony@nezia.dev>
+ */
+
+import type { APIReply } from '@/globals'
 import { authenticationHook, authorizationHook } from '@/hooks'
 import { Permissions } from '@/permissions'
 import type { Prisma } from '@prisma/client'
 import type { FastifyPluginCallback } from 'fastify'
 
+/**
+ * Contains the API routes for public key management.
+ */
 const keys: FastifyPluginCallback = (fastify, _, done) => {
 	// Gets the first pre key for a user, as well as the signed pre key
 	fastify.route<{ Reply: APIReply; Params: { name: string } }>({

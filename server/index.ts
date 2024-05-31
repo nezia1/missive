@@ -1,3 +1,8 @@
+/**
+ * @file This file contains the entry point of the application. It is used to start the server.
+ * @author Anthony Rodriguez <anthony@nezia.dev>
+ */
+
 import app from '@/app'
 
 try {

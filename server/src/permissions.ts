@@ -1,3 +1,8 @@
+/**
+ * @file The permissions that a user can have.
+ * @author Anthony Rodriguez <anthony@nezia.dev>
+ */
+
 export enum Permissions {
 	PROFILE_READ = 'profile:read',
 	PROFILE_WRITE = 'profile:write',

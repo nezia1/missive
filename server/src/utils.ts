@@ -1,3 +1,8 @@
+/**
+ * @file Useful utility functions, used throughout the application.
+ * @author Anthony Rodriguez <anthony@nezia.dev>
+ */
+
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -13,11 +18,17 @@ import {
 	JWTInvalid,
 } from 'jose/errors'
 
+/**
+ * This interface is used to configure the error message the API will return when a parsing error occurs.
+ */
 interface ParseErrorOptions {
 	notFoundMessage: string
 	duplicateMessage: string
 }
 
+/**
+ * This interface is used to configure the error message the API will return after a generic API error occurs.
+ */
 interface APIError {
 	statusCode: number
 	responseMessage: string
@@ -28,6 +39,10 @@ interface APIError {
  * @param {Error} error - The error to parse.
  * @param {ParseErrorOptions | undefined} options - allows to configure the different error messages the API will return.
  * @returns {APIError}
+ * @example
+ * import { parseGenericError } from './utils'
+ * const apiError = parseGenericError(error)
+ * console.log(apiError.message) // Logs stack trace to the console
  * */
 export function parseGenericError(
 	error: Error,
@@ -95,6 +110,13 @@ export function parseGenericError(
 	return apiError
 }
 
+/**
+ * Generates a random Base32 string of the specified length.
+ * @param {number} length - The length of the Base32 string to generate.
+ * @example
+ * import { generateRandomBase32String } from './utils'
+ * const base32String = generateRandomBase32String(32)
+ */
 export function generateRandomBase32String(length: number): string {
 	// Check if the Web Crypto API is available
 	if (!crypto || !crypto.getRandomValues) {
@@ -138,6 +160,10 @@ export function generateRandomBase32String(length: number): string {
 /**
  * Excludes fields from a model.
  * @param {T} model - The model to exclude fields from
+ * @example
+ * import { exclude } from './utils'
+ * const newModel = exclude(model, ['password', 'totp_url'])
+ * console.log(newModel) // { id: '9fa962e5-2466-4ea8-aa07-0b9717b47f13', name: 'john' }
  **/
 export function exclude<T>(model: T, excludedFields: (keyof T)[]): Partial<T> {
 	const newModel = { ...model }
@@ -152,6 +178,9 @@ export function exclude<T>(model: T, excludedFields: (keyof T)[]): Partial<T> {
 /**
  * Load the private and public keys from the filesystem.
  * @returns {Object} - An object containing the private and public keys as strings.
+ * @example
+ * import { loadKeys } from './utils'
+ * const { privateKeyPem, publicKeyPem } = loadKeys()
  */
 export function loadKeys() {
 	const isProduction = process.env.NODE_ENV === 'production'

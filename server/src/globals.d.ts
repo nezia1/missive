@@ -1,4 +1,11 @@
-// TODO add more status for both interfaces
+/**
+ * @file This file contains all the types used globally inside the application. More specific types are defined in the relevant files.
+ * @author Anthony Rodriguez <anthony@nezia.dev>
+ */
+
+/**
+ * This is used by Fastify to strongly type responses for different status codes, since Missive has a different response structure for successes and errors.
+ */
 export interface APIReply {
 	'2xx': {
 		data: {
@@ -12,10 +19,16 @@ export interface APIReply {
 	}
 }
 
+/**
+ * The parameters used to interact with a user.
+ */
 export interface UserParams {
 	id: string
 }
 
+/**
+ * The parameters used to interact with a message.
+ */
 export interface MessageParams {
 	name: string
 }

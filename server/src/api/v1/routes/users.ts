@@ -1,3 +1,8 @@
+/**
+ * @file Contains the API routes for user management.
+ * @author Anthony Rodriguez <anthony@nezia.dev>
+ */
+
 import type { Prisma } from '@prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js'
 import * as argon2 from 'argon2'
@@ -32,6 +37,9 @@ const userPermissions = [
 	Permissions.MESSAGES_READ,
 ]
 
+/**
+ * Contains the API routes for user management.
+ */
 const users: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.register(keys)
 	fastify.register(messages)

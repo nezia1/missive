@@ -1,3 +1,8 @@
+/**
+ * @file This file contains the entry point of the Fastify application. It is used to register all the routes and plugins. It is then exported to be used in index.ts
+ * @author Anthony Rodriguez <anthony@nezia.dev>
+ */
+
 import prismaPlugin from '@/plugins/prisma'
 import tokens from '@api/v1/routes/tokens'
 import users from '@api/v1/routes/users'
