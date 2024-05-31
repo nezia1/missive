@@ -48,7 +48,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 		method: 'GET',
 		url: '/',
 		preParsing: [
-			authenticationHook,
+			authenticationHook(),
 			authorizationHook([Permissions.PROFILE_READ]),
 		],
 		handler: async (request, reply) => {
@@ -82,7 +82,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 		method: 'GET',
 		url: '/:id',
 		preParsing: [
-			authenticationHook,
+			authenticationHook(),
 			authorizationHook([Permissions.PROFILE_READ]),
 		],
 		handler: async (request, reply) => {
@@ -151,7 +151,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 	}>({
 		method: 'PATCH',
 		url: '/:id',
-		preParsing: authenticationHook,
+		preParsing: authenticationHook(),
 		handler: async (request, reply) => {
 			let totp: OTPAuth.TOTP | undefined
 
@@ -199,7 +199,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 	fastify.route<{ Reply: APIReply; Params: UserParams }>({
 		method: 'DELETE',
 		url: '/:id',
-		preParsing: authenticationHook,
+		preParsing: authenticationHook(),
 		handler: async (request, response) => {
 			if (request.params.id !== request.authenticatedUser?.id)
 				throw new AuthorizationError('You can only access your own profile')

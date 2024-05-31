@@ -3,13 +3,25 @@
  */
 export const sampleUsers = [
 	{
+		id: '1',
 		name: 'alice',
 		password: 'Super',
-		totp: false,
+		totp_url: null,
+		createdAt: new Date(),
+		updatedAt: new Date(),
+		registrationId: 1,
+		identityKey: '1',
+		notificationID: '1',
 	},
 	{
+		id: '1',
 		name: 'bob',
 		password: 'Super',
-		totp: true,
+		totp_url: null,
+		createdAt: new Date(),
+		updatedAt: new Date(),
+		registrationId: 1,
+		identityKey: '1',
+		notificationID: '1',
 	},
 ]

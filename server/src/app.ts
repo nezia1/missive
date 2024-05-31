@@ -21,7 +21,9 @@ if (process.env.COOKIE_SECRET === undefined) {
 
 const apiPrefix = '/api/v1'
 
-fastify.register(prismaPlugin)
+if (process.env.NODE_ENV !== 'test') {
+	fastify.register(prismaPlugin)
+}
 fastify.register(fastifyWs)
 fastify.register(users, { prefix: `${apiPrefix}/users` })
 fastify.register(tokens, { prefix: `${apiPrefix}/tokens` })

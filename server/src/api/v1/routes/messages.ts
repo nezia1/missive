@@ -20,7 +20,7 @@ const messages: FastifyPluginCallback = (fastify, _, done) => {
 		method: 'GET',
 		url: '/:name/messages',
 		preParsing: [
-			authenticationHook,
+			authenticationHook(),
 			authorizationHook([Permissions.MESSAGES_READ]),
 		],
 		handler: async (request, reply) => {
@@ -50,7 +50,7 @@ const messages: FastifyPluginCallback = (fastify, _, done) => {
 		method: 'GET',
 		url: '/:name/messages/status',
 		preParsing: [
-			authenticationHook,
+			authenticationHook(),
 			authorizationHook([Permissions.MESSAGES_READ]),
 		],
 		handler: async (request, reply) => {

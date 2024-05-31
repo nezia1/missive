@@ -18,7 +18,7 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 		method: 'GET',
 		url: '/:name/keys',
 		preParsing: [
-			authenticationHook,
+			authenticationHook(),
 			authorizationHook([Permissions.KEYS_READ]),
 		],
 		handler: async (request, reply) => {
@@ -68,7 +68,7 @@ const keys: FastifyPluginCallback = (fastify, _, done) => {
 		method: 'POST',
 		url: '/:name/keys',
 		preParsing: [
-			authenticationHook,
+			authenticationHook(),
 			authorizationHook([Permissions.KEYS_WRITE]),
 		],
 		handler: async (request, reply) => {

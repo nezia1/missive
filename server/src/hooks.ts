@@ -26,47 +26,46 @@ declare module 'fastify' {
 }
 
 /**
- * Verifies the access token and injects the authenticated user in the request.
- * @param {FastifyRequest} request - The Fastify request object
- * @param {FastifyReply} reply - The Fastify reply object
+ * Verifies the access token and injects the authenticated user in the request. This function needs to be curried so that we can abstract the verification and decoding process, for testing purposes (we cannot stub a function that is not passed as an argument)
+ * @param {Function} verifyAndDecode - The function to use to verify and decode the access token
  * @returns {Promise<void>}
  * @example
  * import { authenticationHook } from './hooks'
  * app.addHook('onRequest', authenticationHook) // Global hook
  * @example
  * import { authenticationHook } from './hooks'
+ * import { verifyAndDecodeScopedJWT } from './jwt'
  * fastify.route({
  *   method: 'GET',
  *   url: '/',
- * 	preParsing: [authenticationHook], // Route hook
+ * 	preParsing: [authenticationHook(verifyAndDecodeJwt)], // Route hook
  * 	handler: async (request, reply) => {
  * 		reply.send({ authenticatedUser: request.authenticatedUser }) // Authenticated user is injected in the request
  * 	},
  * })
  */
-export async function authenticationHook(
-	request: FastifyRequest,
-	reply: FastifyReply,
-): Promise<void> {
-	const accessToken = request.headers.authorization?.split(' ')[1]
+export function authenticationHook(verifyAndDecode = verifyAndDecodeScopedJWT) {
+	return async (request: FastifyRequest, reply: FastifyReply) => {
+		const accessToken = request.headers.authorization?.split(' ')[1]
 
-	if (!accessToken) throw new JWTInvalid('Missing access token')
+		if (!accessToken) throw new JWTInvalid('Missing access token')
 
-	// Get access token payload and check if it matches a user (jwtVerify throws an error if the token is invalid for any reason)
-	const payload = await verifyAndDecodeScopedJWT(accessToken, publicKey)
+		// Get access token payload and check if it matches a user (jwtVerify throws an error if the token is invalid for any reason)
+		const payload = await verifyAndDecodeScopedJWT(accessToken, publicKey)
 
-	const user = await prisma.user.findUniqueOrThrow({
-		where: { id: payload.sub },
-	})
-	// Inject the authenticated user ID in the request
-	request.authenticatedUser = user
+		const user = await prisma.user.findUniqueOrThrow({
+			where: { id: payload.sub },
+		})
+		// Inject the authenticated user ID in the request
+		request.authenticatedUser = user
 
-	if (!payload.scope)
-		throw new AuthorizationError(
-			'Token used does not have any permissions (likely a refresh token)',
-		)
+		if (!payload.scope)
+			throw new AuthorizationError(
+				'Token used does not have any permissions (likely a refresh token)',
+			)
 
-	request.authenticatedUser.permissions = payload.scope
+		request.authenticatedUser.permissions = payload.scope
+	}
 }
 
 /**
