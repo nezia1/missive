@@ -10,7 +10,6 @@ import { beforeAll, describe, expect, it, vi } from 'vitest'
 const sampleUser = sampleUsers[0]
 
 let successfulResponse: Response
-let successfulResponseWithTOTP: Response
 let unsuccessfulResponse: Response
 let successfullyRefreshedTokenResponse: Response
 let accessToken: string
@@ -73,8 +72,28 @@ describe('POST /v1/tokens', () => {
 	})
 })
 
-describe('PUT /api/v1/tokens', () => {
+describe('PUT /api/v1/tokens', async () => {
+	const unauthorizedResponseMissingRefreshToken = await app.inject({
+		method: 'PUT',
+		url: '/api/v1/tokens',
+	})
+
+	const unauthorizedResponseInvalidRefreshToken = await app.inject({
+		method: 'PUT',
+		url: '/api/v1/tokens',
+		cookies: {
+			refreshToken: 'invalid-refresh-token',
+		},
+	})
 	it('should respond with a valid access token', () => {
 		expect(isAccessTokenValid).toBe(true)
+	})
+
+	it('should respond with a 401 UNAUTORIZED status code if no refresh token is provided', () => {
+		expect(unauthorizedResponseMissingRefreshToken.statusCode).toBe(401)
+	})
+
+	it('should respond with a 401 UNAUTORIZED status code if an invalid refresh token is provided', () => {
+		expect(unauthorizedResponseInvalidRefreshToken.statusCode).toBe(401)
 	})
 })
