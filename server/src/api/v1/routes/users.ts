@@ -3,7 +3,7 @@
  * @author Anthony Rodriguez <anthony@nezia.dev>
  */
 
-import type { Prisma } from '@prisma/client'
+import type { Prisma, User } from '@prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js'
 import * as argon2 from 'argon2'
 import type { FastifyPluginCallback } from 'fastify'
@@ -65,7 +65,7 @@ const users: FastifyPluginCallback = (fastify, _, done) => {
 
 			reply.status(200).send({
 				data: {
-					users: users.map((user) =>
+					users: users.map((user: User) =>
 						exclude(user, [
 							'password',
 							'identityKey',
