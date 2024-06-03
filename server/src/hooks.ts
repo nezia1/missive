@@ -6,13 +6,12 @@
 import { AuthenticationError, AuthorizationError } from '@/errors'
 import { verifyAndDecodeScopedJWT } from '@/jwt'
 import type { Permissions } from '@/permissions'
+import prisma from '@/prisma'
 import { loadKeys } from '@/utils'
-import { PrismaClient, type User } from '@prisma/client'
+import type { User } from '@prisma/client'
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { importSPKI } from 'jose'
 import { JWTInvalid } from 'jose/errors'
-
-const prisma = new PrismaClient()
 
 const { publicKeyPem } = loadKeys()
 
@@ -51,8 +50,7 @@ export function authenticationHook(verifyAndDecode = verifyAndDecodeScopedJWT) {
 		if (!accessToken) throw new JWTInvalid('Missing access token')
 
 		// Get access token payload and check if it matches a user (jwtVerify throws an error if the token is invalid for any reason)
-		const payload = await verifyAndDecodeScopedJWT(accessToken, publicKey)
-
+		const payload = await verifyAndDecode(accessToken, publicKey)
 		const user = await prisma.user.findUniqueOrThrow({
 			where: { id: payload.sub },
 		})

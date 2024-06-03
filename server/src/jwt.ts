@@ -9,7 +9,7 @@ import type { Permissions } from './permissions'
 /**
  * This interface is used to extend the JWTPayload interface, and add the scope property.
  */
-interface ScopedJWTPayload extends JWTPayload {
+export interface ScopedJWTPayload extends JWTPayload {
 	scope?: Permissions[]
 }
 
