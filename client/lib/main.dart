@@ -181,31 +181,29 @@ ThemeData _buildAppTheme({bool dark = true}) {
       secondary: palette.secondary,
       onSecondary: palette.textSecondary,
       error: palette.error,
-      background: palette.background,
-      onBackground: palette.textSecondary,
       surface: palette.secondary,
       onSurface: palette.textPrimary,
     ),
     iconTheme: IconThemeData(color: palette.textPrimary),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
           ), // Lighter border),
         ),
-        padding: MaterialStateProperty.all<EdgeInsets>(
+        padding: WidgetStateProperty.all<EdgeInsets>(
             const EdgeInsets.symmetric(vertical: 25.0)),
-        backgroundColor: MaterialStateProperty.all<Color>(palette.accent),
-        foregroundColor: MaterialStateProperty.all<Color>(palette.textPrimary),
+        backgroundColor: WidgetStateProperty.all<Color>(palette.accent),
+        foregroundColor: WidgetStateProperty.all<Color>(palette.textPrimary),
         elevation:
-            MaterialStateProperty.all(8.0), // Raised elevation for a 3D effect
+            WidgetStateProperty.all(8.0), // Raised elevation for a 3D effect
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
-        foregroundColor: MaterialStateProperty.all<Color>(palette.textPrimary),
-        iconColor: MaterialStateProperty.all<Color>(palette.textPrimary),
+        foregroundColor: WidgetStateProperty.all<Color>(palette.textPrimary),
+        iconColor: WidgetStateProperty.all<Color>(palette.textPrimary),
       ), // Icon color
     ),
     inputDecorationTheme: InputDecorationTheme(

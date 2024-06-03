@@ -36,7 +36,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<
       ScaffoldState>(); // needed to show the snackbar above the drawer
   String _version = '';
-  FToast _fToast = FToast();
+  final FToast _fToast = FToast();
 
   @override
   void initState() {
@@ -247,7 +247,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
             return _buildBody();
           }
           return Container(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -274,7 +274,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     final textStyle = Theme.of(context)
         .textTheme
         .bodyMedium
-        ?.copyWith(color: Theme.of(context).colorScheme.onBackground);
+        ?.copyWith(color: Theme.of(context).colorScheme.onSurface);
     final differenceInDays = sentAt.difference(DateTime.now()).inDays;
 
     if (differenceInDays == 0) {
