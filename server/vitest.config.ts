@@ -7,6 +7,7 @@ export default defineConfig({
 			COOKIE_SECRET: 'test',
 			POSTGRES_URL: 'postgres://',
 		},
+		pool: 'forks',
 	},
 	resolve: {
 		alias: {
