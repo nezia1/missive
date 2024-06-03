@@ -2,6 +2,7 @@ import { Status } from '@prisma/client'
 import type { FastifyPluginCallback } from 'fastify'
 
 import { authenticationHook } from '@/hooks'
+import prisma from '@/prisma'
 import { exclude, parseGenericError } from '@/utils'
 import { initializeApp } from 'firebase-admin/app'
 import {
@@ -13,7 +14,8 @@ const connections = new Map<string, WebSocket>()
 initializeApp()
 
 const websocket: FastifyPluginCallback = (fastify, _, done) => {
-	fastify.addHook('preParsing', authenticationHook)
+	if (process.env.NODE_ENV !== 'test')
+		fastify.addHook('preParsing', authenticationHook())
 	fastify.get('/', { websocket: true }, (socket, req) => {
 		if (!req.authenticatedUser)
 			return socket.close(1008, 'User is not authenticated')
@@ -37,7 +39,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 			if (!message.state) sendStatusUpdate(Status.SENT, message.id, socket)
 
 			// Check if receiver exists
-			const receiver = await fastify.prisma.user.findUnique({
+			const receiver = await prisma.user.findUnique({
 				where: {
 					name: message.receiver,
 				},
@@ -72,7 +74,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 				if (message.state) {
 					// if message has state (status update), store it in the database
 					const senderId = (
-						await fastify.prisma.user.findUnique({
+						await prisma.user.findUnique({
 							where: {
 								name: message.receiver,
 							},
@@ -83,7 +85,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 					)?.id
 
 					if (senderId)
-						await fastify.prisma.messageStatus.create({
+						await prisma.messageStatus.create({
 							data: {
 								messageId: message.id,
 								state: message.state,
@@ -93,7 +95,7 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 
 					return
 				}
-				const pendingMessage = await fastify.prisma.pendingMessage.create({
+				const pendingMessage = await prisma.pendingMessage.create({
 					// add receiver id to the pending message
 					data: {
 						id: message.id,
@@ -110,8 +112,8 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 						},
 					},
 				})
-
-				await fastify.prisma.messageStatus.create({
+				console.log('Receiver offline, storing message in database')
+				await prisma.messageStatus.create({
 					data: {
 						messageId: pendingMessage.id,
 						state: Status.RECEIVED,
@@ -132,12 +134,14 @@ const websocket: FastifyPluginCallback = (fastify, _, done) => {
 					body: 'New message',
 				},
 			}
-			await getMessaging().send(firebaseMessage)
+			if (process.env.NODE_ENV !== 'test')
+				await getMessaging().send(firebaseMessage)
 			console.log('Notification sent')
 		})
 
 		socket.on('close', () => {
 			if (!req.authenticatedUser) return
+
 			connections.delete(req.authenticatedUser.name)
 		})
 	})
