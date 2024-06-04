@@ -8,6 +8,4 @@
 		"prisma/dbml",
 		"prisma/migrations"
 	],
-	"print.lineNumbers": "on",
-	"print.folder.includeFileList": true
 }
