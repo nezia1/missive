@@ -19,11 +19,15 @@ void main() {
         AuthProvider(httpClient: httpClient, secureStorage: secureStorage);
     SharedPreferences.setMockInitialValues({});
     test('AuthProvider should return a null user when instantiated', () async {
+      when(secureStorage.read(key: 'accessToken'))
+          .thenAnswer((_) => Future.value(null));
       expect(await userProvider.user, isNull);
     });
 
     test('AuthProvider should return a null access token when instantiated',
         () async {
+      when(secureStorage.read(key: 'accessToken'))
+          .thenAnswer((_) => Future.value(null));
       expect(await userProvider.accessToken, isNull);
     });
 
