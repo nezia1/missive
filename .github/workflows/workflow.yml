@@ -130,10 +130,12 @@ jobs:
           source venv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
+          pip install mkdocs
 
       - name: Build documentation
         run: |
           cd documentation
+          source venv/bin/activate
           mkdocs build --verbose --site-dir public
 
       - name: Upload documentation
