@@ -1,4 +1,4 @@
-name: CI
+name: Missive
 
 on:
   push:
@@ -169,7 +169,7 @@ jobs:
         run: |
           mkdir -p public/client-api
           if [ -d documentation/public ]; then cp -r documentation/public/* public/; fi
-          if [ -d client/public ]; then cp -r client/public/* public/client-api/;
+          if [ -d client/public ]; then cp -r client/public/* public/client-api/; fi
 
       - name: Upload public folder
         uses: actions/upload-artifact@v3
