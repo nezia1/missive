@@ -103,10 +103,16 @@ jobs:
           cd client
           dart doc --output='public'
 
-      - name: Move client documentation
+      - name: Prepare combined directory for client docs
         run: |
-          mkdir -p combined/client
-          mv client/public/* combined/
+          mkdir -p combined/client-api
+          mv client/public/* combined/client-api/
+
+      - name: Upload client documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-docs
+          path: combined/client-api
 
   build-server-docs:
     runs-on: ubuntu-latest
@@ -136,30 +142,52 @@ jobs:
           source venv/bin/activate
           mkdocs build --verbose --site-dir public
 
-      - name: Move server documentation
+      - name: Prepare combined directory for server docs
         run: |
-          mkdir -p combined/client-api
-          mv documentation/public/* combined/client-api/
+          mkdir -p combined
+          mv documentation/public/* combined/
 
-  upload-combined-docs:
+      - name: Upload server documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-docs
+          path: combined
+
+  combine-artifacts:
     runs-on: ubuntu-latest
     needs: [build-client-docs, build-server-docs]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Download client documentation
+        uses: actions/download-artifact@v4
         with:
-          submodules: true
+          name: client-docs
+          path: combined/client-api
+          
+      - name: Download server documentation
+        uses: actions/download-artifact@v4
+        with:
+          name: server-docs
+          path: combined
+
       - name: Upload combined documentation
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          path: ./combined
+          name: github-pages
+          path: combined
 
   deploy:
     runs-on: ubuntu-latest
-    needs: upload-combined-docs
+    needs: combine-artifacts
     permissions:
       pages: write
       id-token: write
     steps:
-      - name: Deploy combined documentation to GitHub Pages
+      - name: Download combined documentation artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+
+      - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
+        with:
+          path: combined
