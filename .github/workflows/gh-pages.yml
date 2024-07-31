@@ -138,7 +138,7 @@ jobs:
           mkdocs build --verbose --site-dir public
 
       - name: Upload documentation
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3.0.1
         with:
           name: client-docs
           path: client/public
