@@ -104,7 +104,7 @@ jobs:
           dart doc --output='public'
 
       - name: Upload documentation
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-pages-artifact@v1
         with:
           name: client-docs
           path: client/public
@@ -138,12 +138,11 @@ jobs:
           mkdocs build --verbose --site-dir public
 
       - name: Upload documentation
-        uses: actions/upload-pages-artifact@v3.0.1
+        uses: actions/upload-pages-artifact@v1
         with:
-          name: client-docs
-          path: client/public
+          name: server-docs
+          path: documentation/public
 
-    # Deployment job
   deploy:
     environment:
       name: github-pages
@@ -151,6 +150,30 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-server-docs, build-client-docs]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Download client docs
+        uses: actions/download-pages-artifact@v1
+        with:
+          name: client-docs
+
+      - name: Download server docs
+        uses: actions/download-pages-artifact@v1
+        with:
+          name: server-docs
+
+      - name: Prepare deployment directory
+        run: |
+          mkdir -p public/client-api
+          cp -r server-docs/* public/
+          cp -r client-docs/* public/client-api/
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
