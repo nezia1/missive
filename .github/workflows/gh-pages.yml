@@ -106,7 +106,7 @@ jobs:
       - name: Move client documentation
         run: |
           mkdir -p combined/client
-          mv client/public/* combined/client/
+          mv client/public/* combined/
 
   build-server-docs:
     runs-on: ubuntu-latest
@@ -150,10 +150,9 @@ jobs:
         with:
           submodules: true
       - name: Upload combined documentation
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v4
         with:
-          name: github-pages
-          path: combined
+          path: ./combined
 
   deploy:
     runs-on: ubuntu-latest
