@@ -146,6 +146,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [build-client-docs, build-server-docs]
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
