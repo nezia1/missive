@@ -162,11 +162,5 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          submodules: true
       - name: Deploy combined documentation to GitHub Pages
         uses: actions/deploy-pages@v4
-        with:
-          path: combined
