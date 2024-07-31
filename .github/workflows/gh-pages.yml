@@ -168,10 +168,9 @@ jobs:
 
       - name: Prepare deployment directory
         run: |
-          ls -al
           mkdir -p public/client-api
-          if [ -d documentation/public ]; then cp -r documentation/public/* public/; fi
-          if [ -d client/public ]; then cp -r client/public/* public/client-api/; fi
+          cp -r documentation/public/* public/
+          cp -r client/public/* public/client-api/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
