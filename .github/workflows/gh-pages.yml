@@ -170,9 +170,8 @@ jobs:
           path: combined
 
       - name: Upload combined documentation
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
           path: combined
 
   deploy:
@@ -182,12 +181,5 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - name: Download combined documentation artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: github-pages
-
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
-        with:
-          path: combined
