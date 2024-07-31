@@ -1,0 +1,21 @@
+@startuml authorization
+!include ../include/themes/light.puml
+participant "Application" as Client
+participant API
+database "Base de données" as Database
+
+Client -> API : GET /users/{id}
+activate API
+API -> API : Vérification des permissions du jeton d'accès (user:read dans ce cas)
+
+alt Permissions présentes et valides
+    API -> Database : Requête des données de compte
+    activate Database
+    Database --> API : Envoi des données de compte
+    deactivate Database
+    API --> Client : Envoi des données de compte
+else Permissions absentes ou invalides
+    API --> Client : Envoi d'une erreur 403 Forbidden
+end
+deactivate API
+@enduml

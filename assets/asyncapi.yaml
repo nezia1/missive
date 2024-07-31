@@ -1,0 +1,123 @@
+asyncapi: 3.0.0
+info:
+  title: Missive
+  version: 1.0.0
+  description: >-
+    This service is the real-time communication handler for Missive, a real-time
+    chat application implementing the Signal protocol.
+servers:
+  production:
+    host: missive.nezia.dev
+    protocol: wss
+    description: Secure WebSocket server for encrypted chat messages.
+    security:
+      - $ref: '#/components/securitySchemes/jwtToken'
+channels:
+  /:
+    address: /
+    messages:
+      sendMessage.message.0:
+        $ref: '#/components/messages/encryptedMessage'
+      sendMessage.message.1:
+        $ref: '#/components/messages/deliveryReceipt'
+      sendMessage.message.2:
+        $ref: '#/components/messages/readReceipt'
+      receiveMessage.message.0:
+        $ref: '#/components/messages/encryptedMessage'
+      receiveMessage.message.1:
+        $ref: '#/components/messages/deliveryReceipt'
+      receiveMessage.message.2:
+        $ref: '#/components/messages/readReceipt'
+    description: Main channel for sending and receiving messages.
+operations:
+  sendMessage:
+    action: receive
+    channel:
+      $ref: '#/channels/~1'
+    summary: Send messages and notifications.
+    messages:
+      - $ref: '#/channels/~1/messages/sendMessage.message.0'
+      - $ref: '#/channels/~1/messages/sendMessage.message.1'
+      - $ref: '#/channels/~1/messages/sendMessage.message.2'
+  receiveMessage:
+    action: send
+    channel:
+      $ref: '#/channels/~1'
+    summary: Receive messages and notifications.
+    messages:
+      - $ref: '#/channels/~1/messages/receiveMessage.message.0'
+      - $ref: '#/channels/~1/messages/receiveMessage.message.1'
+      - $ref: '#/channels/~1/messages/receiveMessage.message.2'
+components:
+  securitySchemes:
+    jwtToken:
+      type: http
+      scheme: bearer
+      bearerFormat: jwt
+      description: >-
+        JWT used for authenticating user connections. Must be provided as a
+        query parameter during the WebSocket handshake.
+  messages:
+    encryptedMessage:
+      name: encryptedMessage
+      title: Encrypted Message
+      summary: Represents a message encrypted according to the Signal Protocol.
+      contentType: application/json
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+              - message
+          messageId:
+            type: string
+            description: Unique identifier for the message.
+          sentAt:
+            type: integer
+            description: Unix timestamp of when the message was sent.
+          recipientId:
+            type: string
+            description: ID of the recipient user.
+          senderId:
+            type: string
+            description: ID of the sender user.
+          content:
+            type: string
+            description: The encrypted content of the message.
+    deliveryReceipt:
+      name: deliveryReceipt
+      title: Delivery Receipt
+      summary: Acknowledgement that a message has been delivered.
+      contentType: application/json
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum:
+              - deliveryReceipt
+          messageId:
+            type: string
+          recipientId:
+            type: string
+          timestamp:
+            type: integer
+    readReceipt:
+      name: readReceipt
+      title: Read Receipt
+      summary: Acknowledgement that a message has been read.
+      contentType: application/json
+      payload:
+        type: object
+        properties:
+          messageType:
+            type: string
+            enum:
+              - readReceipt
+          messageId:
+            type: string
+          senderId:
+            type: string
+          timestamp:
+            type: integer

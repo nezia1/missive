@@ -1,0 +1,51 @@
+@startuml authentication
+!include ../../include/themes/light.puml
+actor Utilisateur
+participant Mobile
+participant AuthProvider
+participant NamespacedSecureStorage
+participant API
+participant Firebase
+
+Utilisateur -> AuthProvider: Envoi des informations de connexion
+activate AuthProvider
+
+AuthProvider -> API: Valider les informations (POST /tokens)
+activate API
+
+alt Informations correctes
+    API --> AuthProvider: Envoi des jetons
+    deactivate API
+    
+    AuthProvider -> NamespacedSecureStorage: Stocker le jeton d'accès et le jeton de rafraîchissement
+    activate NamespacedSecureStorage
+    NamespacedSecureStorage --> AuthProvider: Jetons stockés
+    deactivate NamespacedSecureStorage
+    
+    AuthProvider -> Mobile: Vérifier si sur mobile
+    activate Mobile
+    
+    alt Sur mobile
+        AuthProvider -> Firebase: Initialiser la connexion
+        activate Firebase
+        Firebase --> AuthProvider: Connexion initialisée
+        deactivate Firebase
+    end
+    deactivate Mobile
+    
+    AuthProvider -> NamespacedSecureStorage: Vérifier la clé d'identité
+    activate NamespacedSecureStorage
+    
+    alt Première connexion
+        NamespacedSecureStorage --> AuthProvider: Aucune clé trouvée
+    else
+        NamespacedSecureStorage --> AuthProvider: Clé trouvée
+    end
+    deactivate NamespacedSecureStorage
+    
+    AuthProvider --> Mobile: AuthenticationSuccess
+else Informations incorrectes ou erreur
+    AuthProvider --> Mobile: AuthenticationError
+end
+deactivate AuthProvider
+@enduml

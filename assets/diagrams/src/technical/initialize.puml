@@ -1,0 +1,38 @@
+@startuml initialize
+!include ../../include/themes/light.puml
+actor Utilisateur
+participant "SignalProvider" as SignalProvider
+participant "libsignal_protocol_dart" as LibSignal
+participant "NamespacedSecureStorage" as NSS
+participant "SecureStoragePreKeyStore" as PreKeyStore
+participant "SecureStorageSignedPreKeyStore" as SignedPreKeyStore
+participant "SecureStorageSessionStore" as SessionStore
+participant "SecureStorageIdentityKeyStore" as IdentityKeyStore
+participant "API" as Api
+
+SignalProvider <-> NSS : Initialisation de NamespacedSecureStorage 
+activate SignalProvider
+SignalProvider <-> PreKeyStore : Initialisation de SecureStoragePreKeyStore avec NamedspacedSecureStorage
+SignalProvider <-> SignedPreKeyStore : Initialisation de SecureStorageSignedPreKeyStore avec NamedspacedSecureStorage
+activate SignedPreKeyStore
+SignalProvider <-> SessionStore : Initialisation de SecureStorageSessionStore avec NamedspacedSecureStorage
+
+alt L'utilisateur installe l'application (première connexion)
+        SignalProvider <-> LibSignal : generateIdentityKeyPair()
+        activate LibSignal
+        SignalProvider <-> LibSignal : generateRegistrationId(false)
+        SignalProvider <-> LibSignal : generateSignedPreKey(identityKeyPair, 0)
+        deactivate LibSignal
+        SignalProvider <-> SignedPreKeyStore : storeSignedPreKey(id, signedPreKey)
+        deactivate SignedPreKeyStore
+        SignalProvider -> IdentityKeyStore : fromIdentityKeyPair(NSS, identityKeyPair, registrationId)
+        SignalProvider -> SignalProvider : Génère une centaine de pré clés
+        loop Pour chaque clé pré-générée
+            SignalProvider -> PreKeyStore : storePreKey(p.id, p)
+        end
+        SignalProvider -> Api : POST /users/$name/keys avec les données des clés
+else
+    SignalProvider -> IdentityKeyStore : Initialise SecureStorageIdentityKeyStore avec NameSpacedSecureStorage
+    deactivate SignalProvider
+end
+@enduml

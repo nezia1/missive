@@ -1,0 +1,9 @@
+' Override variables for light mode
+!define PRIMARY_COLOR #625D92
+!define SECONDARY_COLOR #EDEDED
+!define ACCENT_COLOR #957DAD
+!define TEXT_PRIMARY_COLOR #2B2B2B
+!define TEXT_SECONDARY_COLOR #353446
+!define ERROR_COLOR #D291BC
+
+!include general.puml

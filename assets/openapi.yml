@@ -1,0 +1,534 @@
+openapi: '3.0.2'
+info:
+  title: Missive
+  version: '1.0'
+servers:
+  - url: https://missive.nezia.dev/api/v1
+security:
+  - BearerAuth: []
+paths:
+  /tokens:
+    summary: Represents access and refresh tokens
+    description: |
+      This resource represents the access and refresh tokens of the user. They allow to handle authentication, as well as authorization.
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate the user and provide an access and refresh token
+      security: [] # Login route is public
+      responses:
+        '200':
+          description: Successfully authenticated the user
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      accessToken:
+                        type: string
+                        description: The access JWT that will be passed to subsequent requests
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMGQ0ZjJmMC0wNGViLTQwM2MtYTgyMS1mMjU5MjcwNWMyYTQiLCJuYW1lIjoiYWxpY2UiLCJjbGFpbXMiOlsicHJvZmlsZTpyZWFkIiwicHJvZmlsZTp3cml0ZSIsInByZWtleXM6cmVhZCIsInByZWtleXM6d3JpdGUiXSwiZXhwIjo5MDAsImlhdCI6MTcxMTYzNzMzMn0.SU7pdrNydxyB2nQK12s0WiELbs80jIIN5D7ELTZao2k
+          headers:
+            Set-Cookie:
+              description: Sets the refresh token as an HTTP only cookie
+              schema:
+                type: string
+                example: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMGQ0ZjJmMC0wNGViLTQwM2MtYTgyMS1mMjU5MjcwNWMyYTQiLCJuYW1lIjoiYWxpY2UiLCJleHAiOjMxNTM2MDAwLCJpYXQiOjE3MTE2MzcxMTJ9.zVcObm2Guk23mvLXuuzX7XghdaCobcX7F_-cA7GjwaI; Path=/; HttpOnly
+        '401':
+          $ref: "#/components/responses/UnauthorizedResponse"
+        '202':
+          description: The user has enabled 2FA, they will need to login again including their one-time password
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      status:
+                        type: string
+                        description: A status informing the consumer that TOTP is required
+                        example: totp_required
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Refresh access token 
+      tags: 
+        - Authentication
+      parameters:
+        - $ref: '#/components/parameters/RefreshCookie'
+      security: [] # No security since we're simply checking for the refresh token (the fact that the user has one meant they are logged in)
+      
+      responses:
+        '200':
+          description: Access token refreshed successfully
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    properties:
+                      accessToken:
+                        type: string
+                        description: The new access JWT
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMGQ0ZjJmMC0wNGViLTQwM2MtYTgyMS1mMjU5MjcwNWMyYTQiLCJuYW1lIjoiYWxpY2UiLCJjbGFpbXMiOlsicHJvZmlsZTpyZWFkIiwicHJvZmlsZTp3cml0ZSIsInByZWtleXM6cmVhZCIsInByZWtleXM6d3JpdGUiXSwiaWF0IjoxNzExNjM3MzU2fQ.2QIhzXBKB31TXrf7g1i_VXSMre74kcLXHqG0WJJGyZ8
+        '401':
+          description: Refresh token missing 
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                    example: Refresh token is missing
+        '403':
+          description: Refresh token invalid
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                    example: Refresh token is invalid
+    delete:
+      summary: Revoke a refresh token
+      tags: 
+        - Authentication
+      responses:
+        '204':
+          description: Refresh token has been successfully revoked
+  /users:
+      post:
+        summary: Create a user account
+        description: |
+          This route allows the user to sign themselves up. If the process is successful, it will return an access token, alongside a refresh token as a cookie.
+        tags: 
+         - Users
+        requestBody: 
+          required: true
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/CreateUserRequest'
+        responses:
+          '204': 
+            description: Account creation successful
+            content:
+              application/json:
+                schema:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    data:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        accessToken:
+                          type: string
+      get:
+        parameters:
+          - in: path
+            name: search
+            schema:
+              type: string
+            description: Allow to search for users using their name
+            required: true
+        responses:
+          '200':
+            description: Successfully fetched users 
+            content: 
+              application/json:
+                schema: 
+                  type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/User"
+            
+  /users/{id}:
+      summary: Represents a user
+      description: |
+        This represents an individual user.
+        Each user is identified by a numeric `id`.
+        Users are only able to carry out operations belonging to their own profile. This is handled by the JWT, containing a user id.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Unique ID (UUIDv4) of the user 
+          example: a0d4f2f0-04eb-403c-a821-f2592705c2a4
+      get:
+        summary: Get a user's data 
+        description: This route allows to fetch a user's data. You need to be logged in to retrieve any sort of information from this. Additionally, you can only retrieve your own data.
+        tags:
+            - Users
+        security: 
+          - BearerAuth: []
+        responses:
+          '200':
+            description: Profile successfully fetched 
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    data:
+                      $ref: "#/components/schemas/User"
+          '401':
+            $ref: "#/components/responses/UnauthorizedResponse"
+          '403':
+            $ref: "#/components/responses/ForbiddenResponse"
+          '404':
+            $ref: "#/components/responses/NotFoundResponse"
+      delete:
+        summary: Delete a user's profile
+        description: This route allows a user to delete their profile completely, deleting all keys related to them in the process.
+        tags:
+          - Users
+        responses:
+          '204':
+             description: User successfully deleted
+          '401':
+            $ref: "#/components/responses/UnauthorizedResponse"
+  /users/{name}/keys:
+    summary: Represents the user's public cryptography keys
+    description: | 
+      This resource represents the entirety of the user's public keys. It contains:
+        - Pre keys
+        - Signed pre key
+    parameters:
+      - in: path
+        name: name 
+        description: User's unique name
+        schema:
+          type: string
+        required: true
+        example: alice
+    post:
+      summary: Store a pre-key bundle
+      description: This route allows to store a pre-key bundle, with an optional signed pre-key if it's the first time the user uses the application.
+      tags:
+        - Pre-keys
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema: 
+              required:
+                - "preKeys"
+              type: object
+              additionalProperties: false
+              properties:
+                preKeys:
+                  type: array
+                  additionalProperties: false
+                  items:
+                    $ref: "#/components/schemas/OneTimePreKey"
+                signedPreKey:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                  $ref: "#/components/schemas/SignedPreKey"
+        description: The `signedPreKey` is optional and only needs to be included if it is the first time the user is using the application (at account setup).
+      responses:
+        '204':
+          description: Pre-key bundle successfully stored
+        '401':
+          $ref: "#/components/responses/UnauthorizedResponse"
+        '403':
+          $ref: "#/components/responses/ForbiddenResponse"
+
+    get:
+      summary:  Fetch pre-keys related to this user
+      description: | 
+        This route allows the currently authenticated user to retrieve public keys from the app users. It's going to return one regular pre-key, and the signed pre-key. This will also effectively delete the pre-key that was used (the Signal protocol specification requires them to be one-time only).
+        Everyone can fetch everybody else's public keys, as long as they're authenticated, but only the user owning the signed public pre-key can update it.
+      tags:
+       - Pre-keys 
+      responses:
+        '200':
+          description: Public pre-keys successfully fetched
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                    $ref: "#/components/schemas/PreKeyBundle"
+                      
+        '401':
+          $ref: "#/components/responses/UnauthorizedResponse"
+    patch:
+      summary: Update the signed pre-key
+      description: This allows the user to update their own signed pre-key. It is recommended that this is updated at least once a month.
+      tags:
+        - Pre-keys
+      responses:
+        '204':
+          description: Signed public pre-key successfully updated
+        '401':
+          $ref: "#/components/responses/UnauthorizedResponse"
+        '403':
+          $ref: "#/components/responses/ForbiddenResponse"
+  /users/{id}/messages:
+    summary: Represents a user's pending messages
+    description: |
+      This resource represents a user's pending messages.
+      They are only accessible if the user it belongs to is the currently authenticated user, and are to be automatically deleted after being successfully received.
+    parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Unique ID (RFC 4122 compliant UUID) of the user 
+          example: a0d4f2f0-04eb-403c-a821-f2592705c2a4
+    get:
+      summary: Fetches all pending messages
+      description: | 
+        This route gets all pending messages in order to be processed by the client. The messages should be deleted after being fetched, or at least marked as received in order for the database / server to automatically clean up.
+      tags: 
+        - Pending messages
+      responses:
+        '200':
+          description: Messages successfully received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PendingMessages"
+        '401':
+          $ref: "#/components/responses/UnauthorizedResponse"
+        '403':
+          $ref: "#/components/responses/ForbiddenResponse"
+  /users/{id}/messages/status:
+    get:
+      summary: Fetch status of sent messages
+      description: |
+        This route allows users to fetch the current status of all messages they have sent. It is useful for synchronizing message statuses when the user logs back into the application after being offline.
+      tags:
+        - Pending messages
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Unique ID (UUIDv4) of the user whose message statuses are to be fetched
+          example: a0d4f2f0-04eb-403c-a821-f2592705c2a4
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successfully fetched message statuses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MessageStatus'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        A JWT authentication flow, requiring an access token generated by the POST /tokens route containing:
+        - the user's unique ID
+        - the scope they have access to 
+  schemas:
+    User:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: The unique id of the user
+          example: a0d4f2f0-04eb-403c-a821-f2592705c2a4
+        name:
+          type: string
+          description: The unique user's username
+          example: alice
+        password:
+          type: string
+          description: The user's password (hashed and salted)
+          example: $argon2i$v=19$m=16,t=2,p=1$IGRrY2trZGtma29zZmZnamRzbGt0cmx3NGVqZXJ0ZXJrbHdza3J0amlrb2w0ZSwuNGVyc2dzZnhn$mOamRmIP06Ny7IXXnv8OSg
+        registrationId:
+          type: string
+          description: The user's unique registration ID (generated from the Signal application)
+          example: 654556789
+    Error:
+      type: object
+      additionalProperties: false
+      properties:
+        error:
+          type: string
+          description: A message describing the error in a human-readable format
+    OneTimePreKey:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          description: Public key id
+        key:
+          type: string
+          description: Public key
+    SignedPreKey:
+      type: object
+      additionalProperties: false
+      allOf:
+        - $ref: "#/components/schemas/OneTimePreKey"
+      properties:
+       signature:
+        type: string
+        description: The pre key's signature
+    PreKeyBundle:
+      type: object
+      additionalProperties: false
+      properties:
+        registrationId:
+          type: string
+          description: The user's registration ID
+        identityKey:
+          type: string
+          description: The user's public identity key
+        preKey: 
+          type: object
+          properties:
+          $ref: "#/components/schemas/OneTimePreKey"
+        signedPreKey:
+          type: object
+          properties:
+          $ref: "#/components/schemas/SignedPreKey"
+    PendingMessage: 
+      type: object
+      properties:
+        id:
+          type: string
+          example: a3461864-2829-44b0-ae9e-79c83837cc0d
+          description: The identifier of the message
+        senderId:
+          type: string
+          example: a0d4f2f0-04eb-403c-a821-f2592705c2a4
+          description: The identifier of the sender
+        receiverId:
+          type: string 
+          example: f89e1a24-6f14-4487-8320-1a6f794efc87
+          description: The identifier of the receiver
+        content:
+          type: string
+          example: encrypted-message
+          description: The encrypted content of the message
+        sentAt: 
+          type: string
+          format: date-time
+          example: 1711637404
+          description: The date and time when the message was sent
+    PendingMessages:
+      properties:
+        messages: 
+          type: array
+          items:
+            $ref: "#/components/schemas/PendingMessage"
+    MessageStatus:
+      type: object
+      required:
+        - messageId
+        - state
+      properties:
+        messageId:
+          type: string
+          description: The unique identifier of the message
+          example: '9f8d88e8-ae60-496b-8e4a-2f5d1d5c093b'
+        state:
+          type: string
+          description: The current status of the message (sent, received, read)
+          example: 'read'
+    CreateUserRequest:
+      properties:
+        name:
+          type: string
+          description: The user's unique username
+          example: alice
+        password:
+          type: string
+          description: Password for the user account
+          example: Super
+        registrationId:
+          type: string
+          description: The user's registration ID (generated using the Signal protocol)
+          example: 321312456
+        identityKey:
+          type: string
+          description: The user's public identity key (generated using the Signal protocol, base64 encoded)
+  parameters:
+    RefreshCookie:
+      required: true
+      in: cookie
+      name: refreshToken
+      description: The refresh token used to authenticate and refresh the access token
+      schema:
+        type: string
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMGQ0ZjJmMC0wNGViLTQwM2MtYTgyMS1mMjU5MjcwNWMyYTQiLCJuYW1lIjoiYWxpY2UiLCJleHAiOjMxNTM2MDAwLCJpYXQiOjE3MTE2MzcxMTJ9.zVcObm2Guk23mvLXuuzX7XghdaCobcX7F_-cA7GjwaI
+  responses:
+    UnauthorizedResponse:
+      description: Authentication is required and has failed or is missing
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+            $ref: "#/components/schemas/Error"
+          example:
+                error: "User is not authenticated"
+    ForbiddenResponse:
+      description: Authentication has succeeded but user is not allowed to access resource
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+            $ref: "#/components/schemas/Error"
+          example:
+                error: "User does not have permission to access resource"
+    NotFoundResponse:
+      description: Resource has not been found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+            $ref: "#/components/schemas/Error"
+          example:
+                error: "The resource you are trying to access has not been found"

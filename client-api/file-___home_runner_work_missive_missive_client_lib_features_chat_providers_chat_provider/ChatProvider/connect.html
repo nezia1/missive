@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the connect method from the ChatProvider class, for the Dart programming language.">
+  <title>connect method - ChatProvider class - chat_provider library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">missive</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider/file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider-library.html">features&#47;chat&#47;providers&#47;chat_provider.dart</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider/ChatProvider-class.html">ChatProvider</a></li>
+    <li class="self-crumb">connect method</li>
+  </ol>
+  <div class="self-name">connect</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span id="dark-theme-button" class="material-symbols-outlined">
+        brightness_4
+      </span>
+      <span id="light-theme-button" class="material-symbols-outlined">
+        brightness_5
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div
+      id="dartdoc-main-content"
+      class="main-content"
+      data-above-sidebar="file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider&#47;ChatProvider-class-sidebar.html"
+      data-below-sidebar="">
+      <div>
+<h1><span class="kind-method">connect</span> method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+<span class="name ">connect</span>(<wbr>)
+
+      
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Connects to the WebSocket server and listens for incoming messages.</p>
+<p>When the WebSocket connection is established, the provider listens for incoming messages. If the message is a status update, it updates the corresponding message status accordingly. If the message is a new message, it decrypts the message using <a href="../../file-___home_runner_work_missive_missive_client_lib_features_encryption_providers_signal_provider/SignalProvider-class.html">SignalProvider</a> and stores it locally in the user's Realm database as a <a href="../../file-___home_runner_work_missive_missive_client_lib_features_chat_models_conversation/PlaintextMessage-class.html">PlaintextMessage</a>.</p>
+<h2 id="throws">Throws</h2>
+<ul>
+<li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider/InitializationError-class.html">InitializationError</a> if the provider is not fully initialized (<code>_url</code>, <code>_authProvider</code>, <code>_signalProvider</code>).</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<pre class="language-dart"><code class="language-dart">await provider.connect();
+</code></pre>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; connect() async {
+  if (_url == null || _authProvider == null || _signalProvider == null) {
+    throw InitializationError(&#39;ChatProvider is not fully initialized&#39;);
+  }
+
+  if (_isConnecting) return;
+
+  _isConnecting = true;
+
+  try {
+    final ws = await WebSocket.connect(
+      _url!,
+      headers: {
+        HttpHeaders.authorizationHeader:
+            &#39;Bearer ${await _authProvider!.accessToken}&#39;
+      },
+    );
+
+    _channel = IOWebSocketChannel(ws);
+    _logger.log(Level.FINE, &#39;Connected to $_url&#39;);
+    _connected = true;
+    _sendPendingMessages();
+
+    &#47;&#47; If reconnection attempts have been made, fetch pending messages as there could have been messages sent while disconnected, and reset the attempts
+    if (_reconnectionAttempts &gt; 0) {
+      fetchPendingMessages();
+      fetchMessageStatuses();
+      _reconnectionAttempts = 0;
+      notifyListeners();
+    }
+
+    _channel!.stream.listen(
+      (message) async {
+        await _handleMessage(message);
+      },
+      onDone: _handleConnectionClosed,
+      onError: (error) =&gt;
+          _logger.log(Level.SEVERE, &#39;WebSocket Error: $error&#39;),
+    );
+  } catch (e) {
+    _logger.log(Level.SEVERE, &#39;Failed to connect: $e&#39;);
+    _connected = false;
+    _scheduleReconnection();
+  } finally {
+    _isConnecting = false;
+  }
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../../index.html">missive</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider/file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider-library.html">chat_provider</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider/ChatProvider-class.html">ChatProvider</a></li>
+    <li class="self-crumb">connect method</li>
+</ol>
+
+
+    <h5>ChatProvider class</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    missive
+      1.0.0+2
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

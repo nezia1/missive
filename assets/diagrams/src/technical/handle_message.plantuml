@@ -1,0 +1,38 @@
+@startuml handle_message
+!include ../../include/themes/light.puml
+actor Utilisateur
+participant _handleMessage
+participant SignalMessage
+participant PreKeySignalMessage
+participant _signalProvider
+participant _getUserRealm
+participant Realm
+participant Conversation
+
+activate _handleMessage
+_handleMessage -> _handleMessage : Traitement du JSON (création d'un objet SignalMessage ou PreKeySignalMessage)
+_handleMessage -> _signalProvider : Déchiffrement du message
+activate _signalProvider
+_signalProvider --> _handleMessage : Envoi du message en clair
+deactivate _signalProvider
+
+_handleMessage -> _getUserRealm : Récupération du Realm de l'utilisateur
+activate _getUserRealm
+_getUserRealm --> _handleMessage : Retourne la base de données Realm
+deactivate _getUserRealm
+
+_handleMessage -> Realm : Écriture du message en clair
+activate Realm
+Realm -> Conversation : Recherche de la conversation
+activate Conversation
+
+alt conversation trouvée
+    Conversation -> Realm : Ajout du message
+else
+    Conversation -> Realm : Création et ajout du message
+end
+
+deactivate Conversation
+deactivate Realm
+deactivate _handleMessage
+@enduml

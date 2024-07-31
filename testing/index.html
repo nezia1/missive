@@ -1,0 +1,1881 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Documentation de Missive, travail de diplôme d'Anthony Rodriguez, étudiant en informatique technicien ES 2023/2024" name="description"/>
+<meta content="Anthony Rodriguez" name="author"/>
+<link href="https://anthony-rdrgz.docs.ictge.ch/missive/testing/" rel="canonical"/>
+<link href="../api/" rel="prev"/>
+<link href="../summary/" rel="next"/>
+<link href="../assets/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.5.3, mkdocs-material-9.4.14" name="generator"/>
+<title>Plan de tests - Documentation Missive</title>
+<link href="../assets/stylesheets/main.fad675c6.min.css" rel="stylesheet"/>
+<link href="../assets/stylesheets/palette.356b1318.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../stylesheets/inline-figures.css" rel="stylesheet"/>
+<link href="../stylesheets/increase-logo-size.css" rel="stylesheet"/>
+<link href="../stylesheets/align-codeblocks-left.css" rel="stylesheet"/>
+<link href="../stylesheets/increase-figure-size.css" rel="stylesheet"/>
+<link href="../stylesheets/add-missive-brand-colors.css" rel="stylesheet"/>
+<link href="../stylesheets/justify-paragraphs.css" rel="stylesheet"/>
+<link href="../stylesheets/icons.css" rel="stylesheet"/>
+<script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<meta name="darkreader-lock">
+<link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }
+    .gscrollbar-fixer { padding-right: 15px; }
+    .gdesc-inner { font-size: 0.75rem; }
+    body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+    body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="../assets/javascripts/glightbox.min.js"></script></link></meta></head>
+<body data-md-color-accent="custom" data-md-color-primary="custom" data-md-color-scheme="default" dir="ltr">
+<script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#plan-de-tests">
+          Aller au contenu
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="En-tête" class="md-header__inner md-grid">
+<a aria-label="Documentation Missive" class="md-header__button md-logo" data-md-component="logo" href=".." title="Documentation Missive">
+<img alt="logo" src="../assets/img/missive_logo.png"/>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Documentation Missive
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Plan de tests
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="custom" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="custom" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_3" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69m-9.15 3.96h2.3L12 9l-1.15 3.65Z"></path></svg>
+</label>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="custom" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="custom" data-md-color-scheme="default" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+<input aria-label="Switch to system preference" class="md-option" data-md-color-accent="custom" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="custom" data-md-color-scheme="slate" id="__palette_3" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to system preference">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+</form>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Rechercher" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Rechercher" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</label>
+<nav aria-label="Recherche" class="md-search__options">
+<a aria-label="Partager" class="md-search__icon md-icon" data-clipboard="" data-clipboard-text="" data-md-component="search-share" href="javascript:void(0)" tabindex="-1" title="Partager">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"></path></svg>
+</a>
+<button aria-label="Effacer" class="md-search__icon md-icon" tabindex="-1" title="Effacer" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://gitlab.ictge.ch/anthony-rdrgz/missive" title="Aller au dépôt">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    anthony-rdrgz/missive
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Onglets" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="..">
+        
+  
+    
+  
+  Accueil
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../specifications/">
+        
+  
+    
+  
+  Spécifications
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../fonctionnement/">
+        
+  
+    
+  
+  Fonctionnement
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../api/">
+        
+  
+    
+  
+  API
+
+      </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="./">
+        
+  
+    
+  
+  Plan de tests
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../summary/">
+        
+  
+    
+  
+  Bilan personnel
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../glossary/">
+        
+  
+    
+  
+  Glossaire
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../figures/">
+        
+  
+    
+  
+  Illustrations
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../logbook/">
+        
+  
+    
+  
+  Journal de bord
+
+      </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden="">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Documentation Missive" class="md-nav__button md-logo" data-md-component="logo" href=".." title="Documentation Missive">
+<img alt="logo" src="../assets/img/missive_logo.png"/>
+</a>
+    Documentation Missive
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://gitlab.ictge.ch/anthony-rdrgz/missive" title="Aller au dépôt">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    anthony-rdrgz/missive
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="..">
+<span class="md-ellipsis">
+    Accueil
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../specifications/">
+<span class="md-ellipsis">
+    Spécifications
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../fonctionnement/">
+<span class="md-ellipsis">
+    Fonctionnement
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../api/">
+<span class="md-ellipsis">
+    API
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    Plan de tests
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
+    Plan de tests
+  </span>
+</a>
+<nav aria-label="Table des matières" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#api">
+<span class="md-ellipsis">
+      API
+    </span>
+</a>
+<nav aria-label="API" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#introduction">
+<span class="md-ellipsis">
+      Introduction
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#lien-de-la-production">
+<span class="md-ellipsis">
+      Lien de la production
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#authentification">
+<span class="md-ellipsis">
+      Authentification
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#scenarios-de-test">
+<span class="md-ellipsis">
+      Scénarios de Test
+    </span>
+</a>
+<nav aria-label="Scénarios de Test" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#notes-supplementaires">
+<span class="md-ellipsis">
+      Notes supplémentaires
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#tests-de-securite-et-de-performance">
+<span class="md-ellipsis">
+      Tests de Sécurité et de Performance
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#automatisation-des-tests">
+<span class="md-ellipsis">
+      Automatisation des tests
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rapport-de-tests">
+<span class="md-ellipsis">
+      Rapport de tests
+    </span>
+</a>
+<nav aria-label="Rapport de tests" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#post-tokens">
+<span class="md-ellipsis">
+      POST /tokens
+    </span>
+</a>
+<nav aria-label="POST /tokens" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#lutilisateur-peut-sauthentifier-et-recoit-des-tokens-valides">
+<span class="md-ellipsis">
+      L'utilisateur peut s'authentifier et reçoit des tokens valides
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#put-tokens">
+<span class="md-ellipsis">
+      PUT /tokens
+    </span>
+</a>
+<nav aria-label="PUT /tokens" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mise-a-jour-du-token-dacces">
+<span class="md-ellipsis">
+      Mise à jour du token d'accès
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#delete-tokens">
+<span class="md-ellipsis">
+      DELETE /tokens
+    </span>
+</a>
+<nav aria-label="DELETE /tokens" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#revocation-du-refresh-token">
+<span class="md-ellipsis">
+      Révocation du refresh token
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#post-users">
+<span class="md-ellipsis">
+      POST /users
+    </span>
+</a>
+<nav aria-label="POST /users" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#creation-du-compte-utilisateur">
+<span class="md-ellipsis">
+      Création du compte utilisateur
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#get-usersid">
+<span class="md-ellipsis">
+      GET /users/{id}
+    </span>
+</a>
+<nav aria-label="GET /users/{id}" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#obtenir-les-donnees-dun-utilisateur">
+<span class="md-ellipsis">
+      Obtenir les données d'un utilisateur
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#post-usersidkeys">
+<span class="md-ellipsis">
+      POST /users/{id}/keys
+    </span>
+</a>
+<nav aria-label="POST /users/{id}/keys" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#stocker-un-bundle-de-pre-cles">
+<span class="md-ellipsis">
+      Stocker un bundle de pré-clés
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#get-usersidkeys">
+<span class="md-ellipsis">
+      GET /users/{id}/keys
+    </span>
+</a>
+<nav aria-label="GET /users/{id}/keys" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#recuperer-un-bundle-de-pre-cles">
+<span class="md-ellipsis">
+      Récupérer un bundle de pré-clés
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#patch-usersidkeys">
+<span class="md-ellipsis">
+      PATCH /users/{id}/keys
+    </span>
+</a>
+<nav aria-label="PATCH /users/{id}/keys" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mise-a-jour-de-la-pre-cle-signee">
+<span class="md-ellipsis">
+      Mise à jour de la pré-clé signée
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#get-usersidmessages">
+<span class="md-ellipsis">
+      GET /users/{id}/messages
+    </span>
+</a>
+<nav aria-label="GET /users/{id}/messages" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#recuperation-des-messages-en-attente">
+<span class="md-ellipsis">
+      Récupération des messages en attente
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#delete-usersid">
+<span class="md-ellipsis">
+      DELETE /users/{id}
+    </span>
+</a>
+<nav aria-label="DELETE /users/{id}" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#suppression-du-profil-utilisateur">
+<span class="md-ellipsis">
+      Suppression du profil utilisateur
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#serveur-websocket">
+<span class="md-ellipsis">
+      Serveur WebSocket
+    </span>
+</a>
+<nav aria-label="Serveur WebSocket" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#introduction_1">
+<span class="md-ellipsis">
+      Introduction
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#lien-de-la-production_1">
+<span class="md-ellipsis">
+      Lien de la production
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#scenarios-de-test_1">
+<span class="md-ellipsis">
+      Scénarios de Test
+    </span>
+</a>
+<nav aria-label="Scénarios de Test" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#historique">
+<span class="md-ellipsis">
+      Historique
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rapport-de-tests_1">
+<span class="md-ellipsis">
+      Rapport de tests
+    </span>
+</a>
+<nav aria-label="Rapport de tests" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#etablissement-dune-connexion-websocket">
+<span class="md-ellipsis">
+      Établissement d'une connexion WebSocket
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#envoi-dun-message-a-un-utilisateur-reception">
+<span class="md-ellipsis">
+      Envoi d'un message à un utilisateur / réception
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#stockage-du-message-si-lutilisateur-est-hors-ligne">
+<span class="md-ellipsis">
+      Stockage du message si l'utilisateur est hors-ligne
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mise-a-jour-des-statuts-de-messages">
+<span class="md-ellipsis">
+      Mise à jour des statuts de messages
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#client">
+<span class="md-ellipsis">
+      Client
+    </span>
+</a>
+<nav aria-label="Client" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#introduction_2">
+<span class="md-ellipsis">
+      Introduction
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#scenarios-de-test_2">
+<span class="md-ellipsis">
+      Scénarios de Test
+    </span>
+</a>
+<nav aria-label="Scénarios de Test" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#historique_1">
+<span class="md-ellipsis">
+      Historique
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rapport-de-tests_2">
+<span class="md-ellipsis">
+      Rapport de tests
+    </span>
+</a>
+<nav aria-label="Rapport de tests" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#creation-de-compte">
+<span class="md-ellipsis">
+      Création de compte
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#authentifier-un-utilisateur">
+<span class="md-ellipsis">
+      Authentifier un utilisateur
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#recuperation-des-donnees-utilisateur">
+<span class="md-ellipsis">
+      Récupération des données utilisateur
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deconnexion-utilisateur">
+<span class="md-ellipsis">
+      Déconnexion utilisateur
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#envoi-des-messages">
+<span class="md-ellipsis">
+      Envoi des messages
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#reception-des-messages">
+<span class="md-ellipsis">
+      Réception des messages
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#implementation-du-protocole-signal">
+<span class="md-ellipsis">
+      Implémentation du protocole Signal
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#reconnexion-automatique">
+<span class="md-ellipsis">
+      Reconnexion automatique
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#gestion-des-notifications">
+<span class="md-ellipsis">
+      Gestion des notifications
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#statut-des-messages">
+<span class="md-ellipsis">
+      Statut des messages
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../summary/">
+<span class="md-ellipsis">
+    Bilan personnel
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../glossary/">
+<span class="md-ellipsis">
+    Glossaire
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../figures/">
+<span class="md-ellipsis">
+    Illustrations
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../logbook/">
+<span class="md-ellipsis">
+    Journal de bord
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table des matières" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#api">
+<span class="md-ellipsis">
+      API
+    </span>
+</a>
+<nav aria-label="API" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#introduction">
+<span class="md-ellipsis">
+      Introduction
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#lien-de-la-production">
+<span class="md-ellipsis">
+      Lien de la production
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#authentification">
+<span class="md-ellipsis">
+      Authentification
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#scenarios-de-test">
+<span class="md-ellipsis">
+      Scénarios de Test
+    </span>
+</a>
+<nav aria-label="Scénarios de Test" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#notes-supplementaires">
+<span class="md-ellipsis">
+      Notes supplémentaires
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#tests-de-securite-et-de-performance">
+<span class="md-ellipsis">
+      Tests de Sécurité et de Performance
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#automatisation-des-tests">
+<span class="md-ellipsis">
+      Automatisation des tests
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rapport-de-tests">
+<span class="md-ellipsis">
+      Rapport de tests
+    </span>
+</a>
+<nav aria-label="Rapport de tests" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#post-tokens">
+<span class="md-ellipsis">
+      POST /tokens
+    </span>
+</a>
+<nav aria-label="POST /tokens" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#lutilisateur-peut-sauthentifier-et-recoit-des-tokens-valides">
+<span class="md-ellipsis">
+      L'utilisateur peut s'authentifier et reçoit des tokens valides
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#put-tokens">
+<span class="md-ellipsis">
+      PUT /tokens
+    </span>
+</a>
+<nav aria-label="PUT /tokens" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mise-a-jour-du-token-dacces">
+<span class="md-ellipsis">
+      Mise à jour du token d'accès
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#delete-tokens">
+<span class="md-ellipsis">
+      DELETE /tokens
+    </span>
+</a>
+<nav aria-label="DELETE /tokens" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#revocation-du-refresh-token">
+<span class="md-ellipsis">
+      Révocation du refresh token
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#post-users">
+<span class="md-ellipsis">
+      POST /users
+    </span>
+</a>
+<nav aria-label="POST /users" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#creation-du-compte-utilisateur">
+<span class="md-ellipsis">
+      Création du compte utilisateur
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#get-usersid">
+<span class="md-ellipsis">
+      GET /users/{id}
+    </span>
+</a>
+<nav aria-label="GET /users/{id}" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#obtenir-les-donnees-dun-utilisateur">
+<span class="md-ellipsis">
+      Obtenir les données d'un utilisateur
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#post-usersidkeys">
+<span class="md-ellipsis">
+      POST /users/{id}/keys
+    </span>
+</a>
+<nav aria-label="POST /users/{id}/keys" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#stocker-un-bundle-de-pre-cles">
+<span class="md-ellipsis">
+      Stocker un bundle de pré-clés
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#get-usersidkeys">
+<span class="md-ellipsis">
+      GET /users/{id}/keys
+    </span>
+</a>
+<nav aria-label="GET /users/{id}/keys" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#recuperer-un-bundle-de-pre-cles">
+<span class="md-ellipsis">
+      Récupérer un bundle de pré-clés
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#patch-usersidkeys">
+<span class="md-ellipsis">
+      PATCH /users/{id}/keys
+    </span>
+</a>
+<nav aria-label="PATCH /users/{id}/keys" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mise-a-jour-de-la-pre-cle-signee">
+<span class="md-ellipsis">
+      Mise à jour de la pré-clé signée
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#get-usersidmessages">
+<span class="md-ellipsis">
+      GET /users/{id}/messages
+    </span>
+</a>
+<nav aria-label="GET /users/{id}/messages" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#recuperation-des-messages-en-attente">
+<span class="md-ellipsis">
+      Récupération des messages en attente
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#delete-usersid">
+<span class="md-ellipsis">
+      DELETE /users/{id}
+    </span>
+</a>
+<nav aria-label="DELETE /users/{id}" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#suppression-du-profil-utilisateur">
+<span class="md-ellipsis">
+      Suppression du profil utilisateur
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#serveur-websocket">
+<span class="md-ellipsis">
+      Serveur WebSocket
+    </span>
+</a>
+<nav aria-label="Serveur WebSocket" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#introduction_1">
+<span class="md-ellipsis">
+      Introduction
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#lien-de-la-production_1">
+<span class="md-ellipsis">
+      Lien de la production
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#scenarios-de-test_1">
+<span class="md-ellipsis">
+      Scénarios de Test
+    </span>
+</a>
+<nav aria-label="Scénarios de Test" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#historique">
+<span class="md-ellipsis">
+      Historique
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rapport-de-tests_1">
+<span class="md-ellipsis">
+      Rapport de tests
+    </span>
+</a>
+<nav aria-label="Rapport de tests" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#etablissement-dune-connexion-websocket">
+<span class="md-ellipsis">
+      Établissement d'une connexion WebSocket
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#envoi-dun-message-a-un-utilisateur-reception">
+<span class="md-ellipsis">
+      Envoi d'un message à un utilisateur / réception
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#stockage-du-message-si-lutilisateur-est-hors-ligne">
+<span class="md-ellipsis">
+      Stockage du message si l'utilisateur est hors-ligne
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mise-a-jour-des-statuts-de-messages">
+<span class="md-ellipsis">
+      Mise à jour des statuts de messages
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#client">
+<span class="md-ellipsis">
+      Client
+    </span>
+</a>
+<nav aria-label="Client" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#introduction_2">
+<span class="md-ellipsis">
+      Introduction
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#scenarios-de-test_2">
+<span class="md-ellipsis">
+      Scénarios de Test
+    </span>
+</a>
+<nav aria-label="Scénarios de Test" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#historique_1">
+<span class="md-ellipsis">
+      Historique
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rapport-de-tests_2">
+<span class="md-ellipsis">
+      Rapport de tests
+    </span>
+</a>
+<nav aria-label="Rapport de tests" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#creation-de-compte">
+<span class="md-ellipsis">
+      Création de compte
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#authentifier-un-utilisateur">
+<span class="md-ellipsis">
+      Authentifier un utilisateur
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#recuperation-des-donnees-utilisateur">
+<span class="md-ellipsis">
+      Récupération des données utilisateur
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deconnexion-utilisateur">
+<span class="md-ellipsis">
+      Déconnexion utilisateur
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#envoi-des-messages">
+<span class="md-ellipsis">
+      Envoi des messages
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#reception-des-messages">
+<span class="md-ellipsis">
+      Réception des messages
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#implementation-du-protocole-signal">
+<span class="md-ellipsis">
+      Implémentation du protocole Signal
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#reconnexion-automatique">
+<span class="md-ellipsis">
+      Reconnexion automatique
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#gestion-des-notifications">
+<span class="md-ellipsis">
+      Gestion des notifications
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#statut-des-messages">
+<span class="md-ellipsis">
+      Statut des messages
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="plan-de-tests">Plan de tests<a class="headerlink" href="#plan-de-tests" title="Permanent link">¶</a></h1>
+<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">¶</a></h2>
+<h3 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">¶</a></h3>
+<p>Ce plan détaille les tests fonctionnels prévus pour valider les fonctionnalités de l'API Missive, qui gère les tokens d'accès et de rafraîchissement ainsi que les informations utilisateur.</p>
+<h3 id="lien-de-la-production">Lien de la production<a class="headerlink" href="#lien-de-la-production" title="Permanent link">¶</a></h3>
+<p>L'API est hébergée sous ce lien : <code>https://missive.nezia.dev/api/v1</code></p>
+<h3 id="authentification">Authentification<a class="headerlink" href="#authentification" title="Permanent link">¶</a></h3>
+<p>Toutes les requêtes nécessitent une authentification par token Bearer, sauf la route <code>POST /tokens</code> et <code>PUT /tokens</code> qui est utilisée pour l'authentification.</p>
+<h3 id="scenarios-de-test">Scénarios de Test<a class="headerlink" href="#scenarios-de-test" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Méthode</th>
+<th>Description</th>
+<th>Objectif</th>
+<th>Code Attendu</th>
+<th>Statut</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST /tokens</td>
+<td>POST</td>
+<td>Authentifier l'utilisateur et fournir tokens</td>
+<td>Vérifier l'authentification et la remise de tokens</td>
+<td>200 OK</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>PUT /tokens</td>
+<td>PUT</td>
+<td>Rafraîchir le token d'accès</td>
+<td>Vérifier la mise à jour du token d'accès</td>
+<td>200 OK</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>DELETE /tokens</td>
+<td>DELETE</td>
+<td>Révoquer un refresh token</td>
+<td>Vérifier la révocation du refresh token</td>
+<td>204 No Content</td>
+<td>X</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>POST /users</td>
+<td>POST</td>
+<td>Créer un compte utilisateur</td>
+<td>Vérifier la création de compte</td>
+<td>204 No Content</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>GET /users/{id}</td>
+<td>GET</td>
+<td>Obtenir les données d'un utilisateur</td>
+<td>Vérifier la récupération des données utilisateur</td>
+<td>200 OK</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>DELETE /users/{id}</td>
+<td>DELETE</td>
+<td>Supprimer le profil d'un utilisateur</td>
+<td>Vérifier la suppression du profil utilisateur</td>
+<td>204 No Content</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>POST /users/{id}/keys</td>
+<td>POST</td>
+<td>Stocker un lot de pré-clés</td>
+<td>Vérifier le stockage des pré-clés</td>
+<td>204 No Content</td>
+<td>OK</td>
+<td>Moyen</td>
+</tr>
+<tr>
+<td>GET /users/{id}/keys</td>
+<td>GET</td>
+<td>Récupérer les pré-clés d'un utilisateur</td>
+<td>Vérifier la récupération des pré-clés</td>
+<td>200 OK</td>
+<td>OK</td>
+<td>Moyen</td>
+</tr>
+<tr>
+<td>PATCH /users/{id}/keys</td>
+<td>PATCH</td>
+<td>Mettre à jour la pré-clé signée d'un utilisateur</td>
+<td>Vérifier la mise à jour de la pré-clé signée</td>
+<td>204 No Content</td>
+<td>OK</td>
+<td>Moyen</td>
+</tr>
+<tr>
+<td>GET /users/{id}/messages</td>
+<td>GET</td>
+<td>Récupérer les messages en attente d'un utilisateur</td>
+<td>Vérifier la récupération des messages en attente</td>
+<td>200 OK</td>
+<td>OK</td>
+<td>Moyen</td>
+</tr>
+<tr>
+<td>GET /users/{id}/messages</td>
+<td>GET</td>
+<td>Récupérer les messages en attente d'un utilisateur</td>
+<td>Vérifier la suppression après récupération</td>
+<td>200 OK</td>
+<td>OK</td>
+<td>Moyen</td>
+</tr>
+</tbody>
+</table>
+<h4 id="notes-supplementaires">Notes supplémentaires<a class="headerlink" href="#notes-supplementaires" title="Permanent link">¶</a></h4>
+<ul>
+<li>Le statut "X" indique que le cas de test doit encore être exécuté ou que le résultat est en attente de vérification.</li>
+<li>Ces tests doivent être effectués dans un environnement de test avant le déploiement en production.</li>
+</ul>
+<h3 id="tests-de-securite-et-de-performance">Tests de Sécurité et de Performance<a class="headerlink" href="#tests-de-securite-et-de-performance" title="Permanent link">¶</a></h3>
+<ul>
+<li>Des tests de charge et de sécurité devraient également être effectués en utilisant des outils comme OWASP ZAP pour identifier toute vulnérabilité potentielle.</li>
+</ul>
+<h3 id="automatisation-des-tests">Automatisation des tests<a class="headerlink" href="#automatisation-des-tests" title="Permanent link">¶</a></h3>
+<ul>
+<li>Envisager l'automatisation de ces tests à l'aide de Postman ou d'autres frameworks d'automatisation pour intégrer dans un pipeline CI/CD.</li>
+</ul>
+<h3 id="rapport-de-tests">Rapport de tests<a class="headerlink" href="#rapport-de-tests" title="Permanent link">¶</a></h3>
+<h4 id="post-tokens">POST /tokens<a class="headerlink" href="#post-tokens" title="Permanent link">¶</a></h4>
+<h5 id="lutilisateur-peut-sauthentifier-et-recoit-des-tokens-valides">L'utilisateur peut s'authentifier et reçoit des tokens valides<a class="headerlink" href="#lutilisateur-peut-sauthentifier-et-recoit-des-tokens-valides" title="Permanent link">¶</a></h5>
+<p>Une des grandes difficultés avec ce schéma d'authentification a été principalement de comprendre comment fonctionnaient les JWT. Je suis parti sur un schéma de token avec un <code>scope</code>, qui permet d'attribuer des permissions à l'utilisateur. J'ai utilisé la bibliothèque <code>jose</code> afin de générer ces différents jetons, ainsi que Prisma pour récupérer les informations de l'utilisateur et comparer le mot de passe haché avec <code>argon2</code>.</p>
+<p>J'ai du étendre une des classes de <code>jose</code>, car j'avais besoin de rajouter un <code>scope</code> sur mes jetons, et vu que j'utilise Typescript, la gestion des types a été assez complexe. Après avoir approfondi, j'ai réussi à créer ma propre classe dérivée, et tout fonctionne correctement.</p>
+<p>Ensuite, pour implémenter une des fonctionnalités les plus essentielles du JWT, la signature, j'ai tout d'abord opté pour une simple chaîne de caractères générée aléatoirement. Voulant encore plus renforcer ma sécurité, j'ai au final opté pour une paire de clés RSA, qui me permettront d'augmenter encore l'entropie et la complexité de la signature, rendant le risque de trouver cette fameuse clé privée encore plus minime, et également de standardiser encore plus la sécurité, une clé asymmétrique étant de manière générale plus standarde qu'une chaîne de caractères dans la cryptographie moderne.</p>
+<p>Une fois cette signature implémentée, elle peut être vérifée au niveau du serveur, et une exception sera générée si il s'avère que le jeton a été modifié. Je pourrais donc refuser l'accès aux routes protégées en conséquence.</p>
+<h4 id="put-tokens">PUT /tokens<a class="headerlink" href="#put-tokens" title="Permanent link">¶</a></h4>
+<h5 id="mise-a-jour-du-token-dacces">Mise à jour du token d'accès<a class="headerlink" href="#mise-a-jour-du-token-dacces" title="Permanent link">¶</a></h5>
+<p>En ce qui concerne la mise à jour du token d'accès, j'ai dû créer une table dans ma base de données, avec Prisma et rajouter une migration afin de pouvoir avoir une table qui stocke un token de rafraîchissement avec un ID utilisateur. De ce fait, je garde mon modèle d'API au maximum <em>stateless</em>, ce qui est un des points principaux d'une API REST. Ensuite, avec le jeton de rafraîchissement, je viens vérifier sa validité ainsi que son appartenance, et je génère un nouveau token pour l'utilisateur. Toute cette logique fonctionne parfaitement.</p>
+<h4 id="delete-tokens">DELETE /tokens<a class="headerlink" href="#delete-tokens" title="Permanent link">¶</a></h4>
+<h5 id="revocation-du-refresh-token">Révocation du refresh token<a class="headerlink" href="#revocation-du-refresh-token" title="Permanent link">¶</a></h5>
+<p>Je n'ai pas eu le temps d'implémenter la révocation du refresh token. Il est par contre correctement supprimé du côté du client, ce qui ne poserait pas de problèmes, à moins que la base de données devienne vraiment grande.</p>
+<h4 id="post-users">POST /users<a class="headerlink" href="#post-users" title="Permanent link">¶</a></h4>
+<h5 id="creation-du-compte-utilisateur">Création du compte utilisateur<a class="headerlink" href="#creation-du-compte-utilisateur" title="Permanent link">¶</a></h5>
+<p>Pour la création du compte utilisateur, j'ai récupéré les informations de l'utilisateur via le corps de la requête, et utilisé Prisma afin de créer un compte. J'ai également haché le mot de passe en utilisant argon2, afin de ne pas le stocker en clair.</p>
+<h4 id="get-usersid">GET /users/{id}<a class="headerlink" href="#get-usersid" title="Permanent link">¶</a></h4>
+<h5 id="obtenir-les-donnees-dun-utilisateur">Obtenir les données d'un utilisateur<a class="headerlink" href="#obtenir-les-donnees-dun-utilisateur" title="Permanent link">¶</a></h5>
+<p>En ce qui concerne la récupération des données, je voulais faire en sorte que cette route retourne le minimum d'informations possibles : elle est utilisée afin d'effectuer une recherche des utilisateurs par tout le monde, il était donc important que le moins d'informations soient disponibles afin de respecter la confidentialité des utilisateurs.</p>
+<p>J'ai donc dû développer une fonction qui me permet d'exclure des clés d'un type d'objet. Ensuite, après avoir récupéré les données avec Prisma, j'utilise cette fonction <code>exclude</code> afin d'envoyer le strict nécéssair au fonctionnement de l'application.</p>
+<h4 id="post-usersidkeys">POST /users/{id}/keys<a class="headerlink" href="#post-usersidkeys" title="Permanent link">¶</a></h4>
+<h5 id="stocker-un-bundle-de-pre-cles">Stocker un bundle de pré-clés<a class="headerlink" href="#stocker-un-bundle-de-pre-cles" title="Permanent link">¶</a></h5>
+<p>Cette partie m'a posé un sacré défi : en effet, ayant réalisé mon serveur avant de faire l'application, je n'avais aucune idée d'à quoi allait ressembler un bundle de pré-clés de manière exacte. Ayant lu le <em>whitepaper</em> du protocole, j'ai essayé au mieux de créer une table qui me semblait correcte. Cependant, l'implémentation en Dart utilisait une structure assez différente, en rajoutant des champs auxquels je n'avais pas du tout pensé auparavant, comme le <code>registrationId</code>, ou même la gestion des différents périphériques. </p>
+<p>J'ai donc dû passer beaucoup de temps sur la modélisation de mes données, et y revenir un bon nombre de fois. Je pense avoir fini sur une itération qui est complètement fonctionnelle. J'ai également fait attention à stocker uniquement la partie publique de ces clés, en les sérialisant en base64 dans la base de données afin de simplifier au maximum le stockage.</p>
+<h4 id="get-usersidkeys">GET /users/{id}/keys<a class="headerlink" href="#get-usersidkeys" title="Permanent link">¶</a></h4>
+<h5 id="recuperer-un-bundle-de-pre-cles">Récupérer un bundle de pré-clés<a class="headerlink" href="#recuperer-un-bundle-de-pre-cles" title="Permanent link">¶</a></h5>
+<p>La récupération des pré-clés avait une petite subtilité : il faut supprimer les <em>one time pre keys</em> une fois utilisées. J'ai donc implémenté une logique similaire à cette pour récupérer un utilisateur, sauf que cette fois, je n'ai pas exclu de champ, et j'ai simplement supprimé la pré-clé correspondante après l'avoir récupérée, en me servant de son ID.</p>
+<h4 id="patch-usersidkeys">PATCH /users/{id}/keys<a class="headerlink" href="#patch-usersidkeys" title="Permanent link">¶</a></h4>
+<h5 id="mise-a-jour-de-la-pre-cle-signee">Mise à jour de la pré-clé signée<a class="headerlink" href="#mise-a-jour-de-la-pre-cle-signee" title="Permanent link">¶</a></h5>
+<p>Idéalement, une application implémentant le protocole Signal devrait se charger de pouvoir effectuer la rotation de la pré-clé signée, afin d'accroître encore plus la confidentialité. Missive implémente cette dernière, en utilisant encore une fois Prisma afin de pouvoir mettre à jour le bon champ. La route est fonctionnelle, malheureusement, il n'y a pas eu le temps de l'implémenter dans le client.</p>
+<h4 id="get-usersidmessages">GET /users/{id}/messages<a class="headerlink" href="#get-usersidmessages" title="Permanent link">¶</a></h4>
+<h5 id="recuperation-des-messages-en-attente">Récupération des messages en attente<a class="headerlink" href="#recuperation-des-messages-en-attente" title="Permanent link">¶</a></h5>
+<p>Cette fonction est une partie extrêmement importante de l'application, car elle permet à chaque lancement de l'application de récupérer les messages envoyés quand le destinataire était hors-ligne (application fermée ou en arrière-plan). J'ai donc passé un bon moment dessus, afin de m'assurer qu'elle fonctionne, et surtout qu'elle supprime bien les messages après avoir accédé à la route. </p>
+<h4 id="delete-usersid">DELETE /users/{id}<a class="headerlink" href="#delete-usersid" title="Permanent link">¶</a></h4>
+<h5 id="suppression-du-profil-utilisateur">Suppression du profil utilisateur<a class="headerlink" href="#suppression-du-profil-utilisateur" title="Permanent link">¶</a></h5>
+<p>Le profil utilisateur peut être supprimé de manière sécurisée. </p>
+<h2 id="serveur-websocket">Serveur WebSocket<a class="headerlink" href="#serveur-websocket" title="Permanent link">¶</a></h2>
+<h3 id="introduction_1">Introduction<a class="headerlink" href="#introduction_1" title="Permanent link">¶</a></h3>
+<p>Ce plan détaille les tests fonctionnels prévus pour valider les fonctionnalités du serveur WebSocket de Missive, qui gère l'envoi et la réception des messages en temps réel ainsi que la gestion des statuts des messages.</p>
+<p>Les tests unitaires du serveur de Missive sont réalisés avec Vitest, un framework de test moderne et rapide, simple à utiliser et extrêmement bien documenté et maintenu. Il est développé par Evan You, le créateur de Vue.JS. Il permet également de réaliser des mocks de manière simple, ce qui a été crucial étant donné que le serveur de Missive dépend d'un bon nombre de composants externes, comme Prisma pour la base de données.</p>
+<p>Ils sont organisés en ajoutant .test.ts après le nom du fichier, ce qui permet d'avoir les tests directement à côté du fichier concerné dans l'arborescence.</p>
+<p>Ils également mis en place de manière à générer un rapport JUnit, ce qui permet d'avoir une vue dans la pipeline Gitlab des différents tests.</p>
+<h3 id="lien-de-la-production_1">Lien de la production<a class="headerlink" href="#lien-de-la-production_1" title="Permanent link">¶</a></h3>
+<p>Le serveur WebSocket est hébergé sous ce lien : <code>wss://missive.nezia.dev</code></p>
+<h3 id="scenarios-de-test_1">Scénarios de Test<a class="headerlink" href="#scenarios-de-test_1" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>Description</th>
+<th>Objectif</th>
+<th>Statut</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Établir une connexion WebSocket</td>
+<td>Vérifier l'établissement de la connexion</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Envoyer un message à un utilisateur spécifique</td>
+<td>Vérifier l'envoi du message</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Recevoir un message de l'utilisateur</td>
+<td>Vérifier la réception du message</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Stocker le message si le récepteur est hors ligne</td>
+<td>Vérifier le stockage temporaire des messages</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Envoyer le message directement si le récepteur est en ligne</td>
+<td>Vérifier l'envoi en temps réel</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Mettre à jour le statut du message à 'envoyé'</td>
+<td>Vérifier la mise à jour du statut après l'envoi</td>
+<td>OK</td>
+<td>Moyen</td>
+</tr>
+<tr>
+<td>Mettre à jour le statut du message à 'reçu'</td>
+<td>Vérifier la mise à jour du statut après la réception</td>
+<td>OK</td>
+<td>Moyen</td>
+</tr>
+<tr>
+<td>Mettre à jour le statut du message à 'lu'</td>
+<td>Vérifier la mise à jour du statut après lecture</td>
+<td>OK</td>
+<td>Moyen</td>
+</tr>
+</tbody>
+</table>
+<h4 id="historique">Historique<a class="headerlink" href="#historique" title="Permanent link">¶</a></h4>
+<ul>
+<li>2024-03-29 : Les routes <code>POST /tokens</code>, <code>PUT /tokens</code> sont opérationnelles et validées.</li>
+<li>2024-05-02 : Validation des routes <code>POST /users/{id}/keys</code>, <code>GET /users/{id}/keys</code>.</li>
+<li>2024-05-16 : Amélioration de la gestion des WebSocket et validation des tests d'envoi et de réception de messages.</li>
+<li>2024-06-03 : Refactoring et validation des tests de mise à jour des statuts des messages.</li>
+<li>2024-06-05 : Documentation du code avec docstrings.</li>
+<li>2024-06-08 : Implémentation de la gestion des WebSocket </li>
+<li>2024-06-13 : Implémentation des tests de mise à jour des statuts des messages à "lu".</li>
+<li>2024-06-15 : Validation de la reconnexion automatique et stockage temporaire des messages.</li>
+</ul>
+<h3 id="rapport-de-tests_1">Rapport de tests<a class="headerlink" href="#rapport-de-tests_1" title="Permanent link">¶</a></h3>
+<h5 id="etablissement-dune-connexion-websocket">Établissement d'une connexion WebSocket<a class="headerlink" href="#etablissement-dune-connexion-websocket" title="Permanent link">¶</a></h5>
+<p>L'établissement d'une connexion WebSocket depuis le serveur étant essentielle pour Missive, j'ai décidé de me concentrer sur cet élément dès les premiers stades de mon projet. J'ai pu trouver une bibliothèque, <code>@fastify/websocket</code>, qui m'a permis d'intégrer des routes WebSocket à mon serveur Fastify existant. Cela a été primordial pour plusieurs raisons : </p>
+<ul>
+<li>Avoir tout le code au même endroit m'a grandement simplifié la tâche</li>
+<li>Avoir le WebSocket au même endroit que mon API m'a permis de réutiliser la même authentification (le hook <code>authenticationHook</code>), ce qui est très pratique car il fallait pouvoir réutiliser la même clé publique afin de vérifier la signature du JWT</li>
+</ul>
+<p>Je me suis donc attaqué à la création d'une route WebSocket à la racine de mon projet. La documentation de <code>@fastify/websocket</code> étant très bonne, j'ai pu réussir à l'implémenter  très rapidement, et même pu réutiliser mon authentification avec la même syntaxe que pour mon API.</p>
+<h5 id="envoi-dun-message-a-un-utilisateur-reception">Envoi d'un message à un utilisateur / réception<a class="headerlink" href="#envoi-dun-message-a-un-utilisateur-reception" title="Permanent link">¶</a></h5>
+<p>Pour envoyer un message à un utilisateur, j'ai tout d'abord commencé par réfléchir à comment j'allais faire pour garder en mémoire les connexions WebSocket : pour envoyer un message à un utilisateur spécifique, il faut utiliser la méthode <code>send()</code> de sa connexion WebSocket. J'ai décidé de partir sur une liste de connexions stockée au dessus de mes routes, dans la mémoire du serveur, car ce ne sont pas des données persistantes, et ces connexions se déconnectant / reconnectant constamment, le choix de tout stocker dans une variable était je pense judicieux dans le cas de Missive.</p>
+<p>J'ai ensuite réfléchi à une structure en JSON afin de pouvoir envoyer ce message : j'ai tout d'abord essayé d'envoyer le message via l'ID de l'utilisateur, ce qui fonctionnait au départ, mais malheureusement, je me suis rendu compte en réalisant le client que ce n'était pas une information à laquelle on pouvait avoir accès, la seule information connue par l'utilisateur étant le nom d'utilisateur. J'ai donc décidé d'utiliser ces derniers, qui sont uniques, et je stocke toutes les connexions WebSocket dans ma liste de connexions sous une clé, la clé étant leur nom.</p>
+<p>A chaque nouveau message, je regarde à quel destinataire il appartient, je retrouve la connexion WebSocket correspondante, et j'envoie le message. Ça fonctionne !</p>
+<h5 id="stockage-du-message-si-lutilisateur-est-hors-ligne">Stockage du message si l'utilisateur est hors-ligne<a class="headerlink" href="#stockage-du-message-si-lutilisateur-est-hors-ligne" title="Permanent link">¶</a></h5>
+<p>Un des premiers défis que j'ai rencontré en programmant mon serveur WebSocket était le souci d'un des deux utilisateurs étant hors-ligne : si le destinataire est hors-ligne, comment j'allais pouvoir gérer tout ça ? C'était essentiel dans le cas de Missive, car l'utilisation d'une application de messagerie instantanée sur téléphone se fait généralement en grande majorité en dehors de l'application, l'application étant seulement ouverte pour répondre à un message ou à l'envoyer (elle est très souvent fermée).</p>
+<p>Ayant implémenté une route pour récupérer les messages temporaires au niveau de mon API, je me suis dit que j'allais stocker le message dans la base de données, en utilisant le client Prisma défini dans l'API (encore un autre avantage du partage de code). Je suis passé par de multiples itérations de ma logique, afin de garantir une expérience responsive pour l'envoyeur et le destinataire. La logique repose principalement sur la vérification de l'existence d'une connexion WebSocket dans la liste des connexions. Si elle n'existe pas, le message sera stocké temporairement en base de données (ce qui n'est pas un problème de sécurité dans le cadre de Missive, les messages étant chiffrés de bout en bout, et supprimés à la récupération.</p>
+<p>J'envoie un message de statut au destinataire après le stockage de son message, pour lui confirmer qu'il a bien été reçu (ce message de statut sera ensuite traité dans le client).</p>
+<h5 id="mise-a-jour-des-statuts-de-messages">Mise à jour des statuts de messages<a class="headerlink" href="#mise-a-jour-des-statuts-de-messages" title="Permanent link">¶</a></h5>
+<p>J'aimerais revenir plus en détails sur la mise à jour des statuts de messages, qui est une partie importante d'une application de messagerie. Cette dernière fonctionne exactement comme l'envoi des messages, avec la différence que la structure d'un message de statut est différente de celle d'un message classique (elle ne possède pas de contenu, avec une propriété <code>state</code> à la place). </p>
+<h2 id="client">Client<a class="headerlink" href="#client" title="Permanent link">¶</a></h2>
+<h3 id="introduction_2">Introduction<a class="headerlink" href="#introduction_2" title="Permanent link">¶</a></h3>
+<p>Ce plan détaille les tests fonctionnels prévus pour valider les fonctionnalités du client Missive, développé en Flutter, qui gère l'authentification des utilisateurs, la communication sécurisée via le protocole Signal, et l'envoi/réception de messages en temps réel.</p>
+<p>Les tests unitaires du client de Missive sont réalisés avec flutter_test, une librairie native à Flutter. Ils utilisent aussi mockito afin de pouvoir créer les différents mocks, qui dans le cas du client est crucial (le client dépend d'un bon nombre d'éléments externes, l'exemple le plus évident étant l'API).</p>
+<p>Ils sont organisés dans le répertoire test, ce qui est la convention pour les tests en Flutter. Un rapport JUnit est également généré afin d'avoir une visualisation claire directement dans la pipeline Gitlab.</p>
+<h3 id="scenarios-de-test_2">Scénarios de Test<a class="headerlink" href="#scenarios-de-test_2" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>Fonctionnalité</th>
+<th>Description</th>
+<th>Objectif</th>
+<th>Statut</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connexion utilisateur</td>
+<td>Authentifier un utilisateur avec ses identifiants</td>
+<td>Vérifier l'authentification et la remise de tokens</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Création de compte utilisateur</td>
+<td>Créer un nouveau compte utilisateur</td>
+<td>Vérifier la création de compte et l'initialisation des clés</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Récupération des données utilisateur</td>
+<td>Obtenir les informations de l'utilisateur connecté</td>
+<td>Vérifier la récupération des données utilisateur</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Déconnexion utilisateur</td>
+<td>Déconnecter l'utilisateur et révoquer les tokens</td>
+<td>Vérifier la déconnexion et la révocation des tokens</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Stockage et récupération des messages en local</td>
+<td>Stocker et récupérer les messages en local</td>
+<td>Vérifier la persistance des messages en local</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Envoi de message</td>
+<td>Envoyer un message chiffré à un autre utilisateur</td>
+<td>Vérifier l'envoi et le chiffrement des messages</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Implémentation du protocole Signal</td>
+<td>Implémenter le protocole Signal en Dart, avec libsignal_protocol_dart</td>
+<td>Vérifier le bon fonctionnement du protocole de chiffrement</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Réception de message</td>
+<td>Recevoir un message chiffré d'un autre utilisateur</td>
+<td>Vérifier la réception et le déchiffrement des messages</td>
+<td>OK</td>
+<td>Élevé</td>
+</tr>
+<tr>
+<td>Reconnexion automatique</td>
+<td>Reconnecter automatiquement en cas de perte de connexion</td>
+<td>Vérifier la reconnexion automatique et la reprise des messages</td>
+<td>OK</td>
+<td>Moyen</td>
+</tr>
+<tr>
+<td>Gestion des notifications</td>
+<td>Recevoir des notifications push en arrière-plan</td>
+<td>Vérifier la réception des notifications</td>
+<td>OK</td>
+<td>Moyen</td>
+</tr>
+<tr>
+<td>Statut des messages</td>
+<td>Mettre à jour le statut des messages (envoyé, reçu, lu)</td>
+<td>Vérifier la mise à jour des statuts des messages</td>
+<td>OK</td>
+<td>Moyen</td>
+</tr>
+</tbody>
+</table>
+<h4 id="historique_1">Historique<a class="headerlink" href="#historique_1" title="Permanent link">¶</a></h4>
+<ul>
+<li>2024-03-27 : Mise en place de l'environnement de développement et configuration initiale.</li>
+<li>2024-05-17 : Validation de l'interface de connexion et des conversations.</li>
+<li>2024-05-18 : Implémentation du stockage sécurisé des clés publiques.</li>
+<li>2024-05-21 : Révision du stockage des clés publiques et validation de la création de sessions chiffrées.</li>
+<li>2024-05-22 : Validation de la connexion WebSocket et de l'envoi/réception de messages chiffrés.</li>
+<li>2024-05-23 : Gestion de la persistance des messages locaux avec Hive.</li>
+<li>2024-05-25 : Validation de l'envoi et de la réception de messages avec mise à jour des statuts.</li>
+<li>2024-05-26 : Amélioration de l'interface utilisateur.</li>
+<li>2024-06-01 : Validation de l'écran de conversations.</li>
+<li>2024-06-02 : Implémentation de la recherche d'utilisateurs.</li>
+<li>2024-06-03 : Validation de la récupération et du stockage des messages temporaires.</li>
+<li>2024-06-07 : Validation des notifications push avec Firebase.</li>
+<li>2024-06-13 : Validation des tests de mise à jour des statuts des messages à "lu".</li>
+<li>2024-06-15 : Validation de la reconnexion automatique et du stockage temporaire des messages.</li>
+<li>2024-06-17 : Validation des notifications sur iOS et Android.</li>
+<li>2024-06-28 : Déploiement sur Jelastic Cloud.</li>
+</ul>
+<h3 id="rapport-de-tests_2">Rapport de tests<a class="headerlink" href="#rapport-de-tests_2" title="Permanent link">¶</a></h3>
+<h4 id="creation-de-compte">Création de compte<a class="headerlink" href="#creation-de-compte" title="Permanent link">¶</a></h4>
+<p>J'ai tout d'abord commencé par implémenter un système d'authentification avec le client. Ayant un système d'API fonctionnelle, j'ai tout d'abord commencé par créer un écran de démarrage, qui permet d'accéder à l'écran de création de compte, et à l'écran de connexion. Ensuite, j'ai implémenté mon <code>AuthProvider</code>, qui gère l'intégralité du statut de création de compte de l'utilisateur, en utilisant l'API, et gère également les jetons, en les stockant dans le stockage sécurisé du téléphone. Le <code>AuthProvider</code> gère également l'upload des clés publiques sur le serveur, afin que les autres utilisateurs puissent les trouver.</p>
+<p>J'ai ensuite implémenté un routeur, avec <code>go_router</code>, qui me permet d'avoir des routes nommées, et d'également de permettre une redirection automatique avec la propriété <code>refreshListenable</code>, qui écoute les changements sur mon <code>AuthProvider</code>, et dès qu'il y en a, la fonction <code>redirect</code> est appelée, qui contient la logique de redirection par rapport au statut de connexion de l'utilisateur.</p>
+<h4 id="authentifier-un-utilisateur">Authentifier un utilisateur<a class="headerlink" href="#authentifier-un-utilisateur" title="Permanent link">¶</a></h4>
+<p>J'ai rajouté une fonction de connexion dans mon <code>AuthProvider</code>, qui va venir faire un appel à l'API, et vérifier les informations de l'utilisateur. Quand la connexion réussit, les jetons sont stockés comme pour la création de compte, et l'utilisateur est renvoyé sur la page d'accueil (la page des conversations).</p>
+<h4 id="recuperation-des-donnees-utilisateur">Récupération des données utilisateur<a class="headerlink" href="#recuperation-des-donnees-utilisateur" title="Permanent link">¶</a></h4>
+<p>J'ai implémenté un getter dans mon <code>AuthProvider</code>, qui permet de récupérer les informations utilisateur si elles ne sont pas disponibles. Cela permet notamment d'afficher le nom de l'utilisateur dans la barre à gauche.</p>
+<h4 id="deconnexion-utilisateur">Déconnexion utilisateur<a class="headerlink" href="#deconnexion-utilisateur" title="Permanent link">¶</a></h4>
+<p>La déconnexion de l'utilisateur a été implémentée en ajoutant une fonction <code>logout</code> dans mon <code>AuthProvider</code>, qui se charge de supprimer tous les jetons, remettre le statut <code>isLoggedIn</code> à <code>false</code>, et de supprimer toutes les données de connexion. La redirection au <em>landing screen</em> est ensuite effectuée automatiquement, grâce au routeur, qui écoute les changements sur <code>AuthProvider</code>.</p>
+<h4 id="envoi-des-messages">Envoi des messages<a class="headerlink" href="#envoi-des-messages" title="Permanent link">¶</a></h4>
+<p>Une fois tout ça implémenté, car j'avais besoin des jetons pour tester la connexion en temps réel, j'ai commencé à réfléchir à comment j'allais gérer les messages en temps réel. C'est une étape qui m'a pris du temps, car je n'avais jamais travaillé avec des WebSocket auparavant, je n'étais donc pas sûr de comment le faire. Je n'avais en plus jamais fait de Flutter de toute ma vie, donc j'ai dû me pencher sur la manière dont on stocke l'état global de l'application en Flutter de manière générale. L'architecture de l'application est d'ailleurs une des choses qui m'a pris le plus de temps, car les frameworks à composants non dogmatiques ont tendance à devenir extrêmement désorganisés si on ne réfléchit pas à son architecture.  </p>
+<p>J'ai donc décidé de programmer toute la logique dans un Provider, <code>ChatProvider</code>, afin de pouvoir séparer la logique le plus possible de l'interface. Le système de widgets de Flutter pouvant devenir assez complexe à suivre, en raison de l'imbrication des différentes parties, j'ai donc implémenté pour commencer une fonction <code>connect()</code>, qui permet de connecter l'application au serveur WebSocket. Une fois que tout ça a été réalisé, j'ai implémenté une fonction <code>sendMessage</code>, qui permet d'envoyer un message en clair pour commencer à tester le WebSocket. Une fois que la bonne structure JSON a été implémentée, tout a fonctionné !</p>
+<h4 id="reception-des-messages">Réception des messages<a class="headerlink" href="#reception-des-messages" title="Permanent link">¶</a></h4>
+<p>Une fois les messages envoyés, il était temps de programmer la manière dont j'allais les afficher. J'ai décidé, de manière temporaire, de les afficher de manière désorganisée sur la page d'accueil afin de juste pouvoir tester si j'arrivais à avoir une application réactive. Vu que ma connexion WebSocket a été enveloppée dans un Provider, ces derniers donnent accès à une fonction, <code>notifyListeners</code>, qui permet de notifier l'application et les parties de l'interface qui ont besoin d'être rechargées. Cela veut dire qu'à chaque message, on peut utiliser <code>notifyListeners</code> afin de notifier l'interface que les messages ont besoin d'être mis à jour. Il m'a ensuite fallu utiliser un widget <code>ListView</code>, qui prend une liste quelconque, en l'occurence les messages, et permet d'afficher des widgets en itérant sur la liste automatiquement. Cela permet également d'ajouter des séparateurs, et de contrôler le comportement de visualisation, ce qui sera très utile par la suite.</p>
+<h4 id="implementation-du-protocole-signal">Implémentation du protocole Signal<a class="headerlink" href="#implementation-du-protocole-signal" title="Permanent link">¶</a></h4>
+<p>Maintenant que la connexion au WebSocket fonctionne, il est temps de s'attaquer au gros morceau du projet, à savoir implémenter le protocole Signal. Une des raisons principales pour lesquelles j'ai choisi Flutter pour mon projet, est l'existence d'une implémentation de ce protocole en Dart. Après avoir lu comment fonctionnait le protocole Signal, avec le <em>whitepaper</em> que la fondation a publiée sur son site, j'ai commencé à me pencher sur comment utiliser l'implémentation en Dart.</p>
+<p>Pour faire simple, la librairie implémente toutes les fonctions mathématiques et la logique dont une application Signal a besoin. La manière dont la librairie fonctionne est très intéressante, car elle nous laisse libre arbitre sur la manière dont on souhaite implémenter le stockage des différentes clés privées et publiques. L'idée est que il est nécéssaire d'implémenter des classes, appelées des stores, qui vont gérer les interactions avec la manière de stocker de votre choix. Vous trouverez ci-dessous un exemple d'une de ces interfaces :</p>
+<figure class="figure-codeblock" id="figure-39">
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="kd">abstract</span><span class="w"> </span><span class="kd">mixin</span><span class="w"> </span><span class="nc">class</span><span class="w"> </span><span class="n">PreKeyStore</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">PreKeyRecord</span><span class="o">&gt;</span><span class="w"> </span><span class="n">loadPreKey</span><span class="p">(</span>
+</span><span id="__span-0-3"><a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">      </span><span class="kt">int</span><span class="w"> </span><span class="n">preKeyId</span><span class="p">);</span><span class="w"> </span><span class="c1">//  throws InvalidKeyIdException;</span>
+</span><span id="__span-0-4"><a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">storePreKey</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">preKeyId</span><span class="p">,</span><span class="w"> </span><span class="n">PreKeyRecord</span><span class="w"> </span><span class="n">record</span><span class="p">);</span>
+</span><span id="__span-0-6"><a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="n">containsPreKey</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">preKeyId</span><span class="p">);</span>
+</span><span id="__span-0-8"><a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">removePreKey</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">preKeyId</span><span class="p">);</span>
+</span><span id="__span-0-10"><a href="#__codelineno-0-10" id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="p">}</span>
+</span></code></pre></div>
+<figcaption>Figure 39 — Classe abstraite de PreKeyStore</figcaption>
+</figure>
+<p>Ces différentes méthodes doivent être implémentées de la manière dont l'on souhaite. Le seul souci de ce procédé était malheureusement le fait que la librairie était assez mal documentée, j'ai donc dû passer beaucoup de temps à déchiffrer les implémentations et à essayer de comprendre la logique derrière.</p>
+<p>Une fois tout ça terminé, il suffit simplement d'utiliser les classes qu'ils ont implémenté, comme <code>SessionCipher</code>, qui prend toutes nos classes et utilise leurs fonctions internes, et le chiffrement fonctionne ! J'ai fait en sorte de tester ces classes unitairement de manière assez extensive, afin de m'assurer du bon fonctionnement de ces dernières. J'ai également à terme créé un provider, <code>SignalProvider</code>, qui me permet d'envelopper la logique un peu plus bas niveau de ces derniers dans des fonctions simples, comme <code>encrypt</code>, <code>buildSession</code> et <code>decrypt</code>. Cela permet de rendre la logique beaucoup plus lisible à terme, et beaucoup plus facilement maintenable.</p>
+<h4 id="reconnexion-automatique">Reconnexion automatique<a class="headerlink" href="#reconnexion-automatique" title="Permanent link">¶</a></h4>
+<p>La reconnexion automatique est extrêmement importante pour Missive, car étant une application téléphone, la qualité de la connexion de l'appareil peut changer constamment car l'utilisateur est en mouvement.</p>
+<p>J'ai donc rajouté de la logique dans ma fonction <code>connect()</code>, qui me permet de gérer tout ça. Voici à quoi la logique ressemble :</p>
+<figure class="figure-codeblock" id="figure-40">
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="w">      </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">connect</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="w">      </span><span class="p">...</span>
+</span><span id="__span-1-3"><a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">      </span><span class="c1">// If reconnection attempts have been made, fetch pending messages as there could have been messages sent while disconnected, and reset the attempts</span>
+</span><span id="__span-1-4"><a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="w">      </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-5"><a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">_reconnectionAttempts</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-6"><a href="#__codelineno-1-6" id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="w">        </span><span class="n">fetchPendingMessages</span><span class="p">();</span>
+</span><span id="__span-1-7"><a href="#__codelineno-1-7" id="__codelineno-1-7" name="__codelineno-1-7"></a><span class="w">        </span><span class="n">fetchMessageStatuses</span><span class="p">();</span>
+</span><span id="__span-1-8"><a href="#__codelineno-1-8" id="__codelineno-1-8" name="__codelineno-1-8"></a><span class="w">        </span><span class="n">_reconnectionAttempts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">;</span>
+</span><span id="__span-1-9"><a href="#__codelineno-1-9" id="__codelineno-1-9" name="__codelineno-1-9"></a><span class="w">        </span><span class="n">notifyListeners</span><span class="p">();</span>
+</span><span id="__span-1-10"><a href="#__codelineno-1-10" id="__codelineno-1-10" name="__codelineno-1-10"></a><span class="w">      </span><span class="p">}</span>
+</span><span id="__span-1-11"><a href="#__codelineno-1-11" id="__codelineno-1-11" name="__codelineno-1-11"></a>
+</span><span id="__span-1-12"><a href="#__codelineno-1-12" id="__codelineno-1-12" name="__codelineno-1-12"></a><span class="w">      </span><span class="n">_channel</span><span class="o">!</span><span class="p">.</span><span class="n">stream</span><span class="p">.</span><span class="n">listen</span><span class="p">(</span>
+</span><span id="__span-1-13"><a href="#__codelineno-1-13" id="__codelineno-1-13" name="__codelineno-1-13"></a><span class="w">        </span><span class="p">(</span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-14"><a href="#__codelineno-1-14" id="__codelineno-1-14" name="__codelineno-1-14"></a><span class="w">          </span><span class="kd">await</span><span class="w"> </span><span class="n">_handleMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+</span><span id="__span-1-15"><a href="#__codelineno-1-15" id="__codelineno-1-15" name="__codelineno-1-15"></a><span class="w">        </span><span class="p">},</span>
+</span><span id="__span-1-16"><a href="#__codelineno-1-16" id="__codelineno-1-16" name="__codelineno-1-16"></a><span class="w">        </span><span class="nl">onDone:</span><span class="w"> </span><span class="n">_handleConnectionClosed</span><span class="p">,</span>
+</span><span id="__span-1-17"><a href="#__codelineno-1-17" id="__codelineno-1-17" name="__codelineno-1-17"></a><span class="w">        </span><span class="nl">onError:</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span>
+</span><span id="__span-1-18"><a href="#__codelineno-1-18" id="__codelineno-1-18" name="__codelineno-1-18"></a><span class="w">            </span><span class="n">_logger</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">Level</span><span class="p">.</span><span class="n">SEVERE</span><span class="p">,</span><span class="w"> </span><span class="s1">'WebSocket Error: </span><span class="si">$</span><span class="n">error</span><span class="s1">'</span><span class="p">),</span>
+</span><span id="__span-1-19"><a href="#__codelineno-1-19" id="__codelineno-1-19" name="__codelineno-1-19"></a><span class="w">      </span><span class="p">);</span>
+</span><span id="__span-1-20"><a href="#__codelineno-1-20" id="__codelineno-1-20" name="__codelineno-1-20"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-21"><a href="#__codelineno-1-21" id="__codelineno-1-21" name="__codelineno-1-21"></a><span class="w">      </span><span class="n">_logger</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">Level</span><span class="p">.</span><span class="n">SEVERE</span><span class="p">,</span><span class="w"> </span><span class="s1">'Failed to connect: </span><span class="si">$</span><span class="n">e</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-1-22"><a href="#__codelineno-1-22" id="__codelineno-1-22" name="__codelineno-1-22"></a><span class="w">      </span><span class="n">_connected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+</span><span id="__span-1-23"><a href="#__codelineno-1-23" id="__codelineno-1-23" name="__codelineno-1-23"></a><span class="w">      </span><span class="n">_scheduleReconnection</span><span class="p">();</span>
+</span><span id="__span-1-24"><a href="#__codelineno-1-24" id="__codelineno-1-24" name="__codelineno-1-24"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-25"><a href="#__codelineno-1-25" id="__codelineno-1-25" name="__codelineno-1-25"></a><span class="w">      </span><span class="n">_isConnecting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+</span><span id="__span-1-26"><a href="#__codelineno-1-26" id="__codelineno-1-26" name="__codelineno-1-26"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-27"><a href="#__codelineno-1-27" id="__codelineno-1-27" name="__codelineno-1-27"></a><span class="w">    </span><span class="p">...</span>
+</span><span id="__span-1-28"><a href="#__codelineno-1-28" id="__codelineno-1-28" name="__codelineno-1-28"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-1-29"><a href="#__codelineno-1-29" id="__codelineno-1-29" name="__codelineno-1-29"></a>
+</span><span id="__span-1-30"><a href="#__codelineno-1-30" id="__codelineno-1-30" name="__codelineno-1-30"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">_handleConnectionClosed</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-31"><a href="#__codelineno-1-31" id="__codelineno-1-31" name="__codelineno-1-31"></a><span class="w">    </span><span class="n">_logger</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">Level</span><span class="p">.</span><span class="n">WARNING</span><span class="p">,</span><span class="w"> </span><span class="s1">'WebSocket connection closed.'</span><span class="p">);</span>
+</span><span id="__span-1-32"><a href="#__codelineno-1-32" id="__codelineno-1-32" name="__codelineno-1-32"></a><span class="w">    </span><span class="n">_channel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+</span><span id="__span-1-33"><a href="#__codelineno-1-33" id="__codelineno-1-33" name="__codelineno-1-33"></a><span class="w">    </span><span class="n">_scheduleReconnection</span><span class="p">();</span>
+</span><span id="__span-1-34"><a href="#__codelineno-1-34" id="__codelineno-1-34" name="__codelineno-1-34"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-1-35"><a href="#__codelineno-1-35" id="__codelineno-1-35" name="__codelineno-1-35"></a>
+</span><span id="__span-1-36"><a href="#__codelineno-1-36" id="__codelineno-1-36" name="__codelineno-1-36"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">_scheduleReconnection</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-37"><a href="#__codelineno-1-37" id="__codelineno-1-37" name="__codelineno-1-37"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">_disposed</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+</span><span id="__span-1-38"><a href="#__codelineno-1-38" id="__codelineno-1-38" name="__codelineno-1-38"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">_reconnectionTimer</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_reconnectionTimer</span><span class="o">!</span><span class="p">.</span><span class="n">isActive</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+</span><span id="__span-1-39"><a href="#__codelineno-1-39" id="__codelineno-1-39" name="__codelineno-1-39"></a>
+</span><span id="__span-1-40"><a href="#__codelineno-1-40" id="__codelineno-1-40" name="__codelineno-1-40"></a><span class="w">    </span><span class="n">_reconnectionAttempts</span><span class="o">++</span><span class="p">;</span>
+</span><span id="__span-1-41"><a href="#__codelineno-1-41" id="__codelineno-1-41" name="__codelineno-1-41"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">delay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min</span><span class="p">(</span><span class="n">_reconnectionAttempts</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">2</span><span class="p">,</span>
+</span><span id="__span-1-42"><a href="#__codelineno-1-42" id="__codelineno-1-42" name="__codelineno-1-42"></a><span class="w">        </span><span class="m">30</span><span class="p">);</span><span class="w"> </span><span class="c1">// take more and more time to reconnect after each failed attempt (max 30s)</span>
+</span><span id="__span-1-43"><a href="#__codelineno-1-43" id="__codelineno-1-43" name="__codelineno-1-43"></a><span class="w">    </span><span class="n">_reconnectionTimer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Timer</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="n">delay</span><span class="p">),</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-44"><a href="#__codelineno-1-44" id="__codelineno-1-44" name="__codelineno-1-44"></a><span class="w">      </span><span class="n">_logger</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">Level</span><span class="p">.</span><span class="n">INFO</span><span class="p">,</span>
+</span><span id="__span-1-45"><a href="#__codelineno-1-45" id="__codelineno-1-45" name="__codelineno-1-45"></a><span class="w">          </span><span class="s1">'Attempting to reconnect... (Attempt </span><span class="si">$</span><span class="n">_reconnectionAttempts</span><span class="s1">)'</span><span class="p">);</span>
+</span><span id="__span-1-46"><a href="#__codelineno-1-46" id="__codelineno-1-46" name="__codelineno-1-46"></a><span class="w">      </span><span class="n">connect</span><span class="p">();</span>
+</span><span id="__span-1-47"><a href="#__codelineno-1-47" id="__codelineno-1-47" name="__codelineno-1-47"></a><span class="w">    </span><span class="p">});</span>
+</span><span id="__span-1-48"><a href="#__codelineno-1-48" id="__codelineno-1-48" name="__codelineno-1-48"></a><span class="w">  </span><span class="p">}</span>
+</span></code></pre></div>
+<figcaption>Figure 40 — Logique de reconnexion automatique</figcaption>
+</figure>
+<p>Une fois cette partie implémentée, il a fallu trouver un moyen de gérer le cas où un message est envoyée si la connection se ferme, afin d'éviter de perdre un message. </p>
+<p>Il a fallu créer une base de données locale Realm, <code>PendingMessages</code>, qui fonctionne de la même manière que le stockage des conversations. J'ai rajouté un bout de code dans <code>sendMessage</code> qui vérifie si la connexion WebSocket est établie, et si elle ne l'est pas, le message sera stocké avec <code>_storePendingMessage</code>.</p>
+<p>Ensuite, une fois la reconnexion effectuée au WebSocket, une fonction est appelée, <code>_sendPendingMessages</code>, qui s'occupe d'envoyer l'intégralité des messages en attente. L'interface est également modifiée, au niveau de <code>conversation_screen.dart</code>, pour faire en sorte d'afficher un <em>spinner</em> de chargement si le message est en attente.</p>
+<h4 id="gestion-des-notifications">Gestion des notifications<a class="headerlink" href="#gestion-des-notifications" title="Permanent link">¶</a></h4>
+<p>Pour la gestion des notifications, comme dit précédemment, Firebase Cloud Messaging a été utilisé. Comme le serveur s'occupe d'envoyer les notifications, il a fallu également installer l'impléemntation de Firebase Cloud Messaging sur le client.</p>
+<p>J'ai simplement suivi le tutoriel sur le site de Firebase, qui explique en détails comment relier son application à son projet Firebase.</p>
+<p>Un des soucis principaux que j'ai rencontré était avec la mise en place des notifications iOS, qui a été plus complexe que la gestion sur Android. Il a fallu ajouter un bon nombre de profils et de clés dans ma console développeur Apple, ainsi que de les relier via XCode. </p>
+<p>Une fois toutes ces opérations effectuées, il a simplement fallu instancier Firebase Cloud Messaging, ainsi que de générer un jeton qui permet de relier le périphérique de l'utilisateur à la base de données des connexions. Voici à quoi ressemble le code : </p>
+<figure class="figure-codeblock" id="figure-41">
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Platform</span><span class="p">.</span><span class="n">isAndroid</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">Platform</span><span class="p">.</span><span class="n">isIOS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="w">        </span><span class="n">FirebaseMessaging</span><span class="w"> </span><span class="n">messaging</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FirebaseMessaging</span><span class="p">.</span><span class="n">instance</span><span class="p">;</span>
+</span><span id="__span-2-3"><a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="w">        </span><span class="n">notificationId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">messaging</span><span class="p">.</span><span class="n">getToken</span><span class="p">();</span>
+</span><span id="__span-2-4"><a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="w">      </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-5"><a href="#__codelineno-2-5" id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="w">        </span><span class="n">notificationId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+</span><span id="__span-2-6"><a href="#__codelineno-2-6" id="__codelineno-2-6" name="__codelineno-2-6"></a><span class="w">      </span><span class="p">}</span>
+</span></code></pre></div>
+<figcaption>Figure 41 — Génération de l'ID de notification</figcaption>
+</figure>
+<p>Ce code est utilisé dans la fonction <code>login</code> et <code>register</code>, car il est nécéssaire d'éviter d'envoyer des notifications si l'utilisateur est déconnecté, ou de recevoir des notifications qui ne concernent pas la connexion actuelle.</p>
+<h4 id="statut-des-messages">Statut des messages<a class="headerlink" href="#statut-des-messages" title="Permanent link">¶</a></h4>
+<p>La gestion des statuts de messages étant prise en compte au niveau du serveur, il a fallu également l'implémenter côté client. Cette gestion est prise en charge dans ma fonction <code>_handleMessage</code> : si une propriété <code>state</code> est présente (mise à jour de statut), et le message stocké en local sera modifié.</p>
+<p>Ensuite, une logique a été implémentée au niveau de <code>conversation_state.dart</code>, qui permet d'afficher les petites coches, ou le spinner si le message est en attente, afin d'informer l'utilisateur du statut de lecture / envoi de leur message.</p>
+</article>
+</div>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"></path></svg>
+  Retour en haut de la page
+</button>
+</main>
+<footer class="md-footer">
+<nav aria-label="Pied de page" class="md-footer__inner md-grid">
+<a aria-label="Précédent: API" class="md-footer__link md-footer__link--prev" href="../api/">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</div>
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Précédent
+              </span>
+<div class="md-ellipsis">
+                API
+              </div>
+</div>
+</a>
+<a aria-label="Suivant: Bilan personnel" class="md-footer__link md-footer__link--next" href="../summary/">
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Suivant
+              </span>
+<div class="md-ellipsis">
+                Bilan personnel
+              </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"></path></svg>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}}</script>
+<script src="../assets/javascripts/bundle.cd18aaf1.min.js"></script>
+<script src="../javascript/images_dark.js"></script>
+<script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script><script>document$.subscribe(() => {
+            window.update_swagger_ui_iframe_height = function (id) {
+                var iFrameID = document.getElementById(id);
+                if (iFrameID) {
+                    full_height = (iFrameID.contentWindow.document.body.scrollHeight + 80) + "px";
+                    iFrameID.height = full_height;
+                    iFrameID.style.height = full_height;
+                }
+            }
+        
+            let iframe_id_list = []
+            var iframes = document.getElementsByClassName("swagger-ui-iframe");
+            for (var i = 0; i < iframes.length; i++) { 
+                iframe_id_list.push(iframes[i].getAttribute("id"))
+            }
+        
+            let ticking = true;
+            
+            document.addEventListener('scroll', function(e) {
+                if (!ticking) {
+                    window.requestAnimationFrame(()=> {
+                        let half_vh = window.innerHeight/2;
+                        for(var i = 0; i < iframe_id_list.length; i++) {
+                            let element = document.getElementById(iframe_id_list[i])
+                            if(element==null){
+                                return
+                            }
+                            let diff = element.getBoundingClientRect().top
+                            if(element.contentWindow.update_top_val){
+                                element.contentWindow.update_top_val(half_vh - diff)
+                            }
+                        }
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+        
+            const dark_scheme_name = "slate"
+            
+            window.scheme = document.body.getAttribute("data-md-color-scheme")
+            const options = {
+                attributeFilter: ['data-md-color-scheme'],
+            };
+            function color_scheme_callback(mutations) {
+                for (let mutation of mutations) {
+                    if (mutation.attributeName === "data-md-color-scheme") {
+                        scheme = document.body.getAttribute("data-md-color-scheme")
+                        var iframe_list = document.getElementsByClassName("swagger-ui-iframe")
+                        for(var i = 0; i < iframe_list.length; i++) {
+                            var ele = iframe_list.item(i);
+                            if (ele) {
+                                if (scheme === dark_scheme_name) {
+                                    ele.contentWindow.enable_dark_mode();
+                                } else {
+                                    ele.contentWindow.disable_dark_mode();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            observer = new MutationObserver(color_scheme_callback);
+            observer.observe(document.body, options);
+            })</script></body>
+</html>

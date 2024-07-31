@@ -1,0 +1,15 @@
+@startuml pending_messages
+!include ../../include/themes/light.puml
+class PendingMessages {
+  String id
+  List<PendingMessage> messages
+}
+
+class PendingMessage {
+  String id
+  String ciphertextMessage
+  String receiver
+}
+
+PendingMessages "1" *-- "many" PendingMessage : contains
+@enduml

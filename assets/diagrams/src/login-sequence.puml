@@ -1,0 +1,45 @@
+@startuml login-sequence
+!include ../include/themes/light.puml
+actor Utilisateur as User
+participant "Application" as Client
+participant API
+database "Base de données" as Database
+
+User -> Client : Création de compte
+activate Client
+Client -> Client : Vérification des données
+
+alt Données client valides
+    Client -> API : Envoi des informations de\n création de compte
+    activate API
+    API -> API : Vérification des données
+    
+    alt Données serveur valides
+        API -> Database : Stockage des données de compte
+        activate Database
+        Database --> API : Confirmation de stockage
+        deactivate Database
+        
+        API --> Client : Confirmation de création de compte
+        deactivate API
+        
+        Client -> Client : Génération des clés publiques et privées
+        Client -> Client : Stockage de la clé privée\n(API native sécurisée)
+        
+        Client -> API : Envoi des clés publiques
+        activate API
+        API -> Database : Stockage des clés publiques
+        activate Database
+        Database --> API : Confirmation de stockage
+        deactivate Database
+        API --> Client : Confirmation de stockage des clés publiques
+        deactivate API
+    else Données invalides
+        API --> Client : Erreur de création de compte
+        deactivate API
+    end
+else Données client invalides
+    Client -> Client : Erreur de création de compte
+end
+deactivate Client
+@enduml

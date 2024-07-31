@@ -1,0 +1,27 @@
+@startuml use-case
+!include ../include/themes/light.puml
+left to right direction
+skinparam packageStyle rectangle
+actor Utilisateur as U
+
+rectangle "Missive" {
+  usecase "Se Connecter" as UC1
+  usecase "Se Déconnecter" as UC2
+  usecase "Créer un Compte" as UC3
+  usecase "Envoyer un Message Chiffré" as UC4
+  usecase "Recevoir un Message Chiffré" as UC5
+  usecase "Récupérer le Bundle de Pré-Clés" as UC6
+  usecase "Stocker le Message" as UC7
+  usecase "Voir les Messages" as UC8
+
+  U --> UC1
+  U --> UC2
+  U --> UC3
+  U --> UC4
+  U --> UC5
+  U --> UC8
+}
+
+UC4 .down.> UC6 : <<extend>>
+UC5 .down.> UC7 : <<extend>>
+@enduml

@@ -1,0 +1,16 @@
+@startmindmap provider-diagram
+!include ../include/themes/light.puml
+* Fournisseurs de l'application
+** AuthProvider
+*** Gérer l'authentification des utilisateurs
+*** Gérer la session de l'utilisateur
+** SignalProvider
+*** Interface de haut niveau pour le protocole Signal
+*** Communication avec le serveur pour la rotation et le stockage des clés
+*** Chiffrement et déchiffrement des messages
+*** Récupération des bundles de pré clés
+** ChatProvider
+*** Gestion des messages
+*** Envoi et réception
+*** Communique avec le serveur WebSocket
+@endmindmap

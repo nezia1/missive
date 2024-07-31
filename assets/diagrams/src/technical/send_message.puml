@@ -1,0 +1,41 @@
+@startuml send_message
+!include ../../include/themes/light.puml
+
+actor User
+participant ConversationScreen
+participant uuid_generator.Uuid
+participant SignalProvider
+participant Realm
+participant WebSocketChannel
+
+User -> ConversationScreen: Envoie un message texte clair au destinataire
+activate ConversationScreen
+
+ConversationScreen -> uuid_generator.Uuid: Génère un identifiant unique
+activate uuid_generator.Uuid
+uuid_generator.Uuid -> ConversationScreen: Renvoie l'UUID
+
+deactivate uuid_generator.Uuid
+ConversationScreen -> SignalProvider: Chiffre le message pour le destinataire
+activate SignalProvider
+SignalProvider -> ConversationScreen: Renvoie le message chiffré
+
+deactivate SignalProvider
+ConversationScreen -> ConversationScreen: Encode le message en JSON
+ConversationScreen -> ConversationScreen: Récupère le Realm utilisateur
+ConversationScreen -> Realm: Écrit dans Realm (trouve ou ajoute la conversation, ajoute le message)
+activate Realm
+Realm -> ConversationScreen: Écriture réussie
+
+deactivate Realm
+ConversationScreen -> ConversationScreen: Vérifie si l'utilisateur est connecté
+ConversationScreen -> ConversationScreen: Vérifie la connexion WebSocket
+alt Non connecté
+    ConversationScreen -> ConversationScreen: Stocke le message en attente
+else Connecté
+    ConversationScreen -> WebSocketChannel: Envoie le message via WebSocket
+    activate WebSocketChannel
+end
+
+deactivate ConversationScreen
+@enduml

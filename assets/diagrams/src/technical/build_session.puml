@@ -1,0 +1,28 @@
+@startuml build_session
+!include ../../include/themes/light.puml
+actor User
+participant SignalProvider
+participant SecureStorageSessionStore
+participant Server
+participant SessionBuilder
+
+User -> SignalProvider: buildSession(name, accessToken)
+activate SignalProvider
+SignalProvider -> SecureStorageSessionStore: Vérifie si la session existe
+alt La session n'existe pas
+  SignalProvider -> Server: Récupère le bundle de clés de l'utilisateur - GET /users/{name}/keys
+  activate Server
+  Server --> SignalProvider: Envoie le bundle de clés
+  deactivate Server
+  alt PreKeyBundle is null
+    SignalProvider --> User: return
+    deactivate SignalProvider
+  else PreKeyBundle is not null
+    SignalProvider -> SessionBuilder: new SessionBuilder(...)
+    activate SessionBuilder
+    SessionBuilder -> SessionBuilder: processPreKeyBundle(remotePreKeyBundle)
+    deactivate SessionBuilder
+    SignalProvider --> User: return
+    deactivate SignalProvider
+end
+@enduml

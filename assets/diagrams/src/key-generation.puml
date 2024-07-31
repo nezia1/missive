@@ -1,0 +1,27 @@
+@startuml key-generation
+!include ../include/themes/light.puml
+actor "Utilisateur" as User
+participant "Application" as Client
+participant "API" as API
+database "Base de données" as DB
+
+User -> Client : Accès à la page d'accueil
+activate Client
+alt Première connexion au compte sur ce périphérique
+Client -> User : Écran de chargement
+Client -> Client : Génération des clés
+Client -> API : Envoi de la partie publique des clés
+activate API
+API -> DB : Enregistrement des clés
+activate DB
+DB -> API : Confirmation de l'enregistrement
+deactivate DB
+API -> Client : Confirmation du stockage des clés
+deactivate API
+Client -> Client : Stockage des clés en local
+else
+Client -> Client : Récupération des clés en local
+end
+Client -> User : Redirection vers la page d'accueil
+deactivate Client
+@enduml

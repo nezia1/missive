@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the login method from the AuthProvider class, for the Dart programming language.">
+  <title>login method - AuthProvider class - auth_provider library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">missive</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider/file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider-library.html">features&#47;authentication&#47;providers&#47;auth_provider.dart</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider/AuthProvider-class.html">AuthProvider</a></li>
+    <li class="self-crumb">login method</li>
+  </ol>
+  <div class="self-name">login</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span id="dark-theme-button" class="material-symbols-outlined">
+        brightness_4
+      </span>
+      <span id="light-theme-button" class="material-symbols-outlined">
+        brightness_5
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div
+      id="dartdoc-main-content"
+      class="main-content"
+      data-above-sidebar="file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider&#47;AuthProvider-class-sidebar.html"
+      data-below-sidebar="">
+      <div>
+<h1><span class="kind-method">login</span> method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider/AuthenticationResult-class.html">AuthenticationResult</a></span>&gt;</span></span>
+<span class="name ">login</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="login-param-name"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span></li>
+<li><span class="parameter" id="login-param-password"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">password</span>, </span></li>
+<li><span class="parameter" id="login-param-totp">[<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">totp</span>]</span></li>
+</ol>)
+
+      
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Logs in a user and returns an <code>AuthenticationResult</code>, that can either be <a href="../../file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider/AuthenticationSuccess-class.html">AuthenticationSuccess</a> or <a href="../../file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider/AuthenticationError-class.html">AuthenticationError</a>.</p>
+<p>This method attempts to log in a user using their name and password. If a TOTP is required or provided, it includes this in the request. It then stores the necessary tokens and updates the user's login state.</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li><code>name</code>: The name of the user trying to log in.</li>
+<li><code>password</code>: The password of the user trying to log in.</li>
+<li><code>totp</code>: The Time-based One-Time Password (TOTP), if required or available.</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider/AuthenticationSuccess-class.html">AuthenticationSuccess</a> if the login is successful.</li>
+<li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider/AuthenticationError-class.html">AuthenticationError</a> if an error occurs during the login process.</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<pre class="language-dart"><code class="language-dart">AuthenticationResult result = await provider.login('username', 'password');
+</code></pre>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Future&lt;AuthenticationResult&gt; login(String name, String password,
+    [String? totp]) async {
+  try {
+    final requestBody = jsonEncode(
+        {&#39;name&#39;: name, &#39;password&#39;: password, if (totp != null) &#39;totp&#39;: totp});
+
+    final response = await _httpClient
+        .post(&#39;&#47;tokens&#39;, data: requestBody)
+        .timeout(const Duration(seconds: 5));
+
+    &#47;&#47; 200 represents a successful login attempt, but the user needs to provide a TOTP
+    if (response.statusCode == 200 &amp;&amp;
+        response.data[&#39;data&#39;][&#39;status&#39;] == &#39;totp_required&#39;) {
+      return TOTPRequiredError();
+    }
+
+    final accessToken = response.data[&#39;data&#39;][&#39;accessToken&#39;];
+
+    &#47;&#47; the set-cookie header is not accessible from the http package, so we have to parse it manually
+    final refreshToken = response.headers
+        .value(&#39;set-cookie&#39;)
+        ?.split(&#39;;&#39;)
+        .firstWhere((cookie) =&gt; cookie.contains(&#39;refreshToken&#39;))
+        .split(&#39;=&#39;)
+        .last;
+
+    await _secureStorage.write(key: &#39;refreshToken&#39;, value: refreshToken);
+    await _secureStorage.write(key: &#39;accessToken&#39;, value: accessToken);
+
+    NamespacedSecureStorage storageManager = NamespacedSecureStorage(
+        secureStorage: _secureStorage, namespace: name);
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      final payload = jsonDecode(utf8.decode(
+          base64Decode(base64Url.normalize(accessToken.split(&#39;.&#39;)[1]))));
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
+      await _setNotificationID(payload[&#39;sub&#39;], await messaging.getToken());
+    }
+
+    &#47;&#47; If user didn&#39;t log in yet, we need to install the app
+    final firstLogin = await storageManager
+            .read(key: &#39;identityKeyPair&#39;)
+            .catchError((_) =&gt; null) ==
+        null;
+    _logger.log(Level.INFO, &#39;first time logged in: $firstLogin&#39;);
+    if (firstLogin) {
+      (await SharedPreferences.getInstance()).setBool(&#39;installed&#39;, false);
+    }
+
+    await _secureStorage.write(key: &#39;isLoggedIn&#39;, value: &#39;true&#39;);
+    _isLoggedIn = true;
+    notifyListeners();
+    return AuthenticationSuccess();
+  } on DioException catch (e) {
+    switch (e.response?.statusCode) {
+      case 401:
+        if (e.response?.data?[&#39;data&#39;]?[&#39;status&#39;] == &#39;totp_invalid&#39;) {
+          return TOTPInvalidError();
+        }
+        return InvalidCredentialsError();
+      default:
+        return AuthenticationError(e.message);
+    }
+  }
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../../index.html">missive</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider/file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider-library.html">auth_provider</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider/AuthProvider-class.html">AuthProvider</a></li>
+    <li class="self-crumb">login method</li>
+</ol>
+
+
+    <h5>AuthProvider class</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    missive
+      1.0.0+2
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

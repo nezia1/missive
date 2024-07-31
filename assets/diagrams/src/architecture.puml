@@ -1,0 +1,21 @@
+@startuml architecture
+!include ../include/themes/light.puml
+package "Client" {
+    [Flutter Application]
+}
+
+package "Serveur" {
+    [REST API]
+    [WebSocket Server]
+}
+
+package "Base de données" {
+    [PostgreSQL]
+}
+
+[Flutter Application] -> [REST API] : Gestion des comptes
+[Flutter Application] -> [REST API] : Récupération et stockage des clés publiques
+[Flutter Application] -> [WebSocket Server] : Messagerie en temps réel
+[REST API] -> [PostgreSQL] : Gestion du compte & stockage des clés publiques
+[WebSocket Server] -> [PostgreSQL] : Stockage des messages temporaires
+@enduml

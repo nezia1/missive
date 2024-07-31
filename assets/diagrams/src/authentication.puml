@@ -1,0 +1,23 @@
+@startuml authentication
+!include ../include/themes/light.puml
+participant "Application" as Client
+participant API
+database "Base de données" as Database
+
+Client -> API : POST /tokens 
+activate API
+API -> Database : Requête des données client
+activate Database
+Database --> API : Envoi des données client
+deactivate Database
+API -> API : Vérification des données client
+
+alt Données client présentes et valides
+    API -> API : Génération access token
+    API -> API : Génération refresh token
+    API --> Client : Envoi des tokens
+else Données client absentes ou invalides
+    API --> Client : Envoi d'une erreur 401 Unauthorized
+end
+deactivate API
+@enduml

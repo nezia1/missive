@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the fetchMessageStatuses method from the ChatProvider class, for the Dart programming language.">
+  <title>fetchMessageStatuses method - ChatProvider class - chat_provider library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">missive</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider/file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider-library.html">features&#47;chat&#47;providers&#47;chat_provider.dart</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider/ChatProvider-class.html">ChatProvider</a></li>
+    <li class="self-crumb">fetchMessageStatuses method</li>
+  </ol>
+  <div class="self-name">fetchMessageStatuses</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span id="dark-theme-button" class="material-symbols-outlined">
+        brightness_4
+      </span>
+      <span id="light-theme-button" class="material-symbols-outlined">
+        brightness_5
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div
+      id="dartdoc-main-content"
+      class="main-content"
+      data-above-sidebar="file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider&#47;ChatProvider-class-sidebar.html"
+      data-below-sidebar="">
+      <div>
+<h1><span class="kind-method">fetchMessageStatuses</span> method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+<span class="name ">fetchMessageStatuses</span>(<wbr>)
+
+      
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Fetches the latest message statuses from the server and updates the local Realm database accordingly.</p>
+<p>This method queries the server for the latest statuses of messages (like 'read', 'received') and updates these statuses in the local database.</p>
+<h2 id="throws">Throws</h2>
+<ul>
+<li><code>Exception</code> if the user is not logged in or the <a href="../../file-___home_runner_work_missive_missive_client_lib_features_authentication_providers_auth_provider/AuthProvider-class.html">AuthProvider</a> is not initialized.</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<pre class="language-dart"><code class="language-dart">await provider.fetchMessageStatuses();
+</code></pre>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; fetchMessageStatuses() async {
+  final name = (await _authProvider?.user)?.name;
+  final accessToken = await _authProvider?.accessToken;
+  if (name == null || accessToken == null) {
+    throw Exception(&#39;User is not logged in&#39;);
+  }
+  Response response;
+  dynamic statuses;
+  try {
+    response = await dio.get(&#39;&#47;users&#47;$name&#47;messages&#47;status&#39;,
+        options: Options(headers: {
+          HttpHeaders.authorizationHeader: &#39;Bearer $accessToken&#39;
+        }));
+    statuses = response.data[&#39;data&#39;][&#39;statuses&#39;];
+  } on DioException catch (e) {
+    _logger.log(Level.WARNING, &#39;Error fetching message statuses: $e&#39;);
+    _connected = false;
+    notifyListeners();
+    return;
+  }
+
+  for (final status in statuses) {
+    _logger.log(Level.FINE, &#39;Updating message status: $status&#39;);
+    final message = _userRealm?.find&lt;PlaintextMessage&gt;(status[&#39;messageId&#39;]);
+    if (message != null) {
+      _updateMessageStatus(
+          status[&#39;messageId&#39;],
+          Status.values.firstWhere((element) =&gt;
+              element.toShortString() ==
+              status[&#39;state&#39;].toString().toLowerCase()));
+    }
+  }
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../../index.html">missive</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider/file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider-library.html">chat_provider</a></li>
+    <li><a href="../../file-___home_runner_work_missive_missive_client_lib_features_chat_providers_chat_provider/ChatProvider-class.html">ChatProvider</a></li>
+    <li class="self-crumb">fetchMessageStatuses method</li>
+</ol>
+
+
+    <h5>ChatProvider class</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    missive
+      1.0.0+2
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

@@ -1,0 +1,122 @@
+' Define general variables for color palette
+' !PRIMARY_COLOR = "#625D92"
+' !SECONDARY_COLOR = "#353446"
+' !ACCENT_COLOR = "#957DAD"
+' !TEXT_PRIMARY_COLOR = "#EDEDED"
+' !TEXT_SECONDARY_COLOR = "#C4C4C4"
+' !BACKGROUND_COLOR = "#2B2B2B"
+' !ERROR_COLOR = "#D291BC"
+
+!define BACKGROUND_COLOR transparent 
+skinparam {
+    BackgroundColor BACKGROUND_COLOR
+    Shadowing false
+    ArrowColor PRIMARY_COLOR
+    ArrowFontColor TEXT_PRIMARY_COLOR
+    ArrowFontSize 13
+
+    DefaultFontName Calibri
+    DefaultFontSize 13
+    DefaultFontColor TEXT_PRIMARY_COLOR
+    DefaultFontStyle normal
+    ActorBackgroundColor SECONDARY_COLOR
+    ActorBorderColor ACCENT_COLOR
+    ActorFontColor TEXT_PRIMARY_COLOR
+
+    ComponentBackgroundColor SECONDARY_COLOR
+    ComponentBorderColor ACCENT_COLOR
+    ComponentFontColor TEXT_PRIMARY_COLOR
+
+    DatabaseBackgroundColor SECONDARY_COLOR
+    DatabaseBorderColor ACCENT_COLOR
+    DatabaseFontColor TEXT_PRIMARY_COLOR
+
+    ArtifactBackgroundColor SECONDARY_COLOR
+    ArtifactBorderColor ACCENT_COLOR
+    ArtifactFontColor TEXT_PRIMARY_COLOR
+
+    NodeBackgroundColor SECONDARY_COLOR
+    NodeBorderColor ACCENT_COLOR
+    NodeFontColor TEXT_PRIMARY_COLOR
+
+    UsecaseBackgroundColor SECONDARY_COLOR
+    UsecaseBorderColor ACCENT_COLOR
+    UsecaseFontColor TEXT_PRIMARY_COLOR
+
+    FolderBackgroundColor SECONDARY_COLOR
+    FolderBorderColor ACCENT_COLOR
+    FolderFontColor TEXT_PRIMARY_COLOR
+
+    FrameBackgroundColor SECONDARY_COLOR
+    FrameBorderColor ACCENT_COLOR
+    FrameFontColor TEXT_PRIMARY_COLOR
+
+    RectangleBackgroundColor SECONDARY_COLOR
+    RectangleBorderColor ACCENT_COLOR
+    RectangleFontColor TEXT_PRIMARY_COLOR
+
+    AgentBackgroundColor SECONDARY_COLOR
+    AgentBorderColor ACCENT_COLOR
+    AgentFontColor TEXT_PRIMARY_COLOR
+
+    BoundaryBackgroundColor SECONDARY_COLOR
+    BoundaryBorderColor ACCENT_COLOR
+    BoundaryFontColor TEXT_PRIMARY_COLOR
+
+    ControlBackgroundColor SECONDARY_COLOR
+    ControlBorderColor ACCENT_COLOR
+    ControlFontColor TEXT_PRIMARY_COLOR
+
+    EntityBackgroundColor SECONDARY_COLOR
+    EntityBorderColor ACCENT_COLOR
+    EntityFontColor TEXT_PRIMARY_COLOR
+
+    InterfaceBackgroundColor SECONDARY_COLOR
+    InterfaceBorderColor ACCENT_COLOR
+    InterfaceFontColor TEXT_PRIMARY_COLOR
+
+    PackageBackgroundColor SECONDARY_COLOR
+    PackageBorderColor ACCENT_COLOR
+    PackageFontColor TEXT_PRIMARY_COLOR
+
+    QueueBackgroundColor SECONDARY_COLOR
+    QueueBorderColor ACCENT_COLOR
+    QueueFontColor TEXT_PRIMARY_COLOR
+
+    
+    ClassBackgroundColor PRIMARY_COLOR
+    ClassBorderColor ACCENT_COLOR
+    ClassFontColor #FFFFFF
+    ClassAttributeFontColor #FFFFFF
+
+    CloudBackgroundColor SECONDARY_COLOR
+    CloudBorderColor ACCENT_COLOR
+    CloudFontColor TEXT_PRIMARY_COLOR
+
+    StorageBackgroundColor SECONDARY_COLOR
+    StorageBorderColor ACCENT_COLOR
+    StorageFontColor TEXT_PRIMARY_COLOR
+
+    LabelBackgroundColor BACKGROUND_COLOR
+    LabelBorderColor BACKGROUND_COLOR
+    LabelFontColor TEXT_PRIMARY_COLOR
+
+    LegendBackgroundColor SECONDARY_COLOR
+    LegendBorderColor ACCENT_COLOR
+    LegendFontColor TEXT_PRIMARY_COLOR
+
+    NoteBackgroundColor ACCENT_COLOR
+    NoteBorderColor ACCENT_COLOR
+    NoteFontColor SECONDARY_COLOR
+    
+    ParticipantBackgroundColor PRIMARY_COLOR
+    ParticipantBorderColor ACCENT_COLOR
+    ParticipantFontColor #FFFFFF
+    
+    SequenceGroupBackgroundColor PRIMARY_COLOR
+    SequenceGroupBorderColor ACCENT_COLOR
+    SequenceGroupHeaderFontColor #FFFFFF
+    
+    SequenceLifeLineBorderColor ACCENT_COLOR
+    SequenceLifeLineBackgroundColor ACCENT_COLOR
+}

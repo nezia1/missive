@@ -1,0 +1,15 @@
+@startuml signal_provider
+!include ../../include/themes/light.puml
+class SignalProvider {
+  -SecureStorageIdentityKeyStore _identityKeyStore
+  -SecureStoragePreKeyStore _preKeyStore
+  -SecureStorageSignedPreKeyStore _signedPreKeyStore
+  -SecureStorageSessionStore _sessionStore
+  -Logger _logger
+  +Future<void> initialize(bool installing, String name, String? accessToken)
+  +Future<PreKeyBundle?> fetchPreKeyBundle(String name, String accessToken)
+  +Future<void> buildSession(String name, String accessToken)
+  +Future<CiphertextMessage> encrypt(String name, String message)
+  +Future<String> decrypt(CiphertextMessage message, SignalProtocolAddress senderAddress)
+}
+@enduml

@@ -1,0 +1,28 @@
+@startuml realm_conversation
+!include ../../include/themes/light.puml
+class _Conversation {
+  +String username
+  +List<_PlaintextMessage> messages
+}
+
+class _PlaintextMessage {
+  +String id
+  +String content
+  +bool own
+  +String? receiver
+  +DateTime sentAt
+  +String? statusString
+  +Status status
+}
+
+class Status {
+  +String pending
+  +String sent
+  +String received
+  +String read
+  +String error
+}
+
+_Conversation "1" -- "*" _PlaintextMessage
+_PlaintextMessage *-- Status : statusString
+@enduml

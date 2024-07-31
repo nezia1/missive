@@ -1,0 +1,28 @@
+@startuml sending-message
+!include ../include/themes/light.puml
+actor "Envoyeur" as Sender
+participant "Serveur WebSocket" as WebSocket
+database "Base de données" as Database
+actor "Destinataire" as Receiver
+
+Sender -> WebSocket : Envoi d'un message (protocole WebSocket)
+activate WebSocket
+WebSocket -> WebSocket : Vérification du destinataire \n(récupération de la connexion)
+
+alt Destinataire en ligne
+    WebSocket -> Receiver : Envoi du message
+    activate Receiver
+    WebSocket -> Sender : Confirmation de la réception
+    deactivate Receiver
+else Destinataire hors ligne
+    WebSocket -> Database : Requête d'enregistrement du message
+    activate Database
+    Database --> WebSocket : Confirmation de l'enregistrement
+    deactivate Database
+    WebSocket -> Receiver : Envoi d'une notification
+    alt Notification reçue
+        WebSocket -> Sender : Confirmation de l'envoi
+    end
+end
+deactivate WebSocket
+@enduml

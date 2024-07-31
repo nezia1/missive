@@ -1,0 +1,22 @@
+@startuml registration
+!include ../include/themes/light.puml
+actor "Utilisateur" as User
+participant "Application" as Client
+participant "API" as API
+database "Base de données" as DB
+
+User -> Client : Crée son compte
+activate Client
+Client -> Client : génère un ID d'enregistrement \n+ paire de clés d'identité
+Client -> API : Envoie les données
+activate API
+API -> API : Traite les données (hachage du mot de passe)
+API -> DB : Envoie les données
+activate DB
+DB -> API : Confirme l'enregistrement
+deactivate DB
+API -> Client : Renvoie jeton d'accès et de rafraîchissement
+deactivate API
+Client -> User : Redirection vers la page d'accueil 
+deactivate Client
+@enduml
