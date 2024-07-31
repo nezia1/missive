@@ -138,42 +138,19 @@ jobs:
           mkdocs build --verbose --site-dir public
 
       - name: Upload documentation
-        uses: actions/upload-artifact@v3
-        with:
-          name: server-docs
-          path: documentation/public
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [build-client-docs, build-server-docs]
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-
-      - name: Download client docs
-        uses: actions/download-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           name: client-docs
           path: client/public
 
-      - name: Download server docs
-        uses: actions/download-artifact@v3
-        with:
-          name: server-docs
-          path: documentation/public
-
-      - name: Prepare deployment directory
-        run: |
-          mkdir -p public/client-api
-          cp -r documentation/public/* public/
-          cp -r client/public/* public/client-api/
-
+    # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: [build-server-docs, build-client-docs]
+    steps:
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+        id: deployment
+        uses: actions/deploy-pages@v4
