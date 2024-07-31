@@ -106,7 +106,7 @@ jobs:
       - name: Upload documentation
         uses: actions/upload-pages-artifact@v1
         with:
-          name: client-docs
+          name: github-pages
           path: client/public
 
   build-server-docs:
@@ -140,7 +140,7 @@ jobs:
       - name: Upload documentation
         uses: actions/upload-pages-artifact@v1
         with:
-          name: server-docs
+          name: github-pages
           path: documentation/public
 
   deploy:
