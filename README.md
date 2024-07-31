@@ -10,7 +10,7 @@
 
 Missive est une application de messagerie sécurisée, basée sur le protocole Signal. Elle permet d'échanger des messages chiffrés de bout-en-bout avec différents utilisateurs. Elle a été réalisée dans le cadre du travail de diplôme de technicien ES en développement d'applications au CFPT informatique de Genève, promotion 2024.
 
-Vous pouvez retrouver la documentation complète de l'application [sur cette page](https://anthony-rdrgz.docs.ictge.ch/missive). Elle comprend une explication du fonctionnement, des choix techniques, des cas d'utilisation, ainsi que l'intégralité de mon journal de bord durant le développement de l'application.
+Vous pouvez retrouver la documentation complète de l'application [sur cette page](https://missive.nezia.dev). Elle comprend une explication du fonctionnement, des choix techniques, des cas d'utilisation, ainsi que l'intégralité de mon journal de bord durant le développement de l'application.
 
 ## Installation
 
