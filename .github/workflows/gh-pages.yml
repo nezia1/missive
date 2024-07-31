@@ -50,7 +50,7 @@ jobs:
         working-directory: server
 
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: server-test-results
           path: server/report.xml
@@ -80,7 +80,7 @@ jobs:
           flutter test --machine | dart pub global run junitreport:tojunit --output junit-report.xml
 
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: client-test-results
           path: client/junit-report.xml
@@ -104,7 +104,7 @@ jobs:
           dart doc --output='public'
 
       - name: Upload documentation
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: github-pages
           path: client/public
@@ -138,7 +138,7 @@ jobs:
           mkdocs build --verbose --site-dir public
 
       - name: Upload documentation
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: github-pages
           path: documentation/public
@@ -153,10 +153,6 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          submodules: true
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
