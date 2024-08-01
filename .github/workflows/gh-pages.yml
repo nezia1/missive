@@ -137,6 +137,8 @@ jobs:
           pip install mkdocs
 
       - name: Build documentation
+        env:
+          ENABLE_PDF_EXPORT: 1
         run: |
           cd documentation
           source venv/bin/activate
