@@ -95,8 +95,8 @@ jobs:
           name: client-test-report
           path: client
 
-      - name: Publish all JUnit test reports
-        uses: mikepenz/action-junit-report@v5
+      - name: Test report
+        uses: dorny/test-reporter@v2
         with:
           report_paths: '**/junit-report.xml'
-          check_annotations: true
+          reporter: jest-junit
