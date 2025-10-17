@@ -44,7 +44,7 @@ jobs:
         working-directory: server
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: server-test-results
           path: server/junit-report.xml
@@ -74,7 +74,8 @@ jobs:
           flutter test --machine | dart pub global run junitreport:tojunit --output junit-report.xml
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: client-test-results
           path: client/junit-report.xml
+
