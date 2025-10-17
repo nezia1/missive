@@ -1,90 +1,10 @@
-name: Missive
+name: Documentation
 on:
   push:
     branches:
       - main
-      - 'refs/tags/*'
-      - 'refs/heads/*'
   pull_request:
-
 jobs:
-  server-unit-tests:
-    runs-on: ubuntu-latest
-    services:
-      db:
-        image: postgres:13
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: test
-    env:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
-      DATABASE_URL: postgres://test:test@localhost:5432/test
-      COOKIE_SECRET: test
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 'latest'
-
-      - name: Install dependencies
-        run: |
-          cd server
-          npm install
-          npx prisma generate
-          npx prisma migrate deploy
-          npx prisma db seed
-          openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
-          openssl rsa -pubout -in private_key.pem -out public_key.pem
-
-      - name: Run tests
-        run: npm test
-        working-directory: server
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: server-test-results
-          path: server/report.xml
-
-  client-unit-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.19.6'
-
-      - name: Install dependencies
-        run: |
-          cd client
-          flutter pub get
-          dart pub global activate junitreport
-
-      - name: Run tests
-        run: |
-          cd client
-          flutter test --machine | dart pub global run junitreport:tojunit --output junit-report.xml
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: client-test-results
-          path: client/junit-report.xml
-
   build-client-docs:
     runs-on: ubuntu-latest
     steps:
