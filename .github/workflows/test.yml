@@ -1,4 +1,6 @@
 name: Unit tests
+permissions:
+  checks: write
 on:
   push:
     branches:
@@ -23,15 +25,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          submodules: false
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 'latest'
 
-      - name: Install dependencies
+      - name: Install server dependencies
         run: |
           cd server
           npm install
@@ -41,14 +41,14 @@ jobs:
           openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
           openssl rsa -pubout -in private_key.pem -out public_key.pem
 
-      - name: Run tests
+      - name: Run server tests
         run: npm test
         working-directory: server
 
-      - name: Upload test results
+      - name: Upload server test report
         uses: actions/upload-artifact@v4
         with:
-          name: server-test-results
+          name: server-test-report
           path: server/junit-report.xml
 
   client-unit-tests:
@@ -56,27 +56,46 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          submodules: false
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.6'
 
-      - name: Install dependencies
+      - name: Install client dependencies
         run: |
           cd client
           flutter pub get
           dart pub global activate junitreport
 
-      - name: Run tests
+      - name: Run client tests
         run: |
           cd client
           flutter test --machine | dart pub global run junitreport:tojunit --output junit-report.xml
 
-      - name: Upload test results
+      - name: Upload client test report
         uses: actions/upload-artifact@v4
         with:
-          name: client-test-results
+          name: client-test-report
           path: client/junit-report.xml
+
+  publish-tests:
+    runs-on: ubuntu-latest
+    needs: [server-unit-tests, client-unit-tests]
+    steps:
+      - name: Download server test report
+        uses: actions/download-artifact@v4
+        with:
+          name: server-test-report
+          path: server
+
+      - name: Download client test report
+        uses: actions/download-artifact@v4
+        with:
+          name: client-test-report
+          path: client
+
+      - name: Publish all JUnit test reports
+        uses: mikepenz/action-junit-report@v5
+        with:
+          report_paths: '**/junit-report.xml'
