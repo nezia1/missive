@@ -99,3 +99,4 @@ jobs:
         uses: mikepenz/action-junit-report@v5
         with:
           report_paths: '**/junit-report.xml'
+          check_annotations: true
