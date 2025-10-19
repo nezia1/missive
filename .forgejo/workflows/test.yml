@@ -30,8 +30,8 @@ jobs:
           node-version: 'latest'
 
       - name: Install dependencies
+        working-directory: server
         run: |
-          cd server
           npm install
           npx prisma generate
           npx prisma migrate deploy
@@ -40,14 +40,8 @@ jobs:
           openssl rsa -pubout -in private_key.pem -out public_key.pem
 
       - name: Run tests
-        run: npm test
         working-directory: server
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v3
-        with:
-          name: server-test-results
-          path: server/junit-report.xml
+        run: npm test
 
   client-unit-tests:
     runs-on: ubuntu-latest
@@ -63,19 +57,11 @@ jobs:
           flutter-version: '3.19.6'
 
       - name: Install dependencies
+        working-directory: client
         run: |
-          cd client
           flutter pub get
           dart pub global activate junitreport
 
       - name: Run tests
-        run: |
-          cd client
-          flutter test --machine | dart pub global run junitreport:tojunit --output junit-report.xml
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v3
-        with:
-          name: client-test-results
-          path: client/junit-report.xml
-
+        working-directory: client
+        run: flutter test --machine
